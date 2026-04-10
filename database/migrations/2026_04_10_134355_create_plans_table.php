@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('num-weeks')->default(4);
+            $table->integer('num_weeks')->default(4);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('pt_id')->costraind('users')->nullOnDelete();
             $table->timestamps();

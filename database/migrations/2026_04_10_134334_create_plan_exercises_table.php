@@ -29,6 +29,8 @@ return new class extends Migration
             // Numero di ripetizioni 
             $table->integer('reps');
 
+            $table->string('rest_time')->nullable();
+
             $table->timestamps();
         });
     }

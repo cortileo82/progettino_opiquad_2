@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'role', 'trainer_id', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -30,5 +30,29 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    // 1. Relazione: un cliente ha un solo Personal Trainer
+    public function trainer() 
+    {
+        return $this->belongsTo(User::class, 'trainer_id');
+    }
+
+    // 2. Relazione: un Personal Trainer ha più clienti
+    public function clients()
+    {
+        return $this->hasMany(User::class, 'trainer_id');
+    }
+
+    // 3. Relazione: un Personal Trainer può creare più schede
+    public function createdPlans()
+    {
+        return $this->hasMany(Plan::class, 'pt_id');
+    }
+
+    // 4. Relazione: un cliente può avere più schede
+    public function assignedPlans()
+    {
+        return $this->hasMany(Plan::class, 'user_id');
     }
 }
