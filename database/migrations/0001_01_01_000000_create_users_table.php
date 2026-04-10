@@ -14,9 +14,17 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('role')->default('client');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Relazione ricorsava sulla tabella users per permettere di associare ai clienti un personal trainer
+            // nullable per permettere il campo vuoto ad admin e personal trainer
+            // constrained per obbligare la presenza in users dell'id inserito
+            // nullOnDelete per permettere la cancellazione dei personal trainer senza creare problemi ai relativi clienti
+            $table->foreignId('trainer_id')->nullable()->constrained('users')->nullOnDelete();
+
             $table->rememberToken();
             $table->timestamps();
         });
