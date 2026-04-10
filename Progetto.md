@@ -1,4 +1,4 @@
-# Progetto Palestra: "FitTrack" (Laravel Backend + React Frontend)
+# Progetto Palestra: "Tempra" (Laravel Backend + React Frontend)
 
 ## Obiettivo del Progetto
 Creare una semplice applicazione web per la gestione di schede di allenamento. 
