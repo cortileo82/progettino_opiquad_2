@@ -5,7 +5,8 @@ import {
     LayoutGrid, 
     Dumbbell, 
     Users, 
-    ClipboardList 
+    ClipboardList,
+    Plus // <--- Import dell'icona fisica Plus
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -54,17 +55,20 @@ const allNavItems: SidebarItem[] = [
         icon: ClipboardList,
         roles: ['client'],
     },
+    {
+        title: 'Inserisci nuovo esercizio', 
+        href: '/exercises/create',
+        icon: Plus, 
+        roles: ['admin'],
+    }, 
 ];
 
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
-    // 2. Recuperiamo l'utente dalle props di Inertia
-    // Usiamo "as any" per bypassare temporaneamente i controlli rigidi di TS sull'oggetto auth
     const { auth } = usePage().props as any;
     const user = auth.user;
 
-    // 3. Filtriamo i link in base al ruolo dell'utente loggato
     const filteredNavItems = allNavItems.filter((item) => 
         item.roles.includes(user?.role || 'client')
     );
@@ -84,7 +88,6 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                {/* Passiamo l'array filtrato al componente NavMain */}
                 <NavMain items={filteredNavItems} />
             </SidebarContent>
 
