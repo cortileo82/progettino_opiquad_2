@@ -2,20 +2,29 @@
 
 use App\Models\User;
 use App\Models\Exercise;
+use App\Models\WorkoutPlan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ExerciseController;
+use App\Http\Controllers\ClientAssignmentController;
 
-// Rotta pubblica (Welcome)
+// ------------------------------------------------
+// ROTTE PUBBLICHE
+// ------------------------------------------------
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
-// Rotte protette da login
+// ------------------------------------------------
+// ROTTE PROTETTE (AUTH & VERIFIED)
+// ------------------------------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    // Reindirizzamento intelligente basato sul ruolo
+    /**
+     * Reindirizzamento intelligente basato sul ruolo.
+     */
     Route::get('/dashboard', function () {
         $role = auth()->user()->role;
 
@@ -27,7 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // ------------------------------------------------
-    // ROTTE ADMIN
+    // AREA ADMIN
     // ------------------------------------------------
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/dashboard', function () {
@@ -41,16 +50,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ]);
         })->name('admin.dashboard');
 
-        Route::resource('exercises', \App\Http\Controllers\ExerciseController::class);
+        Route::resource('exercises', ExerciseController::class);
     });
 
     // ------------------------------------------------
-    // ROTTE PERSONAL TRAINER
+    // AREA PERSONAL TRAINER (PT)
     // ------------------------------------------------
     Route::middleware('role:pt')->prefix('pt')->group(function () {
+        
+        // Dashboard PT: lista atleti già associati
         Route::get('/dashboard', function () {
             return Inertia::render('pt/dashboard', [
-                // Recupera solo i clienti assegnati a questo PT
                 'clients' => User::where('role', 'client')
                                  ->where('trainer_id', auth()->id())
                                  ->get(),
@@ -60,18 +70,48 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ]);
         })->name('pt.dashboard');
 
-        // Rotta per vedere la lista completa dei clienti da associare
-        Route::get('/clients/assign', function () {
-            return Inertia::render('pt/clients/assign', [
-                'availableClients' => User::where('role', 'client')
-                                        ->whereNull('trainer_id')
-                                        ->get()
+        // --- BACHECA NUOVI CLIENTI ---
+        // Visualizza solo utenti 'client' con trainer_id NULL
+        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('pt.clients.assign');
+        
+        // Azione per "reclamare" un cliente (aggiorna trainer_id)
+        Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('pt.clients.store');
+
+        // --- GESTIONE SCHEDE (WORKOUT PLANS) ---
+        // Form creazione scheda
+        Route::get('/plans/create/{client}', function (User $client) {
+            // Sicurezza: puoi creare schede solo per i tuoi atleti
+            if ($client->trainer_id !== auth()->id()) {
+                abort(403, 'Questo atleta non è associato al tuo profilo.');
+            }
+
+            return Inertia::render('pt/plans/create', [
+                'client' => $client,
+                'exercises_list' => Exercise::all()
             ]);
-        })->name('pt.clients.assign');
+        })->name('pt.plans.create');
+
+        // Salvataggio effettivo della scheda nel DB
+        Route::post('/plans/store', function (Request $request) {
+            $data = $request->validate([
+                'user_id'      => 'required|exists:users,id',
+                'name'         => 'required|string|max:255',
+                'workout_data' => 'required|array', 
+            ]);
+
+            WorkoutPlan::create([
+                'user_id'    => $data['user_id'],
+                'trainer_id' => auth()->id(),
+                'name'       => $data['name'],
+                'exercises'  => $data['workout_data'],
+            ]);
+
+            return redirect()->route('pt.dashboard')->with('success', 'Scheda inviata all\'atleta!');
+        })->name('pt.plans.store');
     });
 
     // ------------------------------------------------
-    // ROTTE CLIENTE
+    // AREA CLIENTE
     // ------------------------------------------------
     Route::middleware('role:client')->prefix('client')->group(function () {
         Route::get('/dashboard', function () {
