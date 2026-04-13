@@ -33,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('admin/dashboard');
         })->name('admin.dashboard');
 
-
+        Route::resource('exercises', \App\Http\Controllers\ExerciseController::class);
     });
 
     // ------------------------------------------------
