@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     Route::middleware('role:admin')->prefix('admin')->group(function ()  {
         Route::get('/dashboard', function () {
-            return Inertia::render('Admin/Dashboard');
+            return Inertia::render('admin/dashboard');
         })->name('admin.dashboard');
 
 
@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     Route::middleware('role:pt')->prefix('pt')->group(function () {
         Route::get('/dashboard', function () {
-            return Inertia::render('PT/Dashboard');
+            return Inertia::render('pt/dashboard');
         })->name('pt.dashboard');
         
         
@@ -52,7 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     Route::middleware('role:client')->prefix('client')->group(function () {
         Route::get('/dashboard', function () {
-            return Inertia::render('Client/Dashboard');
+            return Inertia::render('client/dashboard');
         })->name('client.dashboard');
         
         

@@ -21,36 +21,36 @@ class DatabaseSeeder extends Seeder
         $defaultPassword = Hash::make('password123');
 
         $admin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@fittrack.com',
+            'name' => 'First Admin',
+            'email' => 'admin@tempra.com',
             'password' => $defaultPassword,
             'role' => 'admin',
         ]);
 
         $pt1 = User::create([
             'name' => 'Trainer Marco',
-            'email' => 'marco@fittrack.com',
+            'email' => 'marco@tempra.com',
             'password' => $defaultPassword,
             'role' => 'pt',
         ]);
 
         $pt2 = User::create([
             'name' => 'Trainer Giulia',
-            'email' => 'giulia@fittrack.com',
+            'email' => 'giulia@tempra.com',
             'password' => $defaultPassword,
             'role' => 'pt',
         ]);
 
         $client1 = User::create([
             'name' => 'Cliente Luca',
-            'email' => 'luca@fittrack.com',
+            'email' => 'luca@tempra.com',
             'password' => $defaultPassword,
             'role' => 'client',
         ]);
 
         $client2 = User::create([
             'name' => 'Cliente Sara',
-            'email' => 'sara@fittrack.com',
+            'email' => 'sara@tempra.com',
             'password' => $defaultPassword,
             'role' => 'client',
         ]);
