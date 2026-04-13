@@ -1,0 +1,55 @@
+import AppLayout from '@/layouts/app-layout';
+import { Head, Link } from '@inertiajs/react';
+import { UserPlus, FileText, PlusCircle } from 'lucide-react';
+
+export default function MyClients({ clients }: any) {
+    return (
+        <AppLayout breadcrumbs={[{ title: 'I Miei Clienti', href: '/pt/clients' }]}>
+            <Head title="I Miei Clienti" />
+
+            <div className="p-6 flex flex-col gap-6">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold">I Miei Atleti</h1>
+                    <Link 
+                        href="/pt/clients/assign" 
+                        className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
+                    >
+                        <UserPlus size={18} /> Associa Cliente
+                    </Link>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {clients.map((client: any) => (
+                        <div key={client.id} className="bg-sidebar border border-sidebar-border rounded-xl p-5 shadow-sm">
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 className="font-bold text-lg">{client.name}</h3>
+                                    <p className="text-sm text-muted-foreground">{client.email}</p>
+                                </div>
+                                <span className="bg-green-500/10 text-green-500 text-xs px-2 py-1 rounded-full font-medium">Attivo</span>
+                            </div>
+
+                            <div className="flex flex-col gap-2 mt-4">
+                                <button className="flex items-center gap-2 text-sm text-blue-500 hover:underline">
+                                    <FileText size={16} /> Visualizza Schede Attuali
+                                </button>
+                                <Link 
+                                    href={`/pt/plans/create?client_id=${client.id}`}
+                                    className="flex items-center gap-2 text-sm text-orange-500 hover:underline"
+                                >
+                                    <PlusCircle size={16} /> Inserisci Nuova Scheda
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+
+                    {clients.length === 0 && (
+                        <p className="text-muted-foreground italic col-span-full text-center py-10">
+                            Non hai ancora clienti associati. Clicca su "Associa Cliente" per iniziare.
+                        </p>
+                    )}
+                </div>
+            </div>
+        </AppLayout>
+    );
+}
