@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use App\Http\Controllers\ExerciseController;
-use App\Http\Controllers\ClientAssignmentController;
+use App\Http\Controllers\Admin\ExerciseController;
+use App\Http\Controllers\PT\DashboardController as PTDashboard;
+use App\Http\Controllers\PT\ClientAssignmentController;
+use App\Http\Controllers\PT\PlanController;
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
@@ -22,9 +24,9 @@ Route::inertia('/', 'welcome', [
 // ------------------------------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    /**
-     * Reindirizzamento intelligente basato sul ruolo.
-     */
+    
+    // Reindirizzamento basato sul ruolo.
+    
     Route::get('/dashboard', function () {
         $role = auth()->user()->role;
 
@@ -58,56 +60,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     Route::middleware('role:pt')->prefix('pt')->group(function () {
         
-        // Dashboard PT: lista atleti già associati
-        Route::get('/dashboard', function () {
-            return Inertia::render('pt/dashboard', [
-                'clients' => User::where('role', 'client')
-                                 ->where('trainer_id', auth()->id())
-                                 ->get(),
-                'stats' => [
-                    'my_clients_count' => User::where('trainer_id', auth()->id())->count(),
-                ]
-            ]);
-        })->name('pt.dashboard');
-
-        // --- BACHECA NUOVI CLIENTI ---
-        // Visualizza solo utenti 'client' con trainer_id NULL
-        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('pt.clients.assign');
+        // 1. DASHBOARD (Invocabile)
+        // Non specifichiamo un metodo (come 'index') perché la classe fa solo questo.
+        Route::get('/dashboard', PTDashboard::class)->name('pt.dashboard');
         
-        // Azione per "reclamare" un cliente (aggiorna trainer_id)
+        // 2. ASSEGNAZIONE CLIENTI
+        // Qui specifichiamo 'index' e 'store' perché è un controller con più funzioni.
+        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('pt.clients.assign');
         Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('pt.clients.store');
 
-        // --- GESTIONE SCHEDE (WORKOUT PLANS) ---
-        // Form creazione scheda
-        Route::get('/plans/create/{client}', function (User $client) {
-            // Sicurezza: puoi creare schede solo per i tuoi atleti
-            if ($client->trainer_id !== auth()->id()) {
-                abort(403, 'Questo atleta non è associato al tuo profilo.');
-            }
+        // 3. GESTIONE SCHEDE
+        Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('pt.plans.create');
+        Route::post('/plans/store', [PlanController::class, 'store'])->name('pt.plans.store');    
 
-            return Inertia::render('pt/plans/create', [
-                'client' => $client,
-                'exercises_list' => Exercise::all()
-            ]);
-        })->name('pt.plans.create');
-
-        // Salvataggio effettivo della scheda nel DB
-        Route::post('/plans/store', function (Request $request) {
-            $data = $request->validate([
-                'user_id'      => 'required|exists:users,id',
-                'name'         => 'required|string|max:255',
-                'workout_data' => 'required|array', 
-            ]);
-
-            WorkoutPlan::create([
-                'user_id'    => $data['user_id'],
-                'trainer_id' => auth()->id(),
-                'name'       => $data['name'],
-                'exercises'  => $data['workout_data'],
-            ]);
-
-            return redirect()->route('pt.dashboard')->with('success', 'Scheda inviata all\'atleta!');
-        })->name('pt.plans.store');
     });
 
     // ------------------------------------------------

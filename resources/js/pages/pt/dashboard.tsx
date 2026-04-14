@@ -2,7 +2,8 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { UserPlus, FileText, PlusCircle } from 'lucide-react';
 
-export default function MyClients({ clients }: any) {
+export default function MyClients({ clients, stats }: any) {
+
     return (
         <AppLayout breadcrumbs={[{ title: 'I Miei Clienti', href: '/pt/clients' }]}>
             <Head title="I Miei Clienti" />

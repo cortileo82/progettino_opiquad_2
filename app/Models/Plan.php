@@ -5,10 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['id', 'name', 'num_weeks', 'user_id', 'pt_id'])]
 class Plan extends Model
 {
     use HasFactory;
+
+    // Necessariamente scritto così per il mass assignment nel DB eseguito dal PlanController
+    protected $fillable = [
+        'name', 
+        'num_weeks', 
+        'user_id', 
+        'pt_id'
+    ];
 
     // 1. Relazione: la scheda è di un cliente
     public function client()
