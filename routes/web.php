@@ -9,9 +9,9 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 // Controller
-use App\Http\Controllers\ExerciseController;
-use App\Http\Controllers\ClientAssignmentController;
-use App\Http\Controllers\PlanController; // Il nuovo controller per le schede
+use App\Http\Controllers\ExerciseController; // Controller per gli esercizi
+use App\Http\Controllers\ClientAssignmentController; // Controller per assegnare client a PT
+use App\Http\Controllers\PT\PlanController; // Controller per le schede 
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
