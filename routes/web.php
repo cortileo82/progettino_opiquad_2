@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
+use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController;
 
@@ -62,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // 1. DASHBOARD (Invocabile)
         // Non specifichiamo un metodo (come 'index') perché la classe fa solo questo.
-        Route::get('/dashboard', PTDashboard::class)->name('pt.dashboard');
+        Route::get('/dashboard', PTDashboard::class)->name('dashboard');
         
         // 2. ASSEGNAZIONE CLIENTI
         // Qui specifichiamo 'index' e 'store' perché è un controller con più funzioni.
@@ -79,9 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // AREA CLIENTE
     // ------------------------------------------------
     Route::middleware('role:client')->prefix('client')->name('client.')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('client/dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', ClientDashboard::class)->name('dashboard');
     });
 
 });
