@@ -4,13 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon; // Importante per la gestione delle date
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Carbon\Carbon;
 
 class Plan extends Model
 {
     use HasFactory;
 
-    // Includiamo gli attributi calcolati quando il modello viene convertito in JSON/Array per Inertia
+    /**
+     * Gli attributi che vengono aggiunti automaticamente quando il modello
+     * viene convertito in JSON (utile per Vue/React con Inertia).
+     */
     protected $appends = ['is_active', 'end_date'];
 
     protected $fillable = [
@@ -22,50 +27,61 @@ class Plan extends Model
 
     /**
      * ATTRIBUTO: is_active
-     * Determina se la scheda è ancora valida basandosi sulla data di creazione e le settimane.
+     * Determina se la scheda è ancora valida basandosi sulla data attuale.
      */
-    public function getIsActiveAttribute()
+    public function getIsActiveAttribute(): bool
     {
+        if (!$this->created_at) return true;
+
         $now = Carbon::now();
-        // Calcola la fine: data creazione + numero settimane
         $endDate = $this->created_at->copy()->addWeeks($this->num_weeks);
         
-        return $now->between($this->created_at, $endDate);
+        return $now->lte($endDate);
     }
 
     /**
      * ATTRIBUTO: end_date
-     * Restituisce la data di scadenza formattata (es: 14/05/2026).
+     * Restituisce la data di scadenza calcolata e formattata.
      */
-    public function getEndDateAttribute()
+    public function getEndDateAttribute(): string
     {
-        return $this->created_at->copy()->addWeeks($this->num_weeks)->format('d/m/Y');
+        if (!$this->created_at) return 'N/A';
+
+        return $this->created_at->copy()
+            ->addWeeks($this->num_weeks)
+            ->format('d/m/Y');
     }
 
-    // 1. Relazione: la scheda è di un cliente
-    public function client()
+    /**
+     * Relazione: Il cliente a cui appartiene la scheda.
+     */
+    public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // 2. Relazione: la scheda è fatta da un Personal Trainer
-    public function trainer()
+    /**
+     * Relazione: Il Personal Trainer che ha creato la scheda.
+     */
+    public function trainer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'pt_id');
     }
 
-    // 3. Relazione: alla scheda sono associati degli esercizi
-    public function exercises()
+    /**
+     * Relazione: Gli esercizi associati alla scheda.
+     * Include la nuova colonna 'week_number' nella tabella pivot.
+     */
+    public function exercises(): BelongsToMany
     {
-        // NOTA: Assicurati che il nome della tabella pivot sia corretto nel tuo DB.
-        // Nel tuo codice precedente era 'plan_exercises'.
         return $this->belongsToMany(Exercise::class, 'plan_exercises')
-<<<<<<< HEAD
-                    ->withPivot('day_of_week', 'sets', 'reps', 'rest_time')
-                    ->withTimestamps();
-=======
-                    ->withPivot('day_of_week', 'week_number', 'sets', 'reps', 'rest_time')
-                    ->withTimeStamps();
->>>>>>> 559eefc552189407a3d6cbdd4dfea22c2f651d93
+            ->withPivot([
+                'day_of_week', 
+                'week_number', // La colonna che abbiamo aggiunto con la migrazione
+                'sets', 
+                'reps', 
+                'rest_time'
+            ])
+            ->withTimestamps();
     }
 }

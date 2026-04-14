@@ -21,15 +21,19 @@ class Exercise extends Model
 
     /**
      * Relazione Molti-a-Molti con la tabella Plans.
-     * 
-     * Un esercizio può essere presente in molte schede diverse.
-     * Usiamo withPivot per accedere ai dati extra (day_of_week, sets, reps) 
-     * presenti nella tabella ponte 'plan_exercises'.
+     * * Un esercizio può essere presente in molte schede diverse.
+     * Sincronizziamo i campi pivot con quelli definiti nel modello Plan.
      */
     public function plans(): BelongsToMany
     {
         return $this->belongsToMany(Plan::class, 'plan_exercises')
-                    ->withPivot('day_of_week', 'sets', 'reps')
-                    ->withTimestamps();
+            ->withPivot([
+                'day_of_week', 
+                'week_number', // Aggiunto per coerenza con la nuova migrazione
+                'sets', 
+                'reps', 
+                'rest_time'    // Aggiunto per completezza
+            ])
+            ->withTimestamps();
     }
 }
