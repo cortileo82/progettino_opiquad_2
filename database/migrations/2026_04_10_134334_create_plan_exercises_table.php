@@ -23,6 +23,9 @@ return new class extends Migration
             // Giorno della settimana (es. "Lunedì" o un numero da 1 a 7)
             $table->string('day_of_week'); 
 
+            // Settimana della scheda
+            $table->integer('week_number')->after('exercise_id')->default(1);
+
             // Numero di serie
             $table->integer('sets');
 

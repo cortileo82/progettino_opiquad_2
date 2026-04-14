@@ -60,7 +60,12 @@ class Plan extends Model
         // NOTA: Assicurati che il nome della tabella pivot sia corretto nel tuo DB.
         // Nel tuo codice precedente era 'plan_exercises'.
         return $this->belongsToMany(Exercise::class, 'plan_exercises')
+<<<<<<< HEAD
                     ->withPivot('day_of_week', 'sets', 'reps', 'rest_time')
                     ->withTimestamps();
+=======
+                    ->withPivot('day_of_week', 'week_number', 'sets', 'reps', 'rest_time')
+                    ->withTimeStamps();
+>>>>>>> 559eefc552189407a3d6cbdd4dfea22c2f651d93
     }
 }

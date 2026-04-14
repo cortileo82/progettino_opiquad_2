@@ -74,6 +74,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // AREA PERSONAL TRAINER (PT)
     // ------------------------------------------------
     Route::middleware('role:pt')->prefix('pt')->name('pt.')->group(function () {
+<<<<<<< HEAD
+=======
+        
+        // 1. DASHBOARD
+        // Diventa: pt.dashboard
+>>>>>>> 559eefc552189407a3d6cbdd4dfea22c2f651d93
         Route::get('/dashboard', PTDashboard::class)->name('dashboard');
         Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('clients.assign');
         Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('clients.store');

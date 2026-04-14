@@ -34,6 +34,7 @@ class StorePlanRequest extends FormRequest
             'exercises.*.sets'        => 'required|integer|min:1',
             'exercises.*.reps'        => 'required|string',
             'exercises.*.day_of_week' => 'required|string',
+            'exercises.*.week_number' => 'required|integer|min:1',
             'exercises.*.rest_time'   => 'nullable|string',
         ];
     }
