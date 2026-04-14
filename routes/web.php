@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 // Controllers
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
+use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController;
 
@@ -62,8 +63,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     Route::middleware('role:pt')->prefix('pt')->name('pt.')->group(function () {
         
+<<<<<<< HEAD
         // 1. DASHBOARD
         // Diventa: pt.dashboard
+=======
+        // 1. DASHBOARD (Invocabile)
+        // Non specifichiamo un metodo (come 'index') perché la classe fa solo questo.
+>>>>>>> 196836fbb83c05eeeb25293dbf77695099a00209
         Route::get('/dashboard', PTDashboard::class)->name('dashboard');
         
         // 2. ASSEGNAZIONE CLIENTI
@@ -82,9 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // AREA CLIENTE
     // ------------------------------------------------
     Route::middleware('role:client')->prefix('client')->name('client.')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('client/dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', ClientDashboard::class)->name('dashboard');
     });
 
 });
