@@ -34,7 +34,7 @@ class Plan extends Model
     {
         // withPivot dice a Laravel di "pescare" anche le serie, le ripetizioni e i giorni dalla tabella ponte.
         return $this->belongsToMany(Exercise::class, 'plan_exercises')
-                    ->withPivot('day_of_week', 'sets', 'reps', 'rest_time')
+                    ->withPivot('day_of_week', 'week_number', 'sets', 'reps', 'rest_time')
                     ->withTimeStamps();
     }
 }

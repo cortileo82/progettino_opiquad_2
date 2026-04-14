@@ -42,19 +42,16 @@ class PlanController extends Controller
                 'num_weeks' => $data['num_weeks'],
             ]);
 
-            // 2. Si trasformano i dati per il Sync
-            $pivotData = [];
+            // 2. Si trasformano i dati e li si accodano
             foreach ($data['exercises'] as $item) {
-                $pivotData[$item['exercise_id']] = [
+                $plan->exercises()->attach($item['exercise_id'], [
+                    'week_number'  => $item['week_number'], // <-- Inseriamo la settimana!
                     'sets'         => $item['sets'],
                     'reps'         => $item['reps'],
                     'day_of_week'  => $item['day_of_week'],
                     'rest_time'    => $item['rest_time'] ?? null,
-                ];
+                ]);
             }
-
-            // 3. Si scrive nella tabella pivot per la corrispondeza scheda-esercizi
-            $plan->exercises()->sync($pivotData);
 
         });
 
