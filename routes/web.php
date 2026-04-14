@@ -2,7 +2,7 @@
 
 use App\Models\User;
 use App\Models\Exercise;
-use App\Models\WorkoutPlan;
+use App\Models\Plan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
@@ -40,7 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     // AREA ADMIN
     // ------------------------------------------------
-    Route::middleware('role:admin')->prefix('admin')->group(function () {
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', function () {
             return Inertia::render('admin/dashboard', [
                 'stats' => [
@@ -50,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ],
                 'exercises' => Exercise::latest()->take(10)->get(),
             ]);
-        })->name('admin.dashboard');
+        })->name('dashboard');
 
         Route::resource('exercises', ExerciseController::class);
     });
@@ -58,7 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     // AREA PERSONAL TRAINER (PT)
     // ------------------------------------------------
-    Route::middleware('role:pt')->prefix('pt')->group(function () {
+    Route::middleware('role:pt')->prefix('pt')->name('pt.')->group(function () {
         
         // 1. DASHBOARD (Invocabile)
         // Non specifichiamo un metodo (come 'index') perché la classe fa solo questo.
@@ -78,10 +78,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     // AREA CLIENTE
     // ------------------------------------------------
-    Route::middleware('role:client')->prefix('client')->group(function () {
+    Route::middleware('role:client')->prefix('client')->name('client.')->group(function () {
         Route::get('/dashboard', function () {
             return Inertia::render('client/dashboard');
-        })->name('client.dashboard');
+        })->name('dashboard');
     });
 
 });

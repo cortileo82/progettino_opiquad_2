@@ -5,7 +5,7 @@ import { UserPlus, FileText, PlusCircle } from 'lucide-react';
 export default function MyClients({ clients, stats }: any) {
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'I Miei Clienti', href: '/pt/clients' }]}>
+        <AppLayout breadcrumbs={[{ title: 'I Miei Clienti', href: '/pt/dashboard' }]}>
             <Head title="I Miei Clienti" />
 
             <div className="p-6 flex flex-col gap-6">
@@ -27,15 +27,17 @@ export default function MyClients({ clients, stats }: any) {
                                     <h3 className="font-bold text-lg">{client.name}</h3>
                                     <p className="text-sm text-muted-foreground">{client.email}</p>
                                 </div>
-                                <span className="bg-green-500/10 text-green-500 text-xs px-2 py-1 rounded-full font-medium">Attivo</span>
                             </div>
 
                             <div className="flex flex-col gap-2 mt-4">
+                                {/* Bottone Visualizza Schede */}
                                 <button className="flex items-center gap-2 text-sm text-blue-500 hover:underline">
                                     <FileText size={16} /> Visualizza Schede Attuali
                                 </button>
+                                
+                                {/* Link Inserisci Nuova Scheda - URL CORRETTO PER IL CONTROLLER */}
                                 <Link 
-                                    href={`/pt/plans/create?client_id=${client.id}`}
+                                    href={`/pt/plans/create/${client.id}`}
                                     className="flex items-center gap-2 text-sm text-orange-500 hover:underline"
                                 >
                                     <PlusCircle size={16} /> Inserisci Nuova Scheda
