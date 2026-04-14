@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+
+// Controllers
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
@@ -25,9 +27,9 @@ Route::inertia('/', 'welcome', [
 // ------------------------------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    
-    // Reindirizzamento basato sul ruolo.
-    
+    /**
+     * Reindirizzamento basato sul ruolo.
+     */
     Route::get('/dashboard', function () {
         $role = auth()->user()->role;
 
@@ -61,18 +63,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     Route::middleware('role:pt')->prefix('pt')->name('pt.')->group(function () {
         
+<<<<<<< HEAD
+        // 1. DASHBOARD
+        // Diventa: pt.dashboard
+=======
         // 1. DASHBOARD (Invocabile)
         // Non specifichiamo un metodo (come 'index') perché la classe fa solo questo.
+>>>>>>> 196836fbb83c05eeeb25293dbf77695099a00209
         Route::get('/dashboard', PTDashboard::class)->name('dashboard');
         
         // 2. ASSEGNAZIONE CLIENTI
-        // Qui specifichiamo 'index' e 'store' perché è un controller con più funzioni.
-        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('pt.clients.assign');
-        Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('pt.clients.store');
+        // Diventano: pt.clients.assign e pt.clients.store
+        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('clients.assign');
+        Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('clients.store');
 
         // 3. GESTIONE SCHEDE
-        Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('pt.plans.create');
-        Route::post('/plans/store', [PlanController::class, 'store'])->name('pt.plans.store');    
+        // Diventano: pt.plans.create e pt.plans.store
+        Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('plans.create');
+        Route::post('/plans/store', [PlanController::class, 'store'])->name('plans.store');    
 
     });
 

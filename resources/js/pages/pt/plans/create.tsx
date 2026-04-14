@@ -34,7 +34,7 @@ export default function CreatePlan({ client, exercises_list }: Props) {
             <div className="p-4 md:p-8 max-w-5xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-2xl font-extrabold tracking-tight uppercase italic">Compila Scheda</h1>
+                        <h1 className="text-2xl font-extrabold tracking-tight uppercase italic">Compila Nuova Scheda</h1>
                         <p className="text-muted-foreground text-sm">Destinatario: <span className="text-orange-500 font-bold">{client.name}</span></p>
                     </div>
                     <Link href="/pt/dashboard" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary">
