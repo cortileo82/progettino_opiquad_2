@@ -1,12 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import { 
-    BookOpen, 
-    FolderGit2, 
     LayoutGrid, 
     Dumbbell, 
     Users, 
     ClipboardList,
-    Plus // <--- Import dell'icona fisica Plus
+    Plus 
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -29,7 +27,7 @@ interface SidebarItem extends NavItem {
     roles: string[];
 }
 
-// 1. Definiamo tutti i link della piattaforma con i relativi permessi
+// 1. Definiamo i link aggiornati con i prefissi corretti
 const allNavItems: SidebarItem[] = [
     {
         title: 'Dashboard',
@@ -39,28 +37,28 @@ const allNavItems: SidebarItem[] = [
     },
     {
         title: 'Gestione Esercizi',
-        href: '/exercises',
+        href: '/admin/exercises', // AGGIUNTO /admin
         icon: Dumbbell,
-        roles: ['admin', 'pt'],
+        roles: ['admin'], // Di solito la gestione totale è solo admin
+    },
+    {
+        title: 'Nuovo Esercizio', 
+        href: '/admin/exercises/create', // AGGIUNTO /admin
+        icon: Plus, 
+        roles: ['admin'],
     },
     {
         title: 'I Miei Clienti',
-        href: '/clients',
+        href: '/pt/clients', // Assicurati che anche qui ci sia il prefisso del ruolo se necessario
         icon: Users,
         roles: ['pt'],
     },
     {
         title: 'La Mia Scheda',
-        href: '/my-plan',
+        href: '/client/my-plan', // Prefisso client
         icon: ClipboardList,
         roles: ['client'],
     },
-    {
-        title: 'Inserisci nuovo esercizio', 
-        href: '/exercises/create',
-        icon: Plus, 
-        roles: ['admin'],
-    }, 
 ];
 
 const footerNavItems: NavItem[] = [];
@@ -69,8 +67,9 @@ export function AppSidebar() {
     const { auth } = usePage().props as any;
     const user = auth.user;
 
+    // Filtriamo gli elementi in base al ruolo dell'utente loggato
     const filteredNavItems = allNavItems.filter((item) => 
-        item.roles.includes(user?.role || 'client')
+        item.roles.includes(user?.role || '')
     );
 
     return (

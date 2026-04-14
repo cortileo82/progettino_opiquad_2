@@ -35,7 +35,7 @@ export default function Dashboard({ stats, exercises }: Props) {
             <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 {/* Intestazione */}
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase italic">
                         Benvenuto, {auth.user.name}
                     </h1>
                     <p className="text-muted-foreground">
@@ -45,8 +45,7 @@ export default function Dashboard({ stats, exercises }: Props) {
 
                 {/* --- SEZIONE CARDS STATISTICHE --- */}
                 <div className="grid gap-4 md:grid-cols-3">
-                    {/* Card Clienti */}
-                    <div className="flex items-center gap-4 rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-sm transition-hover hover:shadow-md">
+                    <div className="flex items-center gap-4 rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-sm">
                         <div className="rounded-full bg-blue-500/10 p-3 text-blue-600 dark:text-blue-400">
                             <Users size={28} />
                         </div>
@@ -56,24 +55,22 @@ export default function Dashboard({ stats, exercises }: Props) {
                         </div>
                     </div>
 
-                    {/* Card Personal Trainer */}
-                    <div className="flex items-center gap-4 rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-sm transition-hover hover:shadow-md">
+                    <div className="flex items-center gap-4 rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-sm">
                         <div className="rounded-full bg-green-500/10 p-3 text-green-600 dark:text-green-400">
                             <UserCheck size={28} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">PT Attivi</p>
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Personal Trainer</p>
                             <p className="text-3xl font-bold">{stats?.total_pts ?? 0}</p>
                         </div>
                     </div>
 
-                    {/* Card Esercizi */}
-                    <div className="flex items-center gap-4 rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-sm transition-hover hover:shadow-md">
+                    <div className="flex items-center gap-4 rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-sm">
                         <div className="rounded-full bg-orange-500/10 p-3 text-orange-600 dark:text-orange-400">
                             <Dumbbell size={28} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Esercizi</p>
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Esercizi Totali</p>
                             <p className="text-3xl font-bold">{stats?.total_exercises ?? 0}</p>
                         </div>
                     </div>
@@ -82,9 +79,11 @@ export default function Dashboard({ stats, exercises }: Props) {
                 {/* --- SEZIONE TABELLA E AZIONI --- */}
                 <div className="mt-2 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold tracking-tight">Ultimi Esercizi nel Database</h2>
+                        <h2 className="text-xl font-semibold tracking-tight uppercase italic">Ultimi Esercizi nel Database</h2>
+                        
+                        {/* LINK CORRETTO: Aggiunto /admin */}
                         <Link 
-                            href="/exercises/create" 
+                            href="/admin/exercises/create" 
                             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                         >
                             <Plus size={18} />
@@ -95,7 +94,7 @@ export default function Dashboard({ stats, exercises }: Props) {
                     <div className="rounded-xl border border-sidebar-border bg-sidebar shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
-                                <thead className="border-b border-sidebar-border bg-muted/50 text-muted-foreground">
+                                <thead className="border-b border-sidebar-border bg-muted/50 text-muted-foreground uppercase">
                                     <tr>
                                         <th className="px-6 py-4 font-semibold">Nome Esercizio</th>
                                         <th className="px-6 py-4 font-semibold text-right">Azioni</th>
@@ -105,14 +104,18 @@ export default function Dashboard({ stats, exercises }: Props) {
                                     {exercises && exercises.length > 0 ? (
                                         exercises.map((ex) => (
                                             <tr key={ex.id} className="group hover:bg-muted/30 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-foreground">
+                                                <td className="px-6 py-4 font-medium text-foreground uppercase">
                                                     {ex.name}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+                                                    {/* Qui potresti aggiungere il link Edit in futuro: /admin/exercises/${ex.id}/edit */}
+                                                    <Link 
+                                                        href={`/admin/exercises`} 
+                                                        className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
+                                                    >
                                                         Dettagli
                                                         <ChevronRight size={14} />
-                                                    </button>
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         ))
