@@ -2,13 +2,16 @@
 
 use App\Models\User;
 use App\Models\Exercise;
-use App\Models\WorkoutPlan;
+use App\Models\Plan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+
+// Controller
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ClientAssignmentController;
+use App\Http\Controllers\PlanController; // Il nuovo controller per le schede
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
@@ -38,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     // AREA ADMIN
     // ------------------------------------------------
-    Route::middleware('role:admin')->prefix('admin')->group(function () {
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', function () {
             return Inertia::render('admin/dashboard', [
                 'stats' => [
@@ -48,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ],
                 'exercises' => Exercise::latest()->take(10)->get(),
             ]);
-        })->name('admin.dashboard');
+        })->name('dashboard');
 
         Route::resource('exercises', ExerciseController::class);
     });
@@ -56,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ------------------------------------------------
     // AREA PERSONAL TRAINER (PT)
     // ------------------------------------------------
-    Route::middleware('role:pt')->prefix('pt')->group(function () {
+    Route::middleware('role:pt')->prefix('pt')->name('pt.')->group(function () {
         
         // Dashboard PT: lista atleti già associati
         Route::get('/dashboard', function () {
@@ -68,55 +71,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'my_clients_count' => User::where('trainer_id', auth()->id())->count(),
                 ]
             ]);
-        })->name('pt.dashboard');
+        })->name('dashboard');
 
         // --- BACHECA NUOVI CLIENTI ---
-        // Visualizza solo utenti 'client' con trainer_id NULL
-        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('pt.clients.assign');
-        
-        // Azione per "reclamare" un cliente (aggiorna trainer_id)
-        Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('pt.clients.store');
+        Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('clients.assign');
+        Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('clients.store');
 
-        // --- GESTIONE SCHEDE (WORKOUT PLANS) ---
-        // Form creazione scheda
-        Route::get('/plans/create/{client}', function (User $client) {
-            // Sicurezza: puoi creare schede solo per i tuoi atleti
-            if ($client->trainer_id !== auth()->id()) {
-                abort(403, 'Questo atleta non è associato al tuo profilo.');
-            }
-
-            return Inertia::render('pt/plans/create', [
-                'client' => $client,
-                'exercises_list' => Exercise::all()
-            ]);
-        })->name('pt.plans.create');
-
-        // Salvataggio effettivo della scheda nel DB
-        Route::post('/plans/store', function (Request $request) {
-            $data = $request->validate([
-                'user_id'      => 'required|exists:users,id',
-                'name'         => 'required|string|max:255',
-                'workout_data' => 'required|array', 
-            ]);
-
-            WorkoutPlan::create([
-                'user_id'    => $data['user_id'],
-                'trainer_id' => auth()->id(),
-                'name'       => $data['name'],
-                'exercises'  => $data['workout_data'],
-            ]);
-
-            return redirect()->route('pt.dashboard')->with('success', 'Scheda inviata all\'atleta!');
-        })->name('pt.plans.store');
+        // --- GESTIONE SCHEDE (PLANS) ---
+        // Usiamo il PlanController per gestire la logica complessa
+        Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('plans.create');
+        Route::post('/plans/store', [PlanController::class, 'store'])->name('plans.store');
     });
 
     // ------------------------------------------------
     // AREA CLIENTE
     // ------------------------------------------------
-    Route::middleware('role:client')->prefix('client')->group(function () {
+    Route::middleware('role:client')->prefix('client')->name('client.')->group(function () {
         Route::get('/dashboard', function () {
             return Inertia::render('client/dashboard');
-        })->name('client.dashboard');
+        })->name('dashboard');
     });
 
 });

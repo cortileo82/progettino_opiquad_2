@@ -39,7 +39,7 @@ class ClientAssignmentController extends Controller
             ->whereNull('trainer_id')
             ->findOrFail($request->client_id);
 
-        // Aggiorniamo il trainer_id con l'ID di chi è loggato (il PT)
+        // Aggiorniamo il trainer_id con l'ID del PT loggato 
         $client->update([
             'trainer_id' => Auth::id()
         ]);
