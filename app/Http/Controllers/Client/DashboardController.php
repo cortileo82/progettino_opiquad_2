@@ -6,10 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-<<<<<<< HEAD
-=======
 use Illuminate\Support\Facades\Auth;
->>>>>>> 559eefc552189407a3d6cbdd4dfea22c2f651d93
 
 class DashboardController extends Controller
 {
