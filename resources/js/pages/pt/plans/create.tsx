@@ -6,15 +6,17 @@ interface Exercise { id: number; name: string; }
 interface Props { client: { id: number; name: string }; exercises_list: Exercise[]; }
 
 export default function CreatePlan({ client, exercises_list }: Props) {
-    const { data, setData, post, processing } = useForm({
+
+    const { data, setData, post, processing, errors } = useForm({
         user_id: client.id,
         name: '',
         num_weeks: 4,
-        // AGGIUNTO: week_number inizializzato a 1
         exercises: [{ exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '', reps: '', rest_time: '' }]
     });
 
-    // AGGIUNTO: week_number nel nuovo rigo
+    // Stampa nella console di eventuali errori passati da backend
+    // console.log("🛑 ERRORI DAL DOGANIERE:", errors);
+
     const addRow = () => setData('exercises', [
         ...data.exercises, 
         { exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '', reps: '', rest_time: '' }

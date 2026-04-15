@@ -80,6 +80,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('plans.create');
         Route::post('/plans/store', [PlanController::class, 'store'])->name('plans.store');    
+
+        // Mostra il form di modifica
+        Route::get('/plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
+        // Riceve i dati modificati 
+        Route::put('/plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
+        // Elimina la scheda
+        Route::delete('/plans/{plan}', [PlanController::class, 'delete'])->name('plans.delete');
     });
 
     // ------------------------------------------------

@@ -32,7 +32,7 @@ class StorePlanRequest extends FormRequest
             'exercises'   => 'required|array|min:1', 
             'exercises.*.exercise_id' => 'required|exists:exercises,id',
             'exercises.*.sets'        => 'required|integer|min:1',
-            'exercises.*.reps'        => 'required|string',
+            'exercises.*.reps'        => 'required|integer|min:1',
             'exercises.*.day_of_week' => 'required|string',
             'exercises.*.week_number' => 'required|integer|min:1',
             'exercises.*.rest_time'   => 'nullable|string',
