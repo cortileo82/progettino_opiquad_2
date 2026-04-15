@@ -4,10 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
-// Assicurati che questo Enum esista, altrimenti darà errore. 
-// Se non lo hai ancora creato, lo commenteremo nel prossimo passaggio.
 use App\Enums\MuscleGroup; 
-use App\Http\Requests\StoreExerciseRequest;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -23,25 +20,6 @@ class ExerciseController extends Controller
         ]);
     }
 
-    // Mostra il form di creazione
-    public function create()
-    {
-        // Recuperiamo i valori dall'Enum. 
-        // NOTA: Se MuscleGroup::values() fallisce, assicurati che l'Enum sia corretto.
-        return Inertia::render('admin/exercises/create', [
-            'muscleGroups' => MuscleGroup::values(),
-        ]);
-    }
-
-    // Salva un nuovo esercizio
-    public function store(StoreExerciseRequest $request)
-    {
-        Exercise::create($request->validated());
-
-        // Redirect esplicito all'index
-        return redirect()->route('admin.exercises.index');
-    }
-
     // Mostra il form di modifica
     public function edit(Exercise $exercise)
     {
@@ -52,11 +30,20 @@ class ExerciseController extends Controller
     }
 
     // Aggiorna l'esercizio esistente
-    public function update(StoreExerciseRequest $request, Exercise $exercise)
+    public function update(Request $request, Exercise $exercise)
     {
-        $exercise->update($request->validated());
+        // Validazione manuale qui per evitare conflitti con StoreExerciseRequest
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'muscle_group' => 'nullable|string', // Aggiunto per sicurezza
+        ]);
 
-        return redirect()->route('admin.exercises.index');
+        // Esegui l'aggiornamento
+        $exercise->update($validated);
+
+        // Redirect usando il percorso statico (più sicuro nel tuo caso)
+        return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato!');
     }
 
     // Elimina l'esercizio
@@ -64,6 +51,28 @@ class ExerciseController extends Controller
     {
         $exercise->delete();
 
-        return redirect()->back(); 
+        return redirect('/admin/exercises')->with('success', 'Esercizio eliminato!');
+    }
+
+    // Ho lasciato i metodi store e create se ti servono in futuro, 
+    // ma li ho puliti per coerenza
+    public function create()
+    {
+        return Inertia::render('admin/exercises/create', [
+            'muscleGroups' => MuscleGroup::values(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'muscle_group' => 'required|string',
+        ]);
+
+        Exercise::create($validated);
+
+        return redirect('/admin/exercises');
     }
 }
