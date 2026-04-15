@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -10,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'role', 'trainer_id', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -18,11 +19,6 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -32,26 +28,35 @@ class User extends Authenticatable
         ];
     }
 
-    // 1. Relazione: un cliente ha un solo Personal Trainer
-    public function trainer() 
+    /**
+     * Relazione: Un cliente appartiene a un Personal Trainer.
+     * Rinominiamo questa funzione in 'trainer' per compatibilità con il resto del sistema.
+     */
+    public function trainer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trainer_id');
     }
 
-    // 2. Relazione: un Personal Trainer ha più clienti
-    public function clients()
+    /**
+     * Relazione: Un Personal Trainer ha molti clienti.
+     */
+    public function clients(): HasMany
     {
         return $this->hasMany(User::class, 'trainer_id');
     }
 
-    // 3. Relazione: un Personal Trainer può creare più schede
-    public function createdPlans()
+    /**
+     * Relazione: Un Personal Trainer crea molte schede (Workout Plans).
+     */
+    public function createdPlans(): HasMany
     {
         return $this->hasMany(Plan::class, 'pt_id');
     }
 
-    // 4. Relazione: un cliente può avere più schede
-    public function assignedPlans()
+    /**
+     * Relazione: Un cliente ha molte schede assegnate.
+     */
+    public function assignedPlans(): HasMany
     {
         return $this->hasMany(Plan::class, 'user_id');
     }

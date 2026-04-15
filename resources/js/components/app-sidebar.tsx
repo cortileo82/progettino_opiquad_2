@@ -4,7 +4,8 @@ import {
     Dumbbell, 
     Users, 
     ClipboardList,
-    Plus 
+    Plus,
+    UserPlus 
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -49,15 +50,27 @@ const allNavItems: SidebarItem[] = [
     },
     {
         title: 'I Miei Clienti',
-        href: '/pt/clients', // Assicurati che anche qui ci sia il prefisso del ruolo se necessario
+        href: '/pt/clients', 
         icon: Users,
         roles: ['pt'],
     },
     {
         title: 'La Mia Scheda',
-        href: '/client/my-plan', // Prefisso client
+        href: '/client/my-plan', 
         icon: ClipboardList,
         roles: ['client'],
+    },
+    {
+        title: 'Gestione Utenti',
+        href: '/admin/accounts', 
+        icon: Users,
+        roles: ['admin'],
+    },
+    {
+        title: 'Inserisci Utente',
+        href: '/admin/accounts/create', 
+        icon: UserPlus,
+        roles: ['admin'],
     },
 ];
 

@@ -9,8 +9,7 @@ use Illuminate\Http\Request;
 
 // Controllers
 use App\Http\Controllers\Admin\ExerciseController;
-// Commentato per evitare crash finché non creiamo il file fisico
-// use App\Http\Controllers\Admin\TrainerController; 
+use App\Http\Controllers\Admin\UserController; // <--- AGGIUNTO QUESTO
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
@@ -53,21 +52,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'total_clients'   => User::where('role', 'client')->count(),
                     'total_pts'       => User::where('role', 'pt')->count(),
                     'total_exercises' => Exercise::count(),
+                    // Se hai il modello WorkoutPlan, aggiungilo qui come abbiamo visto prima
+                    // 'total_plans' => \App\Models\WorkoutPlan::count(), 
                 ],
                 'exercises' => Exercise::latest()->take(10)->get(),
             ]);
         })->name('dashboard');
 
         // 2. GESTIONE ESERCIZI
-        // Questo comando crea le rotte: index, create, store, show, edit, update, destroy
         Route::resource('exercises', ExerciseController::class);
 
-        // 3. GESTIONE PERSONAL TRAINER (Disabilitata temporaneamente per evitare errori)
-        /*
-        Route::get('/trainers/create', [TrainerController::class, 'create'])->name('trainers.create');
-        Route::post('/trainers', [TrainerController::class, 'store'])->name('trainers.store');
-        Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
-        */
+        // 3. GESTIONE ACCOUNT (Nuova sezione)
+        // Nota: non ripetiamo /admin perché è già nel prefisso del gruppo
+        Route::get('/accounts', [UserController::class, 'index'])->name('accounts.index');
+        Route::get('/accounts/create', [UserController::class, 'create'])->name('accounts.create');
+        Route::post('/accounts', [UserController::class, 'store'])->name('accounts.store');
+
     });
 
     // ------------------------------------------------
@@ -81,11 +81,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('plans.create');
         Route::post('/plans/store', [PlanController::class, 'store'])->name('plans.store');    
 
-        // Mostra il form di modifica
         Route::get('/plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
-        // Riceve i dati modificati 
         Route::put('/plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
-        // Elimina la scheda
         Route::delete('/plans/{plan}', [PlanController::class, 'delete'])->name('plans.delete');
     });
 
