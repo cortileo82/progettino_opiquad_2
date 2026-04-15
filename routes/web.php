@@ -15,6 +15,7 @@ use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController;
+use App\Http\Controllers\Admin\UserController;
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
@@ -68,6 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/trainers', [TrainerController::class, 'store'])->name('trainers.store');
         Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
         */
+
+        // GESTIONE UTENTI
+        Route::resource('users', UserController::class);
     });
 
     // ------------------------------------------------
