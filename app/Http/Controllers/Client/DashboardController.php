@@ -12,35 +12,37 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // 1. Recuperiamo tutti i piani dell'utente loggato con le relazioni necessarie
+        // 1. Recuperiamo l'utente loggato con la relazione del suo trainer
+        // DEFINIAMO LA VARIABILE $user QUI
+        $user = auth()->user()->load('trainer');
+
+        // 2. Recuperiamo tutti i piani dell'utente loggato
         $myPlans = Plan::with(['trainer', 'exercises'])
-                       ->where('user_id', auth()->id())
-                       ->latest() // Ordina per i più recenti
+                       ->where('user_id', $user->id)
+                       ->latest()
                        ->get();
 
-        // 2. Trasformiamo i dati per il frontend
-        // Questa mappatura è fondamentale per calcolare is_active e raggruppare gli esercizi
+        // 3. Trasformiamo i dati per il frontend
         $formattedPlans = $myPlans->map(function ($plan) {
             return [
                 'id'         => $plan->id,
                 'name'       => $plan->name,
-                'is_active'  => $plan->is_active, // Richiama getIsActiveAttribute() nel Modello
+                'is_active'  => $plan->is_active, 
                 'start_date' => $plan->created_at->format('d/m/Y'),
-                'end_date'   => $plan->end_date,   // Richiama getEndDateAttribute() nel Modello
+                'end_date'   => $plan->end_date,
                 
-                // Raggruppiamo gli esercizi per il giorno della settimana (es: "Lunedì", "Martedì")
-                // Il raggruppamento avviene sulla colonna della tabella pivot 'plan_exercises'
+                // Raggruppiamo gli esercizi per il giorno della settimana
                 'days'       => $plan->exercises->groupBy('pivot.day_of_week')->toArray(),
             ];
         });
 
-        // 3. Inviamo i dati separati al frontend React
+        // 4. Inviamo i dati al frontend React
         return Inertia::render('client/dashboard', [
-            // Prendiamo il primo piano che risulta attivo oggi
+            // Ora $user è definita e questo funzionerà!
+            'assignedTrainer' => $user->trainer ? $user->trainer->name : 'Nessun Trainer',
+            
             'activePlan' => $formattedPlans->firstWhere('is_active', true),
             
-            // Prendiamo tutti i piani che NON sono attivi (già scaduti)
-            // Usiamo values() per resettare le chiavi dell'array ed evitare che diventi un oggetto JSON
             'pastPlans'  => $formattedPlans->where('is_active', false)->values()->all(),
         ]);
     }

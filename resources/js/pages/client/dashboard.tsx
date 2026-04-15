@@ -26,6 +26,7 @@ interface Plan {
 interface Props {
     activePlan: Plan | null;
     pastPlans: Plan[];
+    assignedTrainer: string;
 }
 
 export default function Dashboard({ activePlan = null, pastPlans = [] }: Props) {
@@ -63,9 +64,11 @@ export default function Dashboard({ activePlan = null, pastPlans = [] }: Props) 
                         <div className="rounded-full bg-green-500/10 p-3 text-green-600">
                             <Trophy size={24} />
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Obiettivo</p>
-                            <p className="font-bold">{activePlan ? "In corso" : "In attesa"}</p>
+                       <div>
+                            <p className="text-sm font-medium text-muted-foreground">Personal Trainer</p>
+                            <p className="font-bold">
+                                {auth.user.trainer ? auth.user.trainer.name : "Non assegnato"}
+                            </p>
                         </div>
                     </div>
 
@@ -130,7 +133,7 @@ export default function Dashboard({ activePlan = null, pastPlans = [] }: Props) 
                                                         <p className="text-[10px] uppercase font-bold text-muted-foreground">Reps</p>
                                                         <p className="font-mono font-bold text-sm">{ex.pivot.reps}</p>
                                                     </div>
-                                                    <CheckCircle2 size={20} className="text-sidebar-border hover:text-orange-500 transition-colors cursor-pointer" />
+                                                    
                                                 </div>
                                             </div>
                                         ))}
