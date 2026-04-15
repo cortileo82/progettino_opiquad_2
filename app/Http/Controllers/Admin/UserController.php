@@ -5,33 +5,30 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-
-<?php
-
-namespace App\Http\Controllers\Admin;
-
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
-
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    /**
+     * Visualizza la lista di tutti gli utenti.
+     */
     public function index()
     {
-        // 1. Si recuperano gli utenti
-        $users = User::latest()->get();
+        // Carichiamo la relazione 'trainer' per vedere il coach assegnato nella tabella
+        $users = User::with('trainer')->latest()->get();
 
-        // 2. Si restituiscono gli utenti
-        return Inertia::render('admin/users/index', ['users' => $users]);
+        return Inertia::render('admin/accounts/index', [
+            'users' => $users
+        ]);
     }
 
+    /**
+     * Mostra il form per creare un nuovo utente.
+     */
     public function create()
     {
+        // Recuperiamo i Personal Trainer per il dropdown del form di creazione
         $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('admin/accounts/create', [
@@ -39,87 +36,83 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * Salva il nuovo utente nel database e mostra la pagina di successo.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|in:admin,pt,client',
-            'pt_id' => 'nullable|exists:users,id',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|string|email|max:255|unique:users',
+            'password'   => 'required|string|min:8',
+            'role'       => 'required|in:admin,pt,client',
+            'pt_id'      => 'nullable|exists:users,id',
         ]);
 
         User::create([
-            'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => $validated['role'],
+            'name'       => $validated['first_name'] . ' ' . $validated['last_name'],
+            'email'      => $validated['email'],
+            'password'   => Hash::make($validated['password']),
+            'role'       => $validated['role'],
             'trainer_id' => $validated['role'] === 'client' ? $validated['pt_id'] : null,
         ]);
 
-        return redirect()->route('admin.accounts.index')->with('success', 'Utente creato.');
-    }
-}
-
-        // 1. Si resituisce il form di creazione di un utente
-        return Inertia::render('admin/users/create');
+        // COLLEGAMENTO ALLA PAGINA SUCCESS.TSX
+        // Non facciamo il redirect, ma renderizziamo direttamente il componente di successo
+        return Inertia::render('admin/accounts/success');
     }
 
-    public function store(StoreUserRequest $request, User $user)
-    {
-        // 1. Si validano i dati della richiesta
-        $data = $request->validated();
-
-        // 2. Si cripta la password prima di salvarla
-        $data['password'] = Hash::make($data['password']);
-
-        // 3. Si crea effettivamente l'utente
-        User::create($data);
-
-        // 4. Si reindirizza alla route per l'index
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully!');
-    }
-
+    /**
+     * Mostra il form per modificare un utente esistente.
+     */
     public function edit(User $user)
     {
-        // 1. Si restituisce il form di modifica di un utente
-        return Inertia::render('admin/users/index', ['user' => $user]);
+        $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
+
+        return Inertia::render('admin/accounts/edit', [
+            'user'             => $user,
+            'personalTrainers' => $personalTrainers
+        ]);
     }
 
-    public function update(UpdateUserRequest $request, User $user)
+    /**
+     * Aggiorna i dati dell'utente.
+     */
+    public function update(Request $request, User $user)
     {
-        // 1. Si validano i dati della richiesta
-        $data = $request->validated();
+        $validated = $request->validate([
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password'   => 'nullable|string|min:8',
+            'role'       => 'required|in:admin,pt,client',
+            'trainer_id' => 'nullable|exists:users,id',
+        ]);
 
-        // 2. Se vi è una nuova password, allora la si cripta, 
-        //    altrimenti la si rimuove dall'array per evitare rischi di aggiornamento password
-        if($request->filled('password')) {
-            $data['password'] = Hash::make($data['password']);
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
         } else {
-            unset($data['password']);
+            unset($validated['password']);
         }
 
-        // 3. Si aggiorna l'utente
-        $user->update($data);
+        $user->update($validated);
 
-        // 4. Si reindirizza alla route per l'index
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
-
+        // Per l'update torniamo alla lista con messaggio flash
+        return redirect('/admin/accounts')->with('success', 'Utente aggiornato!');
     }
 
+    /**
+     * Elimina un utente dal sistema.
+     */
     public function destroy(User $user)
     {
-        // 1. PREVENZIONE: L'admin non può cancellare se stesso
-        if(auth()->id() === $user->id) {
-            return redirect()->back()->withErrors(['error' => 'You cannot delete yourself from the system']);
+        // Prevenzione: l'admin non può auto-eliminarsi
+        if (auth()->id() === $user->id) {
+            return redirect()->back()->withErrors(['error' => 'Non puoi eliminare il tuo stesso account!']);
         }
 
-        // 2. Si elimina l'utente
         $user->delete();
 
-        // 3. Si reindirizza alla route dell'index
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
+        return redirect('/admin/accounts')->with('success', 'Utente eliminato correttamente.');
     }
 }
-
