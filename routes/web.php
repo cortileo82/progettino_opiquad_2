@@ -14,6 +14,7 @@ use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController;
+use App\Http\Controllers\Admin\UserController;
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
@@ -67,6 +68,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/accounts', [UserController::class, 'index'])->name('accounts.index');
         Route::get('/accounts/create', [UserController::class, 'create'])->name('accounts.create');
         Route::post('/accounts', [UserController::class, 'store'])->name('accounts.store');
+
+        // 3. GESTIONE PERSONAL TRAINER (Disabilitata temporaneamente per evitare errori)
+        /*
+        Route::get('/trainers/create', [TrainerController::class, 'create'])->name('trainers.create');
+        Route::post('/trainers', [TrainerController::class, 'store'])->name('trainers.store');
+        Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
+        */
+
+        // GESTIONE UTENTI
+        Route::resource('users', UserController::class);
 
     });
 
