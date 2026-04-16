@@ -87,9 +87,13 @@ class PlanController extends Controller
         // Si dice a Laravel di caricare gli esercizi collegati a tale scheda per idratare il frontend
         $plan->load('exercises');
 
+        // Inoltre carichiamo i dati base del cliente per avere il suo nome
+        $client = User::find($plan->user_id);
+
         return Inertia::render('pt/plans/edit', [
             'plan' => $plan,
             'exercises_list' => Exercise::orderBy('name')->get(),
+            'client' => $client,
         ]);
     }
 
