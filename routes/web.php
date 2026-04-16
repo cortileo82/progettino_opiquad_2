@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 // Controllers
 use App\Http\Controllers\Admin\ExerciseController;
-use App\Http\Controllers\Admin\UserController; // <--- ORA È PRESENTE UNA SOLA VOLTA
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
@@ -60,10 +60,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // 2. GESTIONE ESERCIZI
         Route::resource('exercises', ExerciseController::class);
 
-        // 3. GESTIONE ACCOUNT (Sostituisce la vecchia rotta "users")
-        // Usiamo un resource così abbiamo index, create, store, edit, update e destroy pronti
-        Route::resource('accounts', UserController::class);
-
+        // 3. GESTIONE ACCOUNT
+        // Usiamo le rotte manuali per avere il controllo totale sui nomi dei parametri ({user})
+        // Questo garantisce che combaci perfettamente con il UserController e il Frontend
+        Route::get('/accounts', [UserController::class, 'index'])->name('accounts.index');
+        Route::get('/accounts/create', [UserController::class, 'create'])->name('accounts.create');
+        Route::post('/accounts', [UserController::class, 'store'])->name('accounts.store');
+        Route::get('/accounts/{user}/edit', [UserController::class, 'edit'])->name('accounts.edit');
+        Route::patch('/accounts/{user}', [UserController::class, 'update'])->name('accounts.update');
+        Route::delete('/accounts/{user}', [UserController::class, 'destroy'])->name('accounts.destroy');
     });
 
     // ------------------------------------------------
