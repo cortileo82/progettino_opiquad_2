@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Exercise;
 use App\Models\Plan;
 use App\Models\PlanExercise;
+use App\Enums\MuscleGroup;
 
 class DatabaseSeeder extends Seeder
 {
@@ -46,6 +47,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'luca@tempra.com',
             'password' => $defaultPassword,
             'role' => 'client',
+            'trainer_id' => $pt1->id,
         ]);
 
         $client2 = User::create([
@@ -53,20 +55,21 @@ class DatabaseSeeder extends Seeder
             'email' => 'sara@tempra.com',
             'password' => $defaultPassword,
             'role' => 'client',
+            'trainer_id' => $pt2->id,
         ]);
 
         // 2. CREAZIONE ESERCIZI BASE
         $exercisesData = [
-            ['name' => 'Panca Piana', 'description' => 'Bilanciere al petto.', 'muscle_group' => 'Petto'],
-            ['name' => 'Squat', 'description' => 'Accosciata con bilanciere.', 'muscle_group' => 'Gambe'],
-            ['name' => 'Stacco da Terra', 'description' => 'Sollevamento da terra.', 'muscle_group' => 'Dorso'],
-            ['name' => 'Trazioni', 'description' => 'Trazioni alla sbarra.', 'muscle_group' => 'Dorso'],
-            ['name' => 'Lento Avanti', 'description' => 'Spinta sopra la testa.', 'muscle_group' => 'Spalle'],
-            ['name' => 'Curl Bicipiti', 'description' => 'Flessione braccia.', 'muscle_group' => 'Bicipiti'],
-            ['name' => 'French Press', 'description' => 'Estensione tricipiti.', 'muscle_group' => 'Tricipiti'],
-            ['name' => 'Leg Extension', 'description' => 'Isolamento quadricipiti.', 'muscle_group' => 'Gambe'],
-            ['name' => 'Leg Curl', 'description' => 'Isolamento femorali.', 'muscle_group' => 'Gambe'],
-            ['name' => 'Crunch', 'description' => 'Addominali a terra.', 'muscle_group' => 'Addome'],
+            ['name' => 'Panca Piana', 'description' => 'Bilanciere al petto.', 'muscle_group' => MuscleGroup::LOWER_CHEST->value],
+            ['name' => 'Squat', 'description' => 'Accosciata con bilanciere.', 'muscle_group' => MuscleGroup::QUADS->value],
+            ['name' => 'Stacco da Terra', 'description' => 'Sollevamento da terra.', 'muscle_group' => MuscleGroup::LOWER_BACK->value],
+            ['name' => 'Trazioni', 'description' => 'Trazioni alla sbarra.', 'muscle_group' => MuscleGroup::UPPER_BACK->value],
+            ['name' => 'Shoulder Press', 'description' => 'Spinta sopra la testa.', 'muscle_group' => MuscleGroup::DELT_ANT->value],
+            ['name' => 'Curl Bicipiti', 'description' => 'Flessione braccia.', 'muscle_group' => MuscleGroup::BICEPS->value],
+            ['name' => 'French Press', 'description' => 'Estensione tricipiti.', 'muscle_group' => MuscleGroup::TRICEPS->value],
+            ['name' => 'Leg Extension', 'description' => 'Isolamento quadricipiti.', 'muscle_group' => MuscleGroup::QUADS->value],
+            ['name' => 'Leg Curl', 'description' => 'Isolamento femorali.', 'muscle_group' => MuscleGroup::HAMSTRINGS->value],
+            ['name' => 'Crunch', 'description' => 'Addominali a terra.', 'muscle_group' => MuscleGroup::ABS->value],
         ];
 
         $exercises = [];

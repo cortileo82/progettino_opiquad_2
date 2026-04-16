@@ -30,10 +30,13 @@ export default function MyClients({ clients, stats }: any) {
                             </div>
 
                             <div className="flex flex-col gap-2 mt-4">
-                                {/* Bottone Visualizza Schede */}
-                                <button className="flex items-center gap-2 text-sm text-blue-500 hover:underline">
+                                {/* Link Visualizza Schede */}
+                                <Link 
+                                    href={`/pt/clients/${client.id}/plans`}
+                                    className="flex items-center gap-2 text-sm text-blue-500 hover:underline"
+                                >
                                     <FileText size={16} /> Visualizza Schede Attuali
-                                </button>
+                                </Link>
                                 
                                 {/* Link Inserisci Nuova Scheda - URL CORRETTO PER IL CONTROLLER */}
                                 <Link 

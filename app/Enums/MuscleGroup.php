@@ -8,7 +8,7 @@ enum MuscleGroup: string
     case LOWER_CHEST = 'Pettorali';
     case UPPER_BACK = 'Schiena Alta';
     case LATS = 'Laterali';
-    case LOWER_BACK = 'Lombari'
+    case LOWER_BACK = 'Schiena Bassa';
     case QUADS = 'Quadricipiti';
     case HAMSTRINGS = 'Bicipiti Femorali';
     case DELT_ANT = 'Deltoidi Anteriori';

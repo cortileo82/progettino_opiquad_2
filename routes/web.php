@@ -9,11 +9,12 @@ use Illuminate\Http\Request;
 
 // Controllers
 use App\Http\Controllers\Admin\ExerciseController;
-use App\Http\Controllers\Admin\UserController; // <--- ORA È PRESENTE UNA SOLA VOLTA
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController;
+use App\Http\Controllers\PT\ShowClientPlansController;
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
@@ -75,7 +76,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('clients.store');
 
         Route::get('/plans/create/{client}', [PlanController::class, 'create'])->name('plans.create');
+        Route::get('/clients/{client}/plans', ShowClientPlansController::class)->name('clients.plans');
         Route::post('/plans/store', [PlanController::class, 'store'])->name('plans.store');    
+        Route::get('/plans/{plan}', [PlanController::class, 'show'])->name('plans.show');
 
         Route::get('/plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
         Route::put('/plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
