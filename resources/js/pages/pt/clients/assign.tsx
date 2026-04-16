@@ -56,7 +56,7 @@ export default function Assign({ availableClients }: Props) {
                                 <button
                                     onClick={() => handleAssign(client.id)} 
                                     disabled={processing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-bold uppercase text-black hover:bg-gray-200 disabled:opacity-50"
+                                    className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-bold uppercase text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <UserPlus className="h-4 w-4" />
                                     {processing ? 'Assegnazione...' : 'Prendi in carico'}
