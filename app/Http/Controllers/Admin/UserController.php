@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers\Admin;
 
@@ -15,11 +15,15 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Carichiamo la relazione 'trainer' per vedere il coach assegnato nella tabella
+        // Carichiamo gli utenti con il loro trainer (Eager Loading)
         $users = User::with('trainer')->latest()->get();
+        
+        // Recuperiamo i PT per il dropdown della modale di modifica
+        $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('admin/accounts/index', [
-            'users' => $users
+            'users' => $users,
+            'personalTrainers' => $personalTrainers
         ]);
     }
 
@@ -28,7 +32,6 @@ class UserController extends Controller
      */
     public function create()
     {
-        // Recuperiamo i Personal Trainer per il dropdown del form di creazione
         $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('admin/accounts/create', [
@@ -37,7 +40,7 @@ class UserController extends Controller
     }
 
     /**
-     * Salva il nuovo utente nel database e mostra la pagina di successo.
+     * Salva il nuovo utente nel database.
      */
     public function store(Request $request)
     {
@@ -47,37 +50,28 @@ class UserController extends Controller
             'email'      => 'required|string|email|max:255|unique:users',
             'password'   => 'required|string|min:8',
             'role'       => 'required|in:admin,pt,client',
-            'pt_id'      => 'nullable|exists:users,id',
+            'pt_id'      => 'nullable', // Gestito manualmente sotto
         ]);
+
+        // Logica per il trainer_id in fase di creazione
+        $trainerId = null;
+        if ($validated['role'] === 'client' && $request->pt_id !== 'none') {
+            $trainerId = $request->pt_id;
+        }
 
         User::create([
             'name'       => $validated['first_name'] . ' ' . $validated['last_name'],
             'email'      => $validated['email'],
             'password'   => Hash::make($validated['password']),
             'role'       => $validated['role'],
-            'trainer_id' => $validated['role'] === 'client' ? $validated['pt_id'] : null,
+            'trainer_id' => $trainerId,
         ]);
 
-        // COLLEGAMENTO ALLA PAGINA SUCCESS.TSX
-        // Non facciamo il redirect, ma renderizziamo direttamente il componente di successo
         return Inertia::render('admin/accounts/success');
     }
 
     /**
-     * Mostra il form per modificare un utente esistente.
-     */
-    public function edit(User $user)
-    {
-        $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
-
-        return Inertia::render('admin/accounts/edit', [
-            'user'             => $user,
-            'personalTrainers' => $personalTrainers
-        ]);
-    }
-
-    /**
-     * Aggiorna i dati dell'utente.
+     * Aggiorna i dati dell'utente (Usato dalla modale in index.tsx).
      */
     public function update(Request $request, User $user)
     {
@@ -86,19 +80,29 @@ class UserController extends Controller
             'email'      => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password'   => 'nullable|string|min:8',
             'role'       => 'required|in:admin,pt,client',
-            'trainer_id' => 'nullable|exists:users,id',
+            'trainer_id' => 'nullable', // Validato manualmente
         ]);
 
+        // 1. Gestione Password: la aggiorniamo solo se fornita
         if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+            $user->password = Hash::make($validated['password']);
         }
 
-        $user->update($validated);
+        // 2. Trasformiamo "none" del frontend in NULL per il database
+        $trainerId = null;
+        if ($validated['role'] === 'client' && $request->trainer_id !== 'none' && !empty($request->trainer_id)) {
+            $trainerId = $request->trainer_id;
+        }
 
-        // Per l'update torniamo alla lista con messaggio flash
-        return redirect('/admin/accounts')->with('success', 'Utente aggiornato!');
+        // 3. Aggiornamento dati
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->role = $validated['role'];
+        $user->trainer_id = $trainerId;
+        
+        $user->save();
+
+        return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
     }
 
     /**
@@ -106,13 +110,13 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Prevenzione: l'admin non può auto-eliminarsi
+        // Impedisci all'utente loggato di eliminarsi da solo
         if (auth()->id() === $user->id) {
-            return redirect()->back()->withErrors(['error' => 'Non puoi eliminare il tuo stesso account!']);
+            return back()->withErrors(['error' => 'Operazione non consentita sul proprio account.']);
         }
 
         $user->delete();
 
-        return redirect('/admin/accounts')->with('success', 'Utente eliminato correttamente.');
+        return redirect('/admin/accounts')->with('success', 'Utente rimosso.');
     }
 }

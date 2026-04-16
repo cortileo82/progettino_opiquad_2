@@ -43,12 +43,6 @@ const allNavItems: SidebarItem[] = [
         roles: ['admin'], // Di solito la gestione totale è solo admin
     },
     {
-        title: 'Nuovo Esercizio', 
-        href: '/admin/exercises/create', // AGGIUNTO /admin
-        icon: Plus, 
-        roles: ['admin'],
-    },
-    {
         title: 'I Miei Clienti',
         href: '/pt/clients', 
         icon: Users,
@@ -64,12 +58,6 @@ const allNavItems: SidebarItem[] = [
         title: 'Gestione Utenti',
         href: '/admin/accounts', 
         icon: Users,
-        roles: ['admin'],
-    },
-    {
-        title: 'Inserisci Utente',
-        href: '/admin/accounts/create', 
-        icon: UserPlus,
         roles: ['admin'],
     },
 ];

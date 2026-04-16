@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,13 +10,37 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'role', 'trainer_id', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
+    /**
+     * I campi che possono essere assegnati massivamente.
+     * Ho aggiunto tutti i campi necessari per il form di modifica.
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'trainer_id',
+        'profile_photo_path', // Utile se userai le foto profilo
+    ];
+
+    /**
+     * I campi che devono essere nascosti nelle risposte JSON.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+    ];
+
+    /**
+     * I cast degli attributi.
+     */
     protected function casts(): array
     {
         return [
@@ -30,7 +52,6 @@ class User extends Authenticatable
 
     /**
      * Relazione: Un cliente appartiene a un Personal Trainer.
-     * Rinominiamo questa funzione in 'trainer' per compatibilità con il resto del sistema.
      */
     public function trainer(): BelongsTo
     {
