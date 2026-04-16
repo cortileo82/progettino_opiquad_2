@@ -18,13 +18,26 @@ interface Props {
 export default function ExerciseIndex({ exercises = [] }: Props) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
+    // Gestione permesso cancellazione una alla volta
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
     const toggleExpand = (id: number) => {
         setExpandedId(expandedId === id ? null : id);
     };
 
     const handleDelete = (id: number, name: string) => {
         if (confirm(`Sei sicuro di voler eliminare "${name}"?`)) {
-            router.delete(`/admin/exercises/${id}`);
+            router.delete(`/admin/exercises/${id}`, {
+                // 1. Quando parte la richiesta di cancellazione, si memorizza l'id di chi si vuole cancellare,
+                //    con l'obiettivo finale di non permettere una sua cancellazione più di una volta
+                onStart: () => setDeletingId(id),
+
+                // 2. Quando la richiesta è stata risposta, si resetta la costante per evitare più cancellazione
+                onFinish: () => setDeletingId(null),
+
+                // 3. Si fa scorrere la barra di caricamento in alto
+                preserveScroll: true,
+            });
         }
     };
 

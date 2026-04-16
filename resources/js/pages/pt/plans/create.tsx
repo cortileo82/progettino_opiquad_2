@@ -126,7 +126,7 @@ export default function CreatePlan({ client, exercises_list }: Props) {
                         <button type="button" onClick={addRow} className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest border border-sidebar-border hover:brightness-110">
                             <Plus size={16}/> Aggiungi Esercizio
                         </button>
-                        <button type="submit" disabled={processing} className="md:ml-auto flex items-center justify-center gap-2 bg-white text-black px-12 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50">
+                        <button type="submit" disabled={processing} className="md:ml-auto flex items-center justify-center gap-2 bg-white text-black px-12 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                             <Save size={16}/> {processing ? 'Salvataggio...' : 'Conferma Scheda'}
                         </button>
                     </div>
