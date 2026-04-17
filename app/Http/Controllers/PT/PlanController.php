@@ -18,13 +18,11 @@ class PlanController extends Controller
     // In PlanController.php
     public function show(Plan $plan)
     {
-        // 1. Sicurezza: Assicuriamoci che il PT stia guardando una scheda dei SUOI clienti
+        // Il PT stia guardando una scheda dei SUOI clienti
         if ($plan->pt_id !== auth()->id()) {
             abort(403, 'Accesso negato.');
         }
 
-        // 2. Magia Architetturale (Eager Loading): 
-        // Diciamo a Laravel di caricare la scheda E contemporaneamente tutti gli esercizi collegati (con i dati pivot: sets, reps, ecc.)
         $plan->load('exercises');
 
         // Inoltre carichiamo i dati base del cliente per avere il suo nome
@@ -67,7 +65,7 @@ class PlanController extends Controller
             // 2. Si trasformano i dati e li si accodano
             foreach ($data['exercises'] as $item) {
                 $plan->exercises()->attach($item['exercise_id'], [
-                    'week_number'  => $item['week_number'], // <-- Inseriamo la settimana!
+                    'week_number'  => $item['week_number'], 
                     'sets'         => $item['sets'],
                     'reps'         => $item['reps'],
                     'day_of_week'  => $item['day_of_week'],

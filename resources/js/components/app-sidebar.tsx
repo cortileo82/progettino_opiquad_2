@@ -4,6 +4,7 @@ import {
     Dumbbell, 
     Users, 
     ClipboardList,
+    BookOpenCheck,
     Plus,
     UserPlus 
 } from 'lucide-react';
@@ -42,12 +43,12 @@ const allNavItems: SidebarItem[] = [
         icon: Dumbbell,
         roles: ['admin'], // Di solito la gestione totale è solo admin
     },
-    {
+    /*{
         title: 'I Miei Clienti',
         href: '/pt/clients', 
         icon: Users,
         roles: ['pt'],
-    },
+    },*/
     {
         title: 'La Mia Scheda',
         href: '/client/my-plan', 
@@ -59,6 +60,12 @@ const allNavItems: SidebarItem[] = [
         href: '/admin/accounts', 
         icon: Users,
         roles: ['admin'],
+    },
+    {
+        title: 'Catalogo Esercizi',
+        href: '/pt/exercises/catalog',
+        icon: BookOpenCheck, 
+        roles: ['pt'],
     },
 ];
 

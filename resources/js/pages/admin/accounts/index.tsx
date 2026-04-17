@@ -1,9 +1,10 @@
+import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal'; // Import del nuovo modal
 import { 
     Pencil, 
     Trash2, 
@@ -11,10 +12,10 @@ import {
     User as UserIcon, 
     Mail, 
     Plus,
-    UserCircle
+    UserCircle,
+    ShieldCheck
 } from 'lucide-react';
 
-// UI Components
 import { 
     Dialog, 
     DialogContent, 
@@ -37,10 +38,7 @@ interface User {
     email: string;
     role: string;
     trainer_id: number | null;
-    trainer?: {
-        id: number;
-        name: string;
-    };
+    trainer?: { id: number; name: string; };
 }
 
 interface Props {
@@ -51,7 +49,9 @@ interface Props {
 
 export default function Index({ users = [], personalTrainers = [], auth }: Props) {
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [userToDelete, setUserToDelete] = useState<number | null>(null);
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
     const { data, setData, patch, processing, reset, errors } = useForm({
@@ -66,12 +66,7 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
         setExpandedId(expandedId === id ? null : id);
     };
 
-    useEffect(() => {
-        if (data.role !== 'client' && data.trainer_id !== 'none') {
-            setData('trainer_id', 'none');
-        }
-    }, [data.role]);
-
+    // Gestione Modale Modifica
     const openEditModal = (user: User) => {
         setSelectedUser(user);
         setData({
@@ -87,22 +82,24 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedUser) return;
-
         patch(`/admin/accounts/${selectedUser.id}`, {
-            onSuccess: () => {
-                setIsEditOpen(false);
-                reset();
-            },
+            onSuccess: () => { setIsEditOpen(false); reset(); },
             preserveScroll: true,
         });
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm('ELIMINARE DEFINITIVAMENTE L\'ACCOUNT?')) {
-            router.delete(`/admin/accounts/${id}`, {
-                preserveScroll: true,
-            });
-        }
+    // Gestione Modale Eliminazione
+    const openDeleteModal = (id: number) => {
+        setUserToDelete(id);
+        setIsDeleteOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!userToDelete) return;
+        router.delete(`/admin/accounts/${userToDelete}`, {
+            preserveScroll: true,
+            onSuccess: () => setIsDeleteOpen(false),
+        });
     };
 
     return (
@@ -111,22 +108,22 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
 
             <div className="w-full p-6 md:p-10">
                 
-                {/* Header con Titolo e Pulsante "Lungo" Nero */}
-                <div className="mb-8 border-b border-sidebar-border pb-6">
-                    <div className="flex items-center justify-between gap-4">
+                {/* Header Uniformato */}
+                <div className="mb-10 border-b border-sidebar-border pb-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
-                            <h1 className="text-3xl font-extrabold tracking-tighter uppercase italic text-foreground">
+                            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-foreground leading-none">
                                 Gestione Account
                             </h1>
-                            <p className="text-muted-foreground text-sm font-medium mt-1">
-                                Controllo accessi e anagrafica utenti.
+                            <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.2em] opacity-70">
+                                Controllo accessi, ruoli e anagrafica di sistema.
                             </p>
                         </div>
                         
                         <Link href="/admin/accounts/create">
-                            <Button className="bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg px-8 py-2.5 h-auto flex items-center gap-3 transition-all shadow-md active:scale-95 group">
-                                <Plus size={14} className="group-hover:rotate-90 transition-transform duration-300" />
-                                <span className="font-black uppercase italic tracking-[0.2em] text-[10px]">
+                            <Button className="bg-zinc-950 hover:bg-zinc-900 text-white rounded-2xl px-8 py-6 h-auto flex items-center gap-4 transition-all shadow-2xl active:scale-95 group border border-white/5">
+                                <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                                <span className="font-black uppercase italic tracking-[0.2em] text-xs">
                                     Nuovo Utente
                                 </span>
                             </Button>
@@ -134,87 +131,81 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
                     </div>
                 </div>
 
+                {/* Lista Cards */}
                 <div className="space-y-4">
                     {users.map((user) => (
                         <div 
                             key={user.id} 
-                            className={`bg-sidebar border rounded-2xl transition-all duration-300 ${
+                            className={`bg-sidebar border rounded-[2rem] transition-all duration-300 ${
                                 expandedId === user.id 
-                                ? 'border-primary/50 ring-1 ring-primary/20 shadow-xl' 
-                                : 'border-sidebar-border hover:border-primary/30'
+                                ? 'border-foreground ring-1 ring-foreground/10 shadow-2xl scale-[1.01]' 
+                                : 'border-sidebar-border hover:border-foreground/20'
                             } overflow-hidden`}
                         >
                             <div 
-                                className="flex items-center justify-between p-5 cursor-pointer" 
+                                className="flex items-center justify-between p-6 cursor-pointer" 
                                 onClick={() => toggleExpand(user.id)}
                             >
-                                <div className="flex items-center gap-5">
-                                    <div className={`p-3 rounded-xl transition-colors ${expandedId === user.id ? 'bg-zinc-950 text-white' : 'bg-background text-muted-foreground'}`}>
-                                        <UserIcon size={20} />
+                                <div className="flex items-center gap-6">
+                                    <div className={`p-4 rounded-2xl transition-all duration-500 ${expandedId === user.id ? 'bg-foreground text-background' : 'bg-background text-muted-foreground'}`}>
+                                        <UserIcon size={22} />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="font-extrabold uppercase text-base tracking-widest text-foreground italic">
+                                        <span className="font-black uppercase italic text-lg tracking-tight text-foreground">
                                             {user.name}
                                         </span>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest mt-0.5 ${user.role === 'admin' ? 'text-primary' : 'text-muted-foreground'}`}>
+                                        <span className={`text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 ${user.role === 'admin' ? 'text-red-500' : 'text-primary'}`}>
                                             {user.role}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2 border-r border-sidebar-border pr-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2 border-r border-sidebar-border pr-5">
                                         <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                openEditModal(user);
-                                            }}
-                                            className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-all"
+                                            onClick={(e) => { e.stopPropagation(); openEditModal(user); }}
+                                            className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all"
                                         >
-                                            <Pencil size={16} />
+                                            <Pencil size={18} />
                                         </button>
                                         
                                         {user.id !== auth.user.id && (
                                             <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDelete(user.id);
-                                                }}
-                                                className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                                onClick={(e) => { e.stopPropagation(); openDeleteModal(user.id); }}
+                                                className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={18} />
                                             </button>
                                         )}
                                     </div>
                                     <ChevronDown 
                                         size={20} 
-                                        className={`text-muted-foreground transition-transform duration-300 ml-1 ${expandedId === user.id ? 'rotate-180 text-primary' : ''}`} 
+                                        className={`text-muted-foreground transition-transform duration-500 ${expandedId === user.id ? 'rotate-180 text-foreground' : ''}`} 
                                     />
                                 </div>
                             </div>
 
                             {expandedId === user.id && (
-                                <div className="px-8 pb-8 pt-4 bg-background/20 border-t border-sidebar-border/50 animate-in fade-in slide-in-from-top-2 italic uppercase">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                        <div className="space-y-2">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary block">
-                                                Email Contatto
+                                <div className="px-10 pb-10 pt-2 bg-background/30 border-t border-sidebar-border/50 animate-in fade-in slide-in-from-top-4 duration-500">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                                        <div className="space-y-3">
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground block ml-1">
+                                                Email di Riferimento
                                             </span>
-                                            <div className="flex items-center gap-3 text-sm font-bold text-foreground bg-background rounded-xl p-3 border border-sidebar-border lowercase">
-                                                <Mail size={14} className="text-primary" />
+                                            <div className="flex items-center gap-4 text-sm font-bold text-foreground bg-background rounded-2xl p-4 border border-sidebar-border shadow-inner">
+                                                <Mail size={16} className="text-primary" />
                                                 {user.email}
                                             </div>
                                         </div>
 
-                                        {/* Mostra PT solo se l'utente è Client */}
                                         {user.role === 'client' && (
-                                            <div className="space-y-2">
-                                                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground block">
-                                                    Personal Trainer
+                                            <div className="space-y-3">
+                                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground block ml-1">
+                                                    Responsabile Tecnico
                                                 </span>
-                                                <div className="flex items-center gap-3 text-sm font-bold text-foreground bg-background rounded-xl p-3 border border-sidebar-border">
-                                                    <UserCircle size={14} className="text-muted-foreground" />
-                                                    {user.trainer ? user.trainer.name : 'LIBERO / NON ASSEGNATO'}
+                                                <div className="flex items-center gap-4 text-sm font-bold text-foreground bg-background rounded-2xl p-4 border border-sidebar-border shadow-inner uppercase italic">
+                                                    <UserCircle size={16} className="text-primary" />
+                                                    {user.trainer ? user.trainer.name : 'DA ASSEGNARE'}
                                                 </div>
                                             </div>
                                         )}
@@ -226,61 +217,73 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
                 </div>
             </div>
 
+            {/* MODALE ELIMINAZIONE (Il tuo nuovo ConfirmationModal) */}
+            <ConfirmationModal
+                isOpen={isDeleteOpen}
+                onClose={() => setIsDeleteOpen(false)}
+                onConfirm={handleConfirmDelete}
+                loading={processing}
+                title="Elimina Account"
+                description="Sei sicuro? Questa azione cancellerà l'utente e tutti i piani di allenamento associati. Non potrai tornare indietro."
+                confirmText="Sì, Elimina Definitivamente"
+            />
+
             {/* Modale Modifica */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent className="rounded-xl border border-sidebar-border bg-sidebar p-6 shadow-lg italic uppercase">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold tracking-tight">Modifica Account</DialogTitle>
+                <DialogContent className="rounded-[2.5rem] border-2 border-sidebar-border bg-sidebar p-8 shadow-2xl max-w-md">
+                    <DialogHeader className="mb-6 text-center sm:text-left">
+                        <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3">
+                            <ShieldCheck className="text-primary" size={28} />
+                            Modifica Account
+                        </DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleUpdate} className="space-y-4 pt-2">
+                    <form onSubmit={handleUpdate} className="space-y-5">
                         <div className="space-y-2">
-                            <Label htmlFor="edit-name" className="text-[10px] font-black tracking-widest">Nome Completo</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Nome Utente</Label>
                             <Input 
-                                id="edit-name"
                                 value={data.name} 
                                 onChange={e => setData('name', e.target.value)} 
-                                className="rounded-md border-sidebar-border bg-background italic font-bold" 
+                                className="rounded-xl border-sidebar-border bg-background h-12 font-bold uppercase italic focus:ring-2 focus:ring-primary/20 transition-all" 
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="edit-email" className="text-[10px] font-black tracking-widest">Email</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Email</Label>
                             <Input 
-                                id="edit-email"
                                 type="email"
                                 value={data.email} 
                                 onChange={e => setData('email', e.target.value)} 
-                                className="rounded-md border-sidebar-border bg-background font-bold" 
+                                className="rounded-xl border-sidebar-border bg-background h-12 font-bold focus:ring-2 focus:ring-primary/20 transition-all" 
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black tracking-widest">Ruolo</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Ruolo</Label>
                                 <Select value={data.role} onValueChange={(v) => setData('role', v)}>
-                                    <SelectTrigger className="rounded-md border-sidebar-border uppercase font-bold text-xs h-10 bg-background">
+                                    <SelectTrigger className="rounded-xl border-sidebar-border bg-background h-12 font-black uppercase italic text-[10px] tracking-widest">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="italic uppercase font-bold">
-                                        <SelectItem value="admin">ADMIN</SelectItem>
-                                        <SelectItem value="pt">PT</SelectItem>
-                                        <SelectItem value="client">CLIENT</SelectItem>
+                                    <SelectContent className="bg-sidebar border-sidebar-border rounded-xl">
+                                        <SelectItem value="admin" className="font-black italic uppercase text-[10px] p-3">ADMIN</SelectItem>
+                                        <SelectItem value="pt" className="font-black italic uppercase text-[10px] p-3">PT</SelectItem>
+                                        <SelectItem value="client" className="font-black italic uppercase text-[10px] p-3">CLIENT</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             {data.role === 'client' && (
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black tracking-widest">Trainer</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Personal Trainer</Label>
                                     <Select value={data.trainer_id.toString()} onValueChange={(v) => setData('trainer_id', v)}>
-                                        <SelectTrigger className="rounded-md border-sidebar-border uppercase font-bold text-xs h-10 bg-background">
+                                        <SelectTrigger className="rounded-xl border-sidebar-border bg-background h-12 font-black uppercase italic text-[10px] tracking-widest">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="italic uppercase font-bold">
-                                            <SelectItem value="none">NESSUNO / LIBERO</SelectItem>
+                                        <SelectContent className="bg-sidebar border-sidebar-border rounded-xl">
+                                            <SelectItem value="none" className="font-black italic uppercase text-[10px] p-3 italic">LIBERO</SelectItem>
                                             {personalTrainers?.map((pt) => (
-                                                <SelectItem key={pt.id} value={pt.id.toString()}>
+                                                <SelectItem key={pt.id} value={pt.id.toString()} className="font-black italic uppercase text-[10px] p-3">
                                                     {pt.name}
                                                 </SelectItem>
                                             ))}
@@ -290,32 +293,31 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
                             )}
                         </div>
 
-                        <div className="space-y-2 pt-2 border-t border-sidebar-border">
-                            <Label htmlFor="edit-pass" className="text-primary text-[10px] font-black">Password (Solo se vuoi cambiarla)</Label>
+                        <div className="pt-4 border-t border-sidebar-border">
+                            <Label className="text-red-500 text-[9px] font-black uppercase tracking-[0.3em] mb-3 block">Cambia Password (Opzionale)</Label>
                             <Input 
-                                id="edit-pass"
                                 type="password" 
-                                placeholder="********" 
-                                className="rounded-md border-sidebar-border h-10 bg-background" 
+                                placeholder="LASCIAR VUOTO PER NON CAMBIARE" 
+                                className="rounded-xl border-sidebar-border bg-background h-12 font-bold text-center text-[9px] tracking-[0.2em] focus:ring-2 focus:ring-red-500/20 placeholder:opacity-50" 
                                 onChange={e => setData('password', e.target.value)} 
                             />
                         </div>
 
-                        <DialogFooter className="gap-2 pt-4">
+                        <DialogFooter className="gap-3 mt-6 sm:flex-row flex-col">
                             <Button 
                                 type="button" 
                                 variant="outline" 
                                 onClick={() => setIsEditOpen(false)}
-                                className="h-10 italic font-bold uppercase text-xs tracking-widest"
+                                className="h-12 flex-1 rounded-xl border-sidebar-border font-black uppercase italic text-[10px] tracking-widest"
                             >
                                 Annulla
                             </Button>
                             <Button 
                                 type="submit" 
                                 disabled={processing} 
-                                className="bg-zinc-950 text-white hover:bg-zinc-800 h-10 italic font-bold uppercase text-xs tracking-widest px-6"
+                                className="h-12 flex-1 bg-zinc-950 text-white rounded-xl font-black uppercase italic text-[10px] tracking-widest shadow-xl hover:bg-zinc-900"
                             >
-                                {processing ? 'Salvataggio...' : 'Aggiorna Account'}
+                                {processing ? 'Salvataggio...' : 'Aggiorna'}
                             </Button>
                         </DialogFooter>
                     </form>

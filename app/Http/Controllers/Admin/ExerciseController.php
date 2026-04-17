@@ -36,7 +36,7 @@ class ExerciseController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'muscle_group' => 'nullable|string', // Aggiunto per sicurezza
+            'muscle_group' => 'nullable|string', 
         ]);
 
         // Esegui l'aggiornamento
@@ -74,5 +74,18 @@ class ExerciseController extends Controller
         Exercise::create($validated);
 
         return redirect('/admin/exercises');
+    }
+    // Aggiungi questo metodo all'interno della classe ExerciseController
+
+   public function catalog()
+    {
+        $exercises = Exercise::orderBy('muscle_group')
+            ->orderBy('name')
+            ->get();
+
+        // Modifica il percorso qui:
+        return Inertia::render('pt/catalog', [
+            'exercises' => $exercises
+        ]);
     }
 }
