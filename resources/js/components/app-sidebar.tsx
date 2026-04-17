@@ -5,6 +5,7 @@ import {
     Users, 
     ClipboardList,
     BookOpenCheck,
+    History,
     Plus,
     UserPlus 
 } from 'lucide-react';
@@ -66,6 +67,12 @@ const allNavItems: SidebarItem[] = [
         href: '/pt/exercises/catalog',
         icon: BookOpenCheck, 
         roles: ['pt'],
+    },
+    {
+        title: 'Storico Schede',
+        href: '/client/history',
+        icon: History, 
+        roles: ['client'],
     },
 ];
 

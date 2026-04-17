@@ -38,7 +38,7 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
                 
                 {/* 1. HEADER: BENVENUTO */}
                 <div>
-                    <h1 className="text-4xl font-black uppercase italic tracking-tighter text-foreground">
+                    <h1 className="text-5xl font-black uppercase italic tracking-tighter text-foreground">
                         Bentornato, <span className="text-primary">{auth.user.name}</span>
                     </h1>
                 </div>
