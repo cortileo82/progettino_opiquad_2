@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -8,107 +8,191 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import { User, Mail, Lock, ShieldCheck, ChevronLeft } from 'lucide-react';
 
 export default function Register() {
     return (
-        <>
-            <Head title="Register" />
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
-                disableWhileProcessing
-                className="flex flex-col gap-6"
+        <div className="min-h-screen bg-[#F8F8F8] flex flex-col items-center justify-center p-6">
+            <Head title="Register - TEMPRA" />
+
+            {/* Navigazione Home */}
+            <Link 
+                href="/" 
+                className="absolute top-8 left-8 flex items-center gap-2 text-[10px] font-black uppercase italic text-zinc-400 hover:text-black transition-all tracking-widest"
             >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
-                            </div>
+                <ChevronLeft size={14} /> Torna alla Home
+            </Link>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <PasswordInput
-                                    id="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="mt-2 w-full"
-                                tabIndex={5}
-                                data-test="register-user-button"
-                            >
-                                {processing && <Spinner />}
-                                Create account
-                            </Button>
+            <div className="w-full max-w-[480px] animate-in fade-in zoom-in-95 duration-500">
+                
+                {/* Branding & Header */}
+                <div className="text-center mb-8">
+                    <div className="flex justify-center mb-6">
+                        <div className="p-1 bg-white border border-zinc-200 rounded-3xl shadow-sm">
+                            <img
+                                src="/images/hero.jpeg"
+                                alt="Tempra"
+                                className="w-16 h-16 rounded-2xl object-cover grayscale-[0.5]"
+                            />
                         </div>
+                    </div>
+                    <h1 className="text-5xl font-black uppercase italic tracking-tighter leading-none text-black">
+                        TEMPRA
+                    </h1>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-400 mt-3">
+                        Crea il tuo profilo atleta
+                    </p>
+                </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
-                            </TextLink>
-                        </div>
-                    </>
-                )}
-            </Form>
-        </>
+                {/* Card del Form */}
+                <div className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-black/[0.03] relative overflow-hidden">
+                    
+                    <Form
+                        {...store.form()}
+                        resetOnSuccess={['password', 'password_confirmation']}
+                        className="flex flex-col gap-5"
+                    >
+                        {({ processing, errors }) => (
+                            <>
+                                <div className="space-y-4">
+                                    {/* Name */}
+                                    <div className="grid gap-2">
+                                        <Label 
+                                            htmlFor="name" 
+                                            className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400"
+                                        >
+                                            Nome Completo
+                                        </Label>
+                                        <div className="relative">
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                required
+                                                autoFocus
+                                                tabIndex={1}
+                                                autoComplete="name"
+                                                placeholder="Mario Rossi"
+                                                className="h-14 pl-12 bg-[#FBFBFB] border-zinc-100 rounded-2xl focus:ring-2 focus:ring-black transition-all font-medium"
+                                            />
+                                        </div>
+                                        <InputError message={errors.name} className="ml-4 italic font-bold text-[10px] uppercase" />
+                                    </div>
+
+                                    {/* Email */}
+                                    <div className="grid gap-2">
+                                        <Label 
+                                            htmlFor="email" 
+                                            className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400"
+                                        >
+                                            Indirizzo Email
+                                        </Label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                name="email"
+                                                required
+                                                tabIndex={2}
+                                                autoComplete="email"
+                                                placeholder="mario@esempio.it"
+                                                className="h-14 pl-12 bg-[#FBFBFB] border-zinc-100 rounded-2xl focus:ring-2 focus:ring-black transition-all font-medium"
+                                            />
+                                        </div>
+                                        <InputError message={errors.email} className="ml-4 italic font-bold text-[10px] uppercase" />
+                                    </div>
+
+                                    {/* Password */}
+                                    <div className="grid gap-2">
+                                        <Label 
+                                            htmlFor="password" 
+                                            className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400"
+                                        >
+                                            Password
+                                        </Label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
+                                            <PasswordInput
+                                                id="password"
+                                                name="password"
+                                                required
+                                                tabIndex={3}
+                                                autoComplete="new-password"
+                                                placeholder="••••••••"
+                                                className="h-14 pl-12 bg-[#FBFBFB] border-zinc-100 rounded-2xl focus:ring-2 focus:ring-black transition-all font-medium"
+                                            />
+                                        </div>
+                                        <InputError message={errors.password} className="ml-4 italic font-bold text-[10px] uppercase" />
+                                    </div>
+
+                                    {/* Confirm Password */}
+                                    <div className="grid gap-2">
+                                        <Label 
+                                            htmlFor="password_confirmation" 
+                                            className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400"
+                                        >
+                                            Conferma Password
+                                        </Label>
+                                        <div className="relative">
+                                            <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
+                                            <PasswordInput
+                                                id="password_confirmation"
+                                                name="password_confirmation"
+                                                required
+                                                tabIndex={4}
+                                                autoComplete="new-password"
+                                                placeholder="••••••••"
+                                                className="h-14 pl-12 bg-[#FBFBFB] border-zinc-100 rounded-2xl focus:ring-2 focus:ring-black transition-all font-medium"
+                                            />
+                                        </div>
+                                        <InputError message={errors.password_confirmation} className="ml-4 italic font-bold text-[10px] uppercase" />
+                                    </div>
+                                </div>
+
+                                {/* Submit Button */}
+                                <Button
+                                    type="submit"
+                                    className="h-16 w-full bg-black text-white rounded-2xl hover:bg-zinc-800 transition-all duration-300 shadow-xl group mt-4"
+                                    tabIndex={5}
+                                    disabled={processing}
+                                >
+                                    {processing ? (
+                                        <Spinner className="mr-2" />
+                                    ) : (
+                                        <User className="mr-2 group-hover:scale-110 transition-transform" size={20} />
+                                    )}
+                                    <span className="font-black uppercase italic text-lg tracking-tight">Registrati</span>
+                                </Button>
+
+                                {/* Login Link */}
+                                <div className="text-center mt-4">
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
+                                        Hai già un account?{' '}
+                                        <Link 
+                                            href={login()} 
+                                            className="text-black hover:underline underline-offset-4 font-black italic"
+                                            tabIndex={6}
+                                        >
+                                            Accedi
+                                        </Link>
+                                    </p>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </div>
+                
+                {/* Footer */}
+                <p className="mt-10 text-center text-[9px] font-black uppercase italic opacity-20 tracking-[0.5em]">
+                    TEMPRA Performance Lab
+                </p>
+            </div>
+        </div>
     );
 }
 
 Register.layout = {
-    title: 'Create an account',
-    description: 'Enter your details below to create your account',
+    title: 'TEMPRA | Register',
+    description: 'Crea il tuo profilo atleta per iniziare il tuo percorso.',
 };

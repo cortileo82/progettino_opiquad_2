@@ -6,6 +6,7 @@ import { Dumbbell, CalendarDays, Timer, Repeat, Info } from 'lucide-react';
 interface Exercise {
     id: number;
     name: string;
+    description: string | null;
     pivot: {
         week_number: number;
         day_of_week: string;
@@ -28,8 +29,6 @@ interface Props {
 export default function MyPlan({ plan }: Props) {
     const breadcrumbs = [{ title: 'La Mia Scheda', href: '/client/my-plan' }];
 
-    // Calcoliamo l'array delle settimane basandoci sul numero totale (es. 1, 2, 3... total_weeks)
-    // Questo garantisce che anche le settimane vuote siano cliccabili
     const totalWeeksArray = plan 
         ? Array.from({ length: plan.total_weeks }, (_, i) => (i + 1).toString()) 
         : [];
@@ -47,7 +46,6 @@ export default function MyPlan({ plan }: Props) {
         );
     }
 
-    // Verifichiamo se la settimana selezionata ha dei giorni/esercizi
     const currentWeekData = plan.weeks[activeWeek];
     const hasExercises = currentWeekData && Object.keys(currentWeekData).length > 0;
 
@@ -75,7 +73,6 @@ export default function MyPlan({ plan }: Props) {
                         </div>
                     </div>
                     
-                    {/* Selettore Settimana: Mostra tutte le settimane fino a total_weeks */}
                     <div className="flex flex-wrap gap-2 w-full lg:w-auto">
                         {totalWeeksArray.map((w) => (
                             <button
@@ -106,10 +103,21 @@ export default function MyPlan({ plan }: Props) {
                                 </div>
                                 <div className="p-6 space-y-6">
                                     {exercises.map((ex) => (
-                                        <div key={ex.id} className="group/ex">
+                                        <div key={ex.id} className="group/ex border-b border-sidebar-border/50 last:border-0 pb-6 last:pb-0">
                                             <p className="text-xs font-black uppercase text-foreground leading-tight tracking-tight">
                                                 {ex.name}
                                             </p>
+
+                                            {/* AGGIUNTA DESCRIZIONE - Unica modifica apportata */}
+                                            {ex.description && (
+                                                <div className="mt-2 mb-1 flex gap-2">
+                                                    <Info size={10} className="text-primary shrink-0 mt-0.5" />
+                                                    <p className="text-[9px] font-bold text-muted-foreground uppercase italic leading-tight opacity-70">
+                                                        {ex.description}
+                                                    </p>
+                                                </div>
+                                            )}
+
                                             <div className="flex items-center gap-4 mt-3">
                                                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
                                                     <Repeat size={12} className="text-primary" />
@@ -126,7 +134,6 @@ export default function MyPlan({ plan }: Props) {
                             </div>
                         ))
                     ) : (
-                        /* STATO VUOTO: Se la settimana esiste ma non ha esercizi */
                         <div className="col-span-full py-24 flex flex-col items-center justify-center bg-sidebar border-2 border-dashed border-sidebar-border rounded-[3rem] text-center animate-in zoom-in duration-300">
                             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                                 <Info size={32} className="text-muted-foreground/50" />

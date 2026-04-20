@@ -37,7 +37,7 @@ export default function HistoryIndex({ pastPlans = [] }: Props) {
                                 Storico Schede
                             </h1>
                             <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.2em] opacity-70">
-                                Archivio tecnico dei programmi e biomeccanica applicata.
+                                Archivio storico delle schede.
                             </p>
                         </div>
                     </div>

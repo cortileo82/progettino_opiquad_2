@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Head, router } from '@inertiajs/react';
-import { ClipboardList, PlusCircle, ArrowRight, Calendar, Trash2 } from 'lucide-react';
+import { ClipboardList, PlusCircle, ArrowRight, Calendar, Trash2, ChevronLeft } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
@@ -48,24 +48,36 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
 
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
-                {/* HEADER */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-sidebar-border pb-8">
-                    <div>
-                        <h1 className="text-4xl font-black uppercase italic tracking-tighter text-foreground">
-                            Schede: <span className="text-primary">{client.name}</span>
-                        </h1>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2 opacity-70">
-                            Gestione storica e attiva dei programmi di allenamento.
-                        </p>
+                {/* HEADER CON PULSANTE TORNA ALLA DASHBOARD */}
+                <div className="flex flex-col gap-6 border-b border-sidebar-border pb-8">
+                    <div className="flex justify-start">
+                        <Link 
+                            href="/pt/dashboard" 
+                            className="flex items-center gap-2 px-4 py-2 bg-sidebar border border-sidebar-border rounded-xl text-[10px] font-black uppercase italic text-muted-foreground hover:text-primary hover:border-primary transition-all duration-200 shadow-sm"
+                        >
+                            <ChevronLeft size={14} />
+                            Torna alla Dashboard
+                        </Link>
                     </div>
-                    
-                    <Link 
-                        href={`/pt/plans/create/${client.id}`} 
-                        className="group flex items-center gap-3 bg-zinc-950 text-white px-8 py-4 rounded-2xl hover:bg-zinc-900 transition-all shadow-xl active:scale-95 border border-white/5"
-                    >
-                        <PlusCircle size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-                        <span className="font-black uppercase italic text-xs tracking-widest">Nuova Scheda</span>
-                    </Link>
+
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <h1 className="text-4xl font-black uppercase italic tracking-tighter text-foreground">
+                                Schede: <span className="text-primary">{client.name}</span>
+                            </h1>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2 opacity-70">
+                                Gestione storica e attiva dei programmi di allenamento.
+                            </p>
+                        </div>
+                        
+                        <Link 
+                            href={`/pt/plans/create/${client.id}`} 
+                            className="group flex items-center gap-3 bg-zinc-950 text-white px-8 py-4 rounded-2xl hover:bg-zinc-900 transition-all shadow-xl active:scale-95 border border-white/5"
+                        >
+                            <PlusCircle size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                            <span className="font-black uppercase italic text-xs tracking-widest">Nuova Scheda</span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* GRID SCHEDE */}
