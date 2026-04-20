@@ -8,6 +8,7 @@ use App\Models\Exercise;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePlanRequest;
+use App\Http\Requests\UpdatePlanRequest;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

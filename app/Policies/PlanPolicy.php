@@ -14,6 +14,7 @@ class PlanPolicy
         // Se l'utente loggato è il proprietario della scheda (il cliente stesso) -> PUÒ PASSARE
         if ($user->id === $plan->user_id) {
             return true;
+        }
 
         // Altrimenti, si applica la logica del PT (attuale trainer o creatore).
         // Nessun User::find(), perché si usa la relazione definita nel Model.
