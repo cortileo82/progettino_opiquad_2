@@ -1,3 +1,4 @@
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { 
@@ -46,12 +47,12 @@ export default function Dashboard({ stats, exercises }: Props) {
                     </p>
                 </div>
 
-                {/* --- SEZIONE CARDS STATISTICHE (Ora a 4 colonne) --- */}
+                {/* --- SEZIONE CARDS STATISTICHE --- */}
                 <div className="grid gap-4 grid-cols-2 xl:grid-cols-4">
                     
                     {/* Card Clienti */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-blue-500/30 transition-colors">
-                        <div className="rounded-xl bg-blue-500/10 p-3 text-blue-500">
+                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
                             <Users size={24} />
                         </div>
                         <div>
@@ -61,8 +62,8 @@ export default function Dashboard({ stats, exercises }: Props) {
                     </div>
 
                     {/* Card Personal Trainer */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-green-500/30 transition-colors">
-                        <div className="rounded-xl bg-green-500/10 p-3 text-green-500">
+                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
                             <UserCheck size={24} />
                         </div>
                         <div>
@@ -72,8 +73,8 @@ export default function Dashboard({ stats, exercises }: Props) {
                     </div>
 
                     {/* Card Esercizi */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-orange-500/30 transition-colors">
-                        <div className="rounded-xl bg-orange-500/10 p-3 text-orange-500">
+                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
                             <Dumbbell size={24} />
                         </div>
                         <div>
@@ -82,9 +83,9 @@ export default function Dashboard({ stats, exercises }: Props) {
                         </div>
                     </div>
 
-                    {/* NUOVA CARD: Schede Allenamento */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-purple-500/30 transition-colors">
-                        <div className="rounded-xl bg-purple-500/10 p-3 text-purple-500">
+                    {/* Card Schede Allenamento */}
+                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
                             <ClipboardList size={24} />
                         </div>
                         <div>
@@ -99,12 +100,12 @@ export default function Dashboard({ stats, exercises }: Props) {
                 <div className="flex flex-col gap-4 w-full mt-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-lg font-black tracking-tight uppercase italic flex items-center gap-2">
-                            <History size={18} className="text-orange-500" />
+                            <History size={18} className="text-foreground" />
                             Ultimi Esercizi Inseriti
                         </h2>
                         <Link 
                             href="/admin/exercises" 
-                            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-orange-500 transition-colors flex items-center gap-1"
+                            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
                         >
                             Vedi Tutti <ArrowUpRight size={12} />
                         </Link>
@@ -116,7 +117,7 @@ export default function Dashboard({ stats, exercises }: Props) {
                                 exercises.slice(0, 5).map((ex) => (
                                     <div key={ex.id} className="p-4 flex items-center justify-between group hover:bg-background/50 transition-colors">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-foreground opacity-30 group-hover:opacity-100 transition-opacity" />
                                             <span className="font-bold uppercase text-sm tracking-widest text-foreground">
                                                 {ex.name}
                                             </span>
