@@ -30,8 +30,13 @@ export default function CreatePlan({ client, exercises_list }: Props) {
 
     const updateRow = (i: number, field: string, val: any) => {
         const updated = [...data.exercises];
-        // Impedisce l'inserimento di valori inferiori a 1 per le serie
-        if (field === 'sets' && val !== '' && parseInt(val) < 1) val = '1';
+
+        // Si controlla che il campo sia uno di quelli strettamente numerici positivi
+        const isStrictPositiveField = ['sets', 'reps', 'rest_time', 'week_number'].includes(field);
+
+        if (isStrictPositiveField && val !== '' && parseInt(val) < 1) {
+            val = '1';
+        }
         
         updated[i] = { ...updated[i], [field]: val };
         setData('exercises', updated);
@@ -89,12 +94,19 @@ export default function CreatePlan({ client, exercises_list }: Props) {
                                     type="number" 
                                     value={data.num_weeks} 
                                     onChange={e => {
-                                        const val = parseInt(e.target.value);
-                                        setData('num_weeks', val < 1 ? 1 : val);
-                                    }} 
+                                        const val = e.target.value;         
+                                        // Se l'utente cancella tutto, si salva la stringa vuota per non bloccarlo
+                                        setData('num_weeks', val === '' ? '' : parseInt(val));
+                                    }}
+                                    onBlur={() => {
+                                        // Quando l'utente clicca fuori, se ha lasciato vuoto o messo 0, forziamo a 1
+                                        if (!data.num_weeks || data.num_weeks < 1) {
+                                            setData('num_weeks', 1);
+                                        }
+                                    }}
                                     className="h-14 bg-background border-sidebar-border rounded-2xl px-6 font-bold" 
                                     min="1" 
-                                    required
+                                    required 
                                 />
                             </div>
                         </div>
@@ -119,8 +131,8 @@ export default function CreatePlan({ client, exercises_list }: Props) {
                                             onChange={e => updateRow(i, 'week_number', parseInt(e.target.value))} 
                                             className="w-full h-12 bg-background border-none rounded-xl text-xs font-black appearance-none text-center focus:ring-2 focus:ring-black"
                                         >
-                                            {[...Array(data.num_weeks)].map((_, idx) => (
-                                                <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                                            {[...Array(Math.max(1, Number(data.num_weeks) || 1))].map((_, idx) => (
+                                                <option key={idx + 1} value={idx + 1}> {idx + 1}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -167,11 +179,27 @@ export default function CreatePlan({ client, exercises_list }: Props) {
                                         </div>
                                         <div>
                                             <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Reps</Label>
-                                            <Input type="text" value={row.reps} onChange={e => updateRow(i, 'reps', e.target.value)} placeholder="10" className="h-12 bg-background border-none rounded-xl text-center font-black" required />
+                                            <Input 
+                                                type="number" 
+                                                min="1" 
+                                                value={row.reps} 
+                                                onChange={e => updateRow(i, 'reps', e.target.value)} 
+                                                placeholder="10" 
+                                                className="h-12 bg-background border-none rounded-xl text-center font-black" 
+                                                required
+                                            />
                                         </div>
                                         <div>
                                             <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Recupero</Label>
-                                            <Input type="text" value={row.rest_time} onChange={e => updateRow(i, 'rest_time', e.target.value)} placeholder="90''" className="h-12 bg-background border-none rounded-xl text-center font-black" required />
+                                            <Input 
+                                                type="number" 
+                                                min="1" 
+                                                value={row.rest_time} 
+                                                onChange={e => updateRow(i, 'rest_time', e.target.value)} 
+                                                placeholder="90''" 
+                                                className="h-12 bg-background border-none rounded-xl text-center font-black" 
+                                                required
+                                            />
                                         </div>
                                     </div>
 
