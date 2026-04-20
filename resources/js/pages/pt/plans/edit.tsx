@@ -1,7 +1,10 @@
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import { Plus, Trash2, Save, ArrowLeft, Dumbbell, Calendar, Layout } from 'lucide-react';
+import { Plus, Trash2, Save, ChevronLeft, Dumbbell, ListChecks } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Exercise { id: number; name: string; }
 interface Client { id: number; name: string; }
@@ -13,7 +16,7 @@ interface Props {
 
 export default function EditPlan({ client, exercises_list, plan }: Props) {
 
-    // 1. HYDRATION: Logica originale preservata al 100%
+    // Mantengo esattamente la logica di inizializzazione originale
     const { data, setData, put, processing, errors } = useForm({
         user_id: plan.user_id,
         name: plan.name,
@@ -30,7 +33,7 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
 
     const addRow = () => setData('exercises', [
         ...data.exercises, 
-        { exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '', reps: '', rest_time: '' }
+        { exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '1', reps: '', rest_time: '' }
     ]);
     
     const removeRow = (i: number) => {
@@ -41,97 +44,93 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
 
     const updateRow = (i: number, field: string, val: any) => {
         const updated = [...data.exercises];
+        // Blocco valori negativi/zero per le serie come richiesto
+        if (field === 'sets' && val !== '' && parseInt(val) < 1) val = '1';
         updated[i] = { ...updated[i], [field]: val };
         setData('exercises', updated);
     };
 
     return (
         <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }, { title: 'Modifica Scheda', href: '#' }]}>
-            <Head title={`Modifica - ${plan.name}`} />
+            <Head title={`Modifica: ${plan.name} - TEMPRA`} />
             
-            <div className="p-6 md:p-10 max-w-7xl mx-auto w-full flex flex-col gap-8">
+            <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
-                {/* HEADER DI PAGINA */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                {/* HEADER SEZIONE */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-sidebar-border pb-8">
                     <div>
                         <h1 className="text-4xl font-black uppercase italic tracking-tighter text-foreground leading-none">
-                            Modifica <span className="text-orange-500">Scheda</span>
+                            Modifica <span className="text-primary">Scheda</span>
                         </h1>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2">
-                            Atleta: <span className="text-foreground">{client?.name}</span>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-3 opacity-70">
+                            Destinatario: <span className="text-foreground">{client?.name}</span>
                         </p>
                     </div>
-                    
+
                     <Link 
                         href={`/pt/clients/${plan.user_id}/plans`} 
-                        className="flex items-center gap-2 text-[10px] font-black uppercase italic tracking-widest text-muted-foreground hover:text-foreground transition-colors bg-secondary/50 px-4 py-2 rounded-full border border-sidebar-border"
+                        className="group flex items-center gap-2 text-[10px] font-black uppercase italic text-zinc-400 hover:text-black transition-all tracking-widest"
                     >
-                        <ArrowLeft size={14}/> Annulla e torna indietro
+                        <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Annulla
                     </Link>
                 </div>
 
-                {/* FORM PRINCIPALE */}
-                <form onSubmit={(e) => { e.preventDefault(); put(`/pt/plans/${plan.id}`); }} className="space-y-8">
+                {/* LOGICA PUT ORIGINALE */}
+                <form onSubmit={(e) => { e.preventDefault(); put(`/pt/plans/${plan.id}`); }} className="space-y-10">
                     
-                    {/* SEZIONE 1: DATI GENERALI */}
+                    {/* CARD DATI GENERALI */}
                     <div className="bg-sidebar border border-sidebar-border rounded-[2.5rem] p-8 shadow-sm">
-                        <div className="flex items-center gap-3 mb-6 border-b border-sidebar-border pb-4">
-                            <Layout size={18} className="text-orange-500" />
-                            <h2 className="text-xs font-black uppercase italic tracking-widest">Configurazione Programma</h2>
+                        <div className="flex items-center gap-3 mb-8 border-b border-sidebar-border pb-4">
+                            <ListChecks size={20} className="text-primary" />
+                            <h2 className="font-black uppercase italic text-sm tracking-widest">Info Programma</h2>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-4">Nome della Scheda</label>
-                                <input 
+                            <div className="grid gap-3">
+                                <Label className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400">Nome Programma</Label>
+                                <Input 
                                     type="text" 
                                     value={data.name} 
                                     onChange={e => setData('name', e.target.value)} 
-                                    className="w-full h-14 bg-background border-sidebar-border rounded-2xl px-6 font-bold uppercase italic focus:ring-2 focus:ring-orange-500 transition-all" 
-                                    placeholder="Es: Powerbuilding Phase 1"
+                                    className="h-14 bg-background border-sidebar-border rounded-2xl px-6 font-bold uppercase italic focus:ring-2 focus:ring-black" 
                                     required 
                                 />
-                                {errors.name && <p className="text-red-500 text-[10px] font-bold uppercase ml-4">{errors.name}</p>}
                             </div>
-                            
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-4">Durata Ciclo (Settimane)</label>
-                                <input 
+                            <div className="grid gap-3">
+                                <Label className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400">Durata Ciclo (Settimane)</Label>
+                                <Input 
                                     type="number" 
                                     value={data.num_weeks} 
-                                    onChange={e => setData('num_weeks', parseInt(e.target.value))} 
-                                    className="w-full h-14 bg-background border-sidebar-border rounded-2xl px-6 font-bold focus:ring-2 focus:ring-orange-500 transition-all" 
+                                    onChange={e => {
+                                        const val = parseInt(e.target.value);
+                                        setData('num_weeks', val < 1 ? 1 : val);
+                                    }} 
+                                    className="h-14 bg-background border-sidebar-border rounded-2xl px-6 font-bold" 
                                     min="1" 
+                                    required
                                 />
-                                {errors.num_weeks && <p className="text-red-500 text-[10px] font-bold uppercase ml-4">{errors.num_weeks}</p>}
                             </div>
                         </div>
                     </div>
 
-                    {/* SEZIONE 2: LISTA ESERCIZI */}
-                    <div className="space-y-4">
+                    {/* LISTA ESERCIZI DINAMICA */}
+                    <div className="space-y-6">
                         <div className="flex items-center gap-3 pl-4">
-                            <Dumbbell size={18} className="text-orange-500" />
-                            <h3 className="text-xs font-black uppercase italic tracking-widest text-foreground">Programmazione Esercizi</h3>
+                            <Dumbbell size={20} className="text-primary" />
+                            <h3 className="font-black uppercase italic text-sm tracking-widest">Protocollo Esercizi</h3>
                         </div>
-                        
-                        {errors.exercises && (
-                            <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl mx-4">
-                                <p className="text-red-500 text-[10px] font-bold uppercase text-center">{errors.exercises}</p>
-                            </div>
-                        )}
 
-                        <div className="flex flex-col gap-4">
+                        <div className="grid gap-4">
                             {data.exercises.map((row: any, i: number) => (
-                                <div key={i} className="bg-sidebar p-6 md:p-8 rounded-[2.5rem] border border-sidebar-border grid grid-cols-1 md:grid-cols-12 gap-6 items-end shadow-sm hover:border-orange-500/30 transition-all">
+                                <div key={i} className="bg-sidebar border border-sidebar-border rounded-[2.5rem] p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-end shadow-sm hover:border-primary/50 transition-all group">
                                     
                                     {/* SETTIMANA */}
                                     <div className="md:col-span-1">
-                                        <label className="text-[9px] font-black uppercase mb-2 block text-center text-muted-foreground">Sett.</label>
+                                        <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Sett.</Label>
                                         <select 
                                             value={row.week_number} 
                                             onChange={e => updateRow(i, 'week_number', parseInt(e.target.value))} 
-                                            className="w-full h-12 bg-background border-none rounded-xl text-xs font-black text-center focus:ring-2 focus:ring-orange-500 appearance-none"
+                                            className="w-full h-12 bg-background border-none rounded-xl text-xs font-black text-center focus:ring-2 focus:ring-black appearance-none"
                                         >
                                             {[...Array(data.num_weeks)].map((_, idx) => (
                                                 <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
@@ -141,52 +140,52 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
 
                                     {/* GIORNO */}
                                     <div className="md:col-span-2">
-                                        <label className="text-[9px] font-black uppercase mb-2 block text-center text-muted-foreground">Giorno</label>
+                                        <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Giorno</Label>
                                         <select 
                                             value={row.day_of_week} 
                                             onChange={e => updateRow(i, 'day_of_week', e.target.value)} 
-                                            className="w-full h-12 bg-background border-none rounded-xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-orange-500"
+                                            className="w-full h-12 bg-background border-none rounded-xl text-xs font-black uppercase italic focus:ring-2 focus:ring-black"
                                         >
                                             {['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'].map(d => <option key={d} value={d}>{d}</option>)}
                                         </select>
                                     </div>
 
-                                    {/* ESERCIZIO */}
+                                    {/* SELEZIONE ESERCIZIO */}
                                     <div className="md:col-span-3">
-                                        <label className="text-[9px] font-black uppercase mb-2 block ml-2 text-muted-foreground">Esercizio</label>
+                                        <Label className="text-[9px] font-black uppercase italic mb-2 block ml-2 opacity-50 tracking-tighter">Esercizio</Label>
                                         <select 
                                             value={row.exercise_id} 
                                             onChange={e => updateRow(i, 'exercise_id', e.target.value)} 
-                                            className="w-full h-12 bg-background border-none rounded-xl text-[10px] font-black uppercase italic focus:ring-2 focus:ring-orange-500" 
+                                            className="w-full h-12 bg-background border-none rounded-xl text-[11px] font-black uppercase italic focus:ring-2 focus:ring-black" 
                                             required
                                         >
-                                            <option value="">Seleziona...</option>
+                                            <option value="">Scegli...</option>
                                             {exercises_list.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
                                         </select>
                                     </div>
 
-                                    {/* PARAMETRI (SERIE, REPS, REST) */}
+                                    {/* STATS TECNICHE */}
                                     <div className="md:col-span-5 grid grid-cols-3 gap-3">
                                         <div>
-                                            <label className="text-[9px] font-black uppercase mb-2 block text-center text-muted-foreground">Serie</label>
-                                            <input type="number" value={row.sets} onChange={e => updateRow(i, 'sets', e.target.value)} className="w-full h-12 bg-background border-none rounded-xl text-xs font-black text-center focus:ring-2 focus:ring-orange-500" />
+                                            <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Serie</Label>
+                                            <Input type="number" min="1" value={row.sets} onChange={e => updateRow(i, 'sets', e.target.value)} className="h-12 bg-background border-none rounded-xl text-center font-black" required />
                                         </div>
                                         <div>
-                                            <label className="text-[9px] font-black uppercase mb-2 block text-center text-muted-foreground">Reps</label>
-                                            <input type="text" value={row.reps} onChange={e => updateRow(i, 'reps', e.target.value)} className="w-full h-12 bg-background border-none rounded-xl text-xs font-black text-center focus:ring-2 focus:ring-orange-500" />
+                                            <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Reps</Label>
+                                            <Input type="text" value={row.reps} onChange={e => updateRow(i, 'reps', e.target.value)} className="h-12 bg-background border-none rounded-xl text-center font-black" required />
                                         </div>
                                         <div>
-                                            <label className="text-[9px] font-black uppercase mb-2 block text-center text-muted-foreground">Rest</label>
-                                            <input type="text" value={row.rest_time} onChange={e => updateRow(i, 'rest_time', e.target.value)} className="w-full h-12 bg-background border-none rounded-xl text-xs font-black text-center focus:ring-2 focus:ring-orange-500" />
+                                            <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Rest</Label>
+                                            <Input type="text" value={row.rest_time} onChange={e => updateRow(i, 'rest_time', e.target.value)} className="h-12 bg-background border-none rounded-xl text-center font-black" required />
                                         </div>
                                     </div>
 
-                                    {/* AZIONE ELIMINA */}
-                                    <div className="md:col-span-1 flex justify-center">
+                                    {/* CANCELLA RIGA */}
+                                    <div className="md:col-span-1 flex justify-center pb-1">
                                         <button 
                                             type="button" 
                                             onClick={() => removeRow(i)} 
-                                            className="p-3 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                                            className="p-3 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                         >
                                             <Trash2 size={20}/>
                                         </button>
@@ -196,30 +195,30 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
                         </div>
                     </div>
 
-                    {/* AZIONI FINALI */}
+                    {/* FOOTER ACTIONS */}
                     <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-sidebar-border">
-                        <button 
+                        <Button 
                             type="button" 
                             onClick={addRow} 
-                            className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-secondary text-foreground px-8 py-4 rounded-2xl font-black uppercase italic text-xs tracking-[0.2em] hover:bg-secondary/80 transition-all border border-sidebar-border shadow-sm"
+                            variant="outline"
+                            className="h-16 flex-1 md:flex-none md:px-10 border-2 border-zinc-200 rounded-2xl font-black uppercase italic text-xs tracking-widest hover:bg-zinc-100 transition-all shadow-sm"
                         >
-                            <Plus size={18}/> Aggiungi Esercizio
-                        </button>
+                            <Plus size={18} className="mr-2" /> Aggiungi Esercizio
+                        </Button>
                         
-                        <button 
+                        <Button 
                             type="submit" 
                             disabled={processing} 
-                            className="md:ml-auto flex items-center justify-center gap-3 bg-foreground text-background px-16 py-4 rounded-2xl font-black uppercase italic text-xs tracking-[0.2em] shadow-xl hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-16 md:ml-auto md:px-16 bg-black text-white rounded-2xl font-black uppercase italic text-sm tracking-widest shadow-2xl hover:bg-zinc-800 transition-all disabled:opacity-50"
                         >
-                            <Save size={18}/> {processing ? 'Salvataggio...' : 'Aggiorna Scheda'}
-                        </button>
+                            <Save size={18} className="mr-2" /> {processing ? 'Salvataggio...' : 'Aggiorna Scheda'}
+                        </Button>
                     </div>
                 </form>
 
-                {/* FOOTER DECORATIVO */}
-                <div className="mt-10 opacity-20 text-center">
-                    <p className="text-[8px] font-black uppercase tracking-[1em]">Tempra Performance System v2.0</p>
-                </div>
+                <p className="text-center text-[9px] font-black uppercase italic opacity-20 tracking-[0.5em] mt-10">
+                    TEMPRA Performance Lab - Sistema di Revisione
+                </p>
             </div>
         </AppLayout>
     );
