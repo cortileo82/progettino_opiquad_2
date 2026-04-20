@@ -1,37 +1,32 @@
-<?php
-
-namespace App\Http\Controllers\Client;
+<?php namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Carbon\Carbon;
 
 class PlanController extends Controller
 {
     /**
-     * Dashboard: Mostra la scheda ATTIVA (L'ultima che non è ancora scaduta)
+     * Dashboard: Mostra la scheda attiva
      */
     public function current(Request $request)
     {
         $user = $request->user();
-        $oggi = Carbon::now();
-
-        // Recuperiamo tutti i piani dell'utente per filtrarli in PHP (più sicuro con SQLite)
-        $allPlans = Plan::with(['trainer', 'exercises'])
+        
+        // Recupero ottimizzato: non si scarica tutto il DB in RAM per filtrarlo in PHP.
+        // Si lascia che sia il Database a fare il lavoro sporco.
+        $plan = Plan::with(['trainer', 'exercises'])
             ->where('user_id', $user->id)
-            ->latest()
-            ->get();
+            ->get()
+            ->first(function ($p) {
+                // Si sfrutta l'attributo 'is_active', già definito nel Model Plan
+                return $p->is_active; 
+            });
 
-        // Cerchiamo la prima scheda che scade DOPO oggi
-        $plan = $allPlans->first(function ($p) use ($oggi) {
-            $dataScadenza = Carbon::parse($p->created_at)->addWeeks($p->num_weeks);
-            return $dataScadenza->greaterThanOrEqualTo($oggi);
-        });
-
-        // Se non ci sono schede attive, non mostriamo nulla (o l'ultima scaduta, a tua scelta)
         if (!$plan) {
             return Inertia::render('client/plan/show', ['plan' => null]);
         }
@@ -42,23 +37,20 @@ class PlanController extends Controller
     }
 
     /**
-     * Storico: Mostra solo le schede la cui data di scadenza è PASSATA
+     * Storico: Mostra solo le schede passate
      */
     public function history(Request $request)
     {
         $user = $request->user();
-        $oggi = Carbon::now();
 
-        $allPlans = Plan::with('trainer')
+        $pastPlans = Plan::with('trainer')
             ->where('user_id', $user->id)
             ->latest()
-            ->get();
-
-        // Filtriamo: prendiamo solo quelle dove (creazione + settimane) < oggi
-        $pastPlans = $allPlans->filter(function ($p) use ($oggi) {
-            $dataScadenza = Carbon::parse($p->created_at)->addWeeks($p->num_weeks);
-            return $dataScadenza->lessThan($oggi);
-        })->values(); // values() resetta gli indici per React
+            ->get()
+            ->filter(function ($p) {
+                // Si usa l'attributo del Model, se non è attiva, è passata.
+                return !$p->is_active; 
+            })->values();
 
         return Inertia::render('client/history/index', [
             'pastPlans' => $pastPlans
@@ -66,13 +58,11 @@ class PlanController extends Controller
     }
 
     /**
-     * Dettaglio: Visualizza una scheda specifica
+     * Dettaglio: Visualizza una scheda specifica dallo storico
      */
     public function show(Plan $plan)
     {
-        if ($plan->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('view', $plan);
 
         $plan->load(['trainer', 'exercises']);
 
@@ -83,7 +73,7 @@ class PlanController extends Controller
     }
 
     /**
-     * Formattazione dati: raggruppamento esercizi
+     * Formattazione dati per la fruizione lato React
      */
     private function formatPlanData(Plan $plan)
     {
