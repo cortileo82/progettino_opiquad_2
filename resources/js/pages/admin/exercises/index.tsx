@@ -59,7 +59,7 @@ export default function ExerciseIndex({ exercises = [] }: Props) {
                                 Gestione Esercizi
                             </h1>
                             <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.2em] opacity-70">
-                                Archivio tecnico degli esercizi e biomeccanica.
+                                Archivio tecnico e modifiche degli esercizi disponibili.
                             </p>
                         </div>
                         

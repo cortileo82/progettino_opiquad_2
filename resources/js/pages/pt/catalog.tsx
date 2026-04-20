@@ -46,7 +46,7 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                             CATALOGO ESERCIZI
                         </h1>
                         <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.3em] opacity-70">
-                            Database tecnico per Personal Trainer
+                            Database tecnico degli esercizi disponibili
                         </p>
                     </div>
 
