@@ -1,91 +1,71 @@
-<?php
-
-namespace App\Http\Controllers\Admin;
+<?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
-use App\Enums\MuscleGroup; 
+use App\Enums\MuscleGroup;
+use App\Http\Requests\StoreExerciseRequest;
+use App\Http\Requests\UpdateExerciseRequest;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 class ExerciseController extends Controller
 {
-    // Visualizza la lista degli esercizi
     public function index()
     {
-        $exercises = Exercise::latest()->get(); 
-        
-        return Inertia::render('admin/exercises/index', [
-            'exercises' => $exercises
+        Gate::authorize('viewAny', Exercise::class);
+
+        $exercises = Exercise::latest()->get();
+        return Inertia::render('admin/exercises/index', ['exercises' => $exercises]);
+    }
+
+    public function create()
+    {
+        Gate::authorize('create', Exercise::class);
+
+        return Inertia::render('admin/exercises/create', [
+            'muscleGroups' => MuscleGroup::values(),
         ]);
     }
 
-    // Mostra il form di modifica
+    public function store(StoreExerciseRequest $request)
+    {
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in StoreExerciseRequest
+
+        Exercise::create($request->validated());
+        return redirect('/admin/exercises')->with('success', 'Esercizio creato!');
+    }
+
     public function edit(Exercise $exercise)
     {
+        Gate::authorize('update', $exercise);
+
         return Inertia::render('admin/exercises/edit', [
             'exercise' => $exercise,
             'muscleGroups' => MuscleGroup::values(),
         ]);
     }
 
-    // Aggiorna l'esercizio esistente
-    public function update(Request $request, Exercise $exercise)
+    public function update(UpdateExerciseRequest $request, Exercise $exercise)
     {
-        // Validazione manuale qui per evitare conflitti con StoreExerciseRequest
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'muscle_group' => 'nullable|string', 
-        ]);
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in UpdateExerciseRequest
 
-        // Esegui l'aggiornamento
-        $exercise->update($validated);
-
-        // Redirect usando il percorso statico (più sicuro nel tuo caso)
+        $exercise->update($request->validated());
         return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato!');
     }
 
-    // Elimina l'esercizio
     public function destroy(Exercise $exercise)
     {
+        // 1. Autorizzazione
+        Gate::authorize('delete', $exercise);
+
+        // 2. Pulizia delle relazioni (Previene il crash del DB)
+        // Questo cancella tutte le righe dalla tabella pivot 'plan_exercises' 
+        // che contengono questo specifico esercizio.
+        $exercise->plans()->detach();
+
+        // 3. Eliminazione fisica
         $exercise->delete();
 
-        return redirect('/admin/exercises')->with('success', 'Esercizio eliminato!');
-    }
-
-    // Ho lasciato i metodi store e create se ti servono in futuro, 
-    // ma li ho puliti per coerenza
-    public function create()
-    {
-        return Inertia::render('admin/exercises/create', [
-            'muscleGroups' => MuscleGroup::values(),
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'muscle_group' => 'required|string',
-        ]);
-
-        Exercise::create($validated);
-
-        return redirect('/admin/exercises');
-    }
-    // Aggiungi questo metodo all'interno della classe ExerciseController
-
-   public function catalog()
-    {
-        $exercises = Exercise::orderBy('muscle_group')
-            ->orderBy('name')
-            ->get();
-
-        // Modifica il percorso qui:
-        return Inertia::render('pt/catalog', [
-            'exercises' => $exercises
-        ]);
+        return redirect('/admin/exercises')->with('success', 'Esercizio eliminato con successo!');
     }
 }

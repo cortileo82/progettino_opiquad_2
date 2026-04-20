@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use App\Enums\Role; 
 use Illuminate\Validation\Rule;
 
@@ -14,7 +15,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;    // L'autorizzazione del ruolo è gestita dal middleware
+        return Gate::allows('create', User::class);    // UserPolicy determina se l'utente loggato può salvare utenti
     }
 
     /**
@@ -25,10 +26,12 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8', // La password è OBBLIGATORIA
             'role'     => ['required', Rule::enum(Role::class)],   // Solo i 3 ruoli prestabiliti sono accettati
+            'trainer_id' => 'nullable|exists:users,id',
         ];
     }
 }

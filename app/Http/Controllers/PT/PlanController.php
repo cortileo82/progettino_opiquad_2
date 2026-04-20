@@ -15,17 +15,12 @@ use Illuminate\Support\Facades\Gate;
 
 class PlanController extends Controller
 {
-    // In PlanController.php
     public function show(Plan $plan)
     {
-        // Il PT stia guardando una scheda dei SUOI clienti
-        if ($plan->pt_id !== auth()->id()) {
-            abort(403, 'Accesso negato.');
-        }
+        Gate::authorize('view', $plan);
 
+        // Si caricano i dati
         $plan->load('exercises');
-
-        // Inoltre carichiamo i dati base del cliente per avere il suo nome
         $client = User::find($plan->user_id);
 
         return Inertia::render('pt/plans/show', [
@@ -36,9 +31,7 @@ class PlanController extends Controller
 
     public function create(User $client) 
     {
-        if($client->trainer_id !== auth()->id()) {
-            abort(403, 'You do not have permission to create plans for this user');
-        }
+        Gate::authorize('create', [Plan::class, $client]);
 
         return Inertia::render('pt/plans/create', [
             'client' => $client,
@@ -48,6 +41,8 @@ class PlanController extends Controller
 
     public function store(StorePlanRequest $request)
     {
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in StorePlanRequest
+
         // Validazione della richiesta
         $data = $request->validated();
 
@@ -83,27 +78,24 @@ class PlanController extends Controller
         Gate::authorize('update', $plan);
 
         // Si dice a Laravel di caricare gli esercizi collegati a tale scheda per idratare il frontend
-        $plan->load('exercises');
-
-        // Inoltre carichiamo i dati base del cliente per avere il suo nome
-        $client = User::find($plan->user_id);
+        // e il cliente di tale scheda per avere il suo nome
+        $plan->load(['exercises', 'client']);
 
         return Inertia::render('pt/plans/edit', [
             'plan' => $plan,
             'exercises_list' => Exercise::orderBy('name')->get(),
-            'client' => $client,
+            'client' => $plan->client,
         ]);
     }
 
-    public function update(StorePlanRequest $request, Plan $plan)
+    public function update(UpdatePlanRequest $request, Plan $plan)
     {
-        // 1. Autorizzazione utente per la modifica di tale specifica scheda (PT diversi potrebbero interferirsi a vicenda)
-        Gate::authorize('update', $plan);
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in UpdatePlanRequest
 
-        // 2. Validazione dei dati ricevuti per la modifica della scheda
+        // 1. Validazione dei dati ricevuti per la modifica della scheda
         $data = $request->validated();
 
-        // 3. Modifica atomica della tabella "plan" e della tabella pivot "plan_exercises"
+        // 2. Modifica atomica della tabella "plan" e della tabella pivot "plan_exercises"
         DB::transaction(function () use ($plan, $data) {
             // A. Aggiornamento tabella "plan"
             $plan->update([

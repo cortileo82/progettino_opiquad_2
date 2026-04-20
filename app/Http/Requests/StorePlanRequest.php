@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 
 class StorePlanRequest extends FormRequest
 {
@@ -12,7 +14,10 @@ class StorePlanRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;    // Il middleware role:pt ci protegge già a livello di rotta
+        $client = User::find($this->input('user_id'));
+        if(!$client) return false;
+
+        return Gate::allows('create', [Plan::class, $client]);
     }
 
     /**

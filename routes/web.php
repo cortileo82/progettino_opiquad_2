@@ -16,6 +16,7 @@ use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController as PTPlanController;
 use App\Http\Controllers\PT\ShowClientPlansController;
+use App\Http\Controllers\PT\ExerciseCatalogController; 
 
 // Controllers Client
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
@@ -78,7 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', PTDashboard::class)->name('dashboard');
         
         // Catalogo Esercizi (Sola Lettura per PT)
-        Route::get('/exercises/catalog', [ExerciseController::class, 'catalog'])->name('exercises.catalog');
+        Route::get('/exercises/catalog', ExerciseCatalogController::class)->name('exercises.catalog');
 
         // Gestione Clienti e Assegnazioni
         Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('clients.assign');

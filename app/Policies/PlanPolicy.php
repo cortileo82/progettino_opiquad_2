@@ -1,78 +1,53 @@
-<?php
-
-namespace App\Policies;
+<?php namespace App\Policies;
 
 use App\Models\Plan;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class PlanPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
+    public function viewAny(User $user): bool {
         return false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Plan $plan): bool
     {
-        if(($user->id == $plan-$pt_id) || ($user->id == $plan->user_id)) {
-            return true;
-        }
+        // Nessun User::find()! si usa la relazione definita nel Model.
+        // Si controlla che il client esista (->client) prima di chiamarne la proprietà (->trainer_id)
+        $isCurrentTrainer = $plan->client && ($user->id === $plan->client->trainer_id);
+        $isOriginalAuthor = $user->id === $plan->pt_id;
 
-        return false;
+        return $isCurrentTrainer || $isOriginalAuthor;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(User $user, User $client): bool
     {
-        return false;
+        return $user->id === $client->trainer_id;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Plan $plan): bool
     {
-        if($user->id == $plan->pt_id) {
-            return true;
+        // Evita il crash se $plan->client è null
+        if (!$plan->client) {
+            return false;
         }
 
-        return false;
+        return $user->id === $plan->client->trainer_id;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Plan $plan): bool
     {
-        if($user->id == $plan->pt_id) {
-            return true;
+        if (!$plan->client) {
+            return false;
         }
 
+        return $user->id === $plan->client->trainer_id;
+    }
+
+    public function restore(User $user, Plan $plan): bool {
         return false;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Plan $plan): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Plan $plan): bool
-    {
+    public function forceDelete(User $user, Plan $plan): bool {
         return false;
     }
 }

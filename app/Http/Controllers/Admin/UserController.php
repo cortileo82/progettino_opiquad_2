@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -15,6 +18,8 @@ class UserController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', User::class);
+
         // Carichiamo gli utenti con il loro trainer (Eager Loading)
         $users = User::with('trainer')->latest()->get();
         
@@ -32,6 +37,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create', User::class);
+
         $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('admin/accounts/create', [
@@ -39,31 +46,22 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Salva il nuovo utente nel database.
-     */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'email'      => 'required|string|email|max:255|unique:users',
-            'password'   => 'required|string|min:8',
-            'role'       => 'required|in:admin,pt,client',
-            'pt_id'      => 'nullable', // Gestito manualmente sotto
-        ]);
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in StoreUserRequest
 
-        // Logica per il trainer_id in fase di creazione
+        $validated = $request->validated();
+
         $trainerId = null;
-        if ($validated['role'] === 'client' && $request->pt_id !== 'none') {
+        if ($validated['role'] === \App\Enums\Role::CLIENT->value && $request->pt_id !== 'none') {
             $trainerId = $request->pt_id;
         }
 
         User::create([
-            'name'       => $validated['first_name'] . ' ' . $validated['last_name'],
-            'email'      => $validated['email'],
-            'password'   => Hash::make($validated['password']),
-            'role'       => $validated['role'],
+            'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
             'trainer_id' => $trainerId,
         ]);
 
@@ -71,35 +69,29 @@ class UserController extends Controller
     }
 
     /**
-     * Aggiorna i dati dell'utente (Usato dalla modale in index.tsx).
+     * Il metodo edit non è implementato in quanto il form di modifica di un utente appare
+     * attraverso un popup e non una pagina dedicata.
      */
-    public function update(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'email'      => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password'   => 'nullable|string|min:8',
-            'role'       => 'required|in:admin,pt,client',
-            'trainer_id' => 'nullable', // Validato manualmente
-        ]);
 
-        // 1. Gestione Password: la aggiorniamo solo se fornita
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in UpdateUserRequest
+
+        $validated = $request->validated();
+
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
-        // 2. Trasformiamo "none" del frontend in NULL per il database
         $trainerId = null;
-        if ($validated['role'] === 'client' && $request->trainer_id !== 'none' && !empty($request->trainer_id)) {
+        if ($validated['role'] === \App\Enums\Role::CLIENT->value && $request->trainer_id !== 'none' && !empty($request->trainer_id)) {
             $trainerId = $request->trainer_id;
         }
 
-        // 3. Aggiornamento dati
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
         $user->trainer_id = $trainerId;
-        
         $user->save();
 
         return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
@@ -110,10 +102,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Impedisci all'utente loggato di eliminarsi da solo
-        if (auth()->id() === $user->id) {
-            return back()->withErrors(['error' => 'Operazione non consentita sul proprio account.']);
-        }
+        Gate::authorize('delete', $user);
 
         $user->delete();
 

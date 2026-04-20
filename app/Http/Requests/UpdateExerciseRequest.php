@@ -1,20 +1,19 @@
 <?php
 
 namespace App\Http\Requests;
-use App\Enums\MuscleGroup; 
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Gate;
+
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
-class StoreExerciseRequest extends FormRequest
+class UpdateExerciseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return Gate::allows('create', Exercise::class);
+        return Gate::allows('update', $this->route('exercise'));
     }
 
     /**
@@ -27,7 +26,7 @@ class StoreExerciseRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'muscle_group' => ['required', Rule::enum(MuscleGroup::class)], // Si verifica che il MuscleGroup sia valido
+            'muscle_group' => ['nullable', Rule::enum(MuscleGroup::class)],
         ];
     }
 }
