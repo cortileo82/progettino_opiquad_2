@@ -11,7 +11,13 @@ class PlanPolicy
 
     public function view(User $user, Plan $plan): bool
     {
-        // Nessun User::find()! si usa la relazione definita nel Model.
+        // Se l'utente loggato è il proprietario della scheda (il cliente stesso) -> PUÒ PASSARE
+        if ($user->id === $plan->user_id) {
+            return true;
+        }
+
+        // Altrimenti, si applica la logica del PT (attuale trainer o creatore).
+        // Nessun User::find(), perché si usa la relazione definita nel Model.
         // Si controlla che il client esista (->client) prima di chiamarne la proprietà (->trainer_id)
         $isCurrentTrainer = $plan->client && ($user->id === $plan->client->trainer_id);
         $isOriginalAuthor = $user->id === $plan->pt_id;

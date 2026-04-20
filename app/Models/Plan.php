@@ -26,8 +26,7 @@ class Plan extends Model
     ];
 
     /**
-     * ATTRIBUTO: is_active
-     * Determina se la scheda è ancora valida basandosi sulla data attuale.
+     * L'attributo is_active determina se la scheda è ancora valida basandosi sulla data attuale.
      */
     public function getIsActiveAttribute(): bool
     {
@@ -40,8 +39,7 @@ class Plan extends Model
     }
 
     /**
-     * ATTRIBUTO: end_date
-     * Restituisce la data di scadenza calcolata e formattata.
+     * L'attributo end_date restituisce la data di scadenza calcolata e formattata.
      */
     public function getEndDateAttribute(): string
     {
@@ -70,14 +68,13 @@ class Plan extends Model
 
     /**
      * Relazione: Gli esercizi associati alla scheda.
-     * Include la nuova colonna 'week_number' nella tabella pivot.
      */
     public function exercises(): BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'plan_exercises')
             ->withPivot([
                 'day_of_week', 
-                'week_number', // La colonna che abbiamo aggiunto con la migrazione
+                'week_number',
                 'sets', 
                 'reps', 
                 'rest_time'
