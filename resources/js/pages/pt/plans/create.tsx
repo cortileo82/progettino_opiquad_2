@@ -1,6 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import { Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, Save, ChevronLeft, Dumbbell, ListChecks } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Exercise { id: number; name: string; }
 interface Props { client: { id: number; name: string }; exercises_list: Exercise[]; }
@@ -11,15 +14,12 @@ export default function CreatePlan({ client, exercises_list }: Props) {
         user_id: client.id,
         name: '',
         num_weeks: 4,
-        exercises: [{ exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '', reps: '', rest_time: '' }]
+        exercises: [{ exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '1', reps: '', rest_time: '' }]
     });
-
-    // Stampa nella console di eventuali errori passati da backend
-    // console.log("🛑 ERRORI DAL DOGANIERE:", errors);
 
     const addRow = () => setData('exercises', [
         ...data.exercises, 
-        { exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '', reps: '', rest_time: '' }
+        { exercise_id: '', week_number: 1, day_of_week: 'Lunedì', sets: '1', reps: '', rest_time: '' }
     ]);
     
     const removeRow = (i: number) => {
@@ -30,107 +30,191 @@ export default function CreatePlan({ client, exercises_list }: Props) {
 
     const updateRow = (i: number, field: string, val: any) => {
         const updated = [...data.exercises];
+        // Impedisce l'inserimento di valori inferiori a 1 per le serie
+        if (field === 'sets' && val !== '' && parseInt(val) < 1) val = '1';
+        
         updated[i] = { ...updated[i], [field]: val };
         setData('exercises', updated);
     };
 
     return (
         <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }, { title: 'Nuova Scheda', href: '#' }]}>
-            <Head title="Crea Scheda" />
+            <Head title="Crea Scheda - TEMPRA" />
             
-            <div className="p-4 md:p-8 max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
+            <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
+                
+                {/* HEADER SEZIONE */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-sidebar-border pb-8">
                     <div>
-                        <h1 className="text-2xl font-extrabold tracking-tight uppercase italic">Compila Nuova Scheda</h1>
-                        <p className="text-muted-foreground text-sm">Destinatario: <span className="text-orange-500 font-bold">{client.name}</span></p>
+                        <h1 className="text-4xl font-black uppercase italic tracking-tighter text-foreground leading-none">
+                            Compila <span className="text-primary">Scheda</span>
+                        </h1>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-3 opacity-70">
+                            Atleta: <span className="text-foreground">{client.name}</span>
+                        </p>
                     </div>
-                    <Link href="/pt/dashboard" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary">
-                        <ArrowLeft size={14}/> Dashboard
+
+                    <Link 
+                        href="/pt/dashboard" 
+                        className="group flex items-center gap-2 text-[10px] font-black uppercase italic text-zinc-400 hover:text-black transition-all tracking-widest"
+                    >
+                        <ChevronLeft size={14} /> Torna alla Dashboard
                     </Link>
                 </div>
 
-                <form onSubmit={(e) => { e.preventDefault(); post('/pt/plans/store'); }} className="space-y-6">
-                    {/* Dati Generali */}
-                    <div className="bg-sidebar p-6 rounded-2xl border border-sidebar-border shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nome Programma</label>
-                            <input type="text" value={data.name} onChange={e => setData('name', e.target.value)} className="w-full bg-background border-sidebar-border rounded-xl px-4 py-2 focus:ring-2 focus:ring-orange-500" placeholder="es. Ipertrofia Push/Pull" required />
+                <form onSubmit={(e) => { e.preventDefault(); post('/pt/plans/store'); }} className="space-y-10">
+                    
+                    {/* DATI GENERALI CARD */}
+                    <div className="bg-sidebar border border-sidebar-border rounded-[2.5rem] p-8 shadow-sm">
+                        <div className="flex items-center gap-3 mb-8 border-b border-sidebar-border pb-4">
+                            <ListChecks size={20} className="text-primary" />
+                            <h2 className="font-black uppercase italic text-sm tracking-widest">Informazioni Base</h2>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Durata Totale (Settimane)</label>
-                            <input type="number" value={data.num_weeks} onChange={e => setData('num_weeks', parseInt(e.target.value))} className="w-full bg-background border-sidebar-border rounded-xl px-4 py-2" min="1" />
-                        </div>
-                    </div>
-
-                    {/* Lista Esercizi Dinamica */}
-                    <div className="space-y-3">
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-orange-500 pl-1">Esercizi e Programmazione</h3>
-                        {data.exercises.map((row, i) => (
-                            <div key={i} className="bg-sidebar p-5 rounded-2xl border border-sidebar-border grid grid-cols-1 md:grid-cols-12 gap-4 items-end shadow-sm hover:border-orange-500/30 transition-colors">
-                                
-                                {/* SETTIMANA - NUOVO CAMPO */}
-                                <div className="md:col-span-1">
-                                    <label className="text-[10px] font-bold uppercase mb-1 block">Sett.</label>
-                                    <select 
-                                        value={row.week_number} 
-                                        onChange={e => updateRow(i, 'week_number', parseInt(e.target.value))} 
-                                        className="w-full bg-background border-sidebar-border rounded-lg text-sm border-none focus:ring-1 focus:ring-orange-500"
-                                    >
-                                        {[...Array(data.num_weeks)].map((_, idx) => (
-                                            <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="text-[10px] font-bold uppercase mb-1 block">Giorno</label>
-                                    <select value={row.day_of_week} onChange={e => updateRow(i, 'day_of_week', e.target.value)} className="w-full bg-background border-sidebar-border rounded-lg text-sm border-none focus:ring-1 focus:ring-orange-500">
-                                        {['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'].map(d => <option key={d} value={d}>{d}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className="md:col-span-3">
-                                    <label className="text-[10px] font-bold uppercase mb-1 block">Esercizio</label>
-                                    <select value={row.exercise_id} onChange={e => updateRow(i, 'exercise_id', e.target.value)} className="w-full bg-background border-sidebar-border rounded-lg text-sm border-none focus:ring-1 focus:ring-orange-500" required>
-                                        <option value="">Scegli...</option>
-                                        {exercises_list.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className="md:col-span-5 grid grid-cols-3 gap-2">
-                                    <div>
-                                        <label className="text-[10px] font-bold uppercase mb-1 block text-center text-muted-foreground">Serie</label>
-                                        <input type="number" value={row.sets} onChange={e => updateRow(i, 'sets', e.target.value)} placeholder="0" className="w-full bg-background border-sidebar-border rounded-lg text-sm p-2 text-center border-none" />
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-bold uppercase mb-1 block text-center text-muted-foreground">Reps</label>
-                                        <input type="text" value={row.reps} onChange={e => updateRow(i, 'reps', e.target.value)} placeholder="es. 10" className="w-full bg-background border-sidebar-border rounded-lg text-sm p-2 text-center border-none" />
-                                    </div>
-                                    <div>
-                                        <label className="text-[10px] font-bold uppercase mb-1 block text-center text-muted-foreground">Recupero</label>
-                                        <input type="text" value={row.rest_time} onChange={e => updateRow(i, 'rest_time', e.target.value)} placeholder="90''" className="w-full bg-background border-sidebar-border rounded-lg text-sm p-2 text-center border-none" />
-                                    </div>
-                                </div>
-
-                                <div className="md:col-span-1 flex justify-end">
-                                    <button type="button" onClick={() => removeRow(i)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-full transition-all">
-                                        <Trash2 size={18}/>
-                                    </button>
-                                </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid gap-3">
+                                <Label className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400">Nome del Programma</Label>
+                                <Input 
+                                    type="text" 
+                                    value={data.name} 
+                                    onChange={e => setData('name', e.target.value)} 
+                                    className="h-14 bg-background border-sidebar-border rounded-2xl px-6 focus:ring-2 focus:ring-black transition-all font-bold uppercase italic" 
+                                    placeholder="es. POWERLIFTING PHASE 1" 
+                                    required 
+                                />
                             </div>
-                        ))}
+                            <div className="grid gap-3">
+                                <Label className="text-[10px] font-black uppercase italic tracking-widest ml-4 text-zinc-400">Durata (Settimane)</Label>
+                                <Input 
+                                    type="number" 
+                                    value={data.num_weeks} 
+                                    onChange={e => {
+                                        const val = parseInt(e.target.value);
+                                        setData('num_weeks', val < 1 ? 1 : val);
+                                    }} 
+                                    className="h-14 bg-background border-sidebar-border rounded-2xl px-6 font-bold" 
+                                    min="1" 
+                                    required
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Pulsanti Azione */}
-                    <div className="flex flex-col md:flex-row gap-4 pt-6 border-t border-sidebar-border">
-                        <button type="button" onClick={addRow} className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest border border-sidebar-border hover:brightness-110">
-                            <Plus size={16}/> Aggiungi Esercizio
-                        </button>
-                        <button type="submit" disabled={processing} className="md:ml-auto flex items-center justify-center gap-2 bg-white text-black px-12 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                            <Save size={16}/> {processing ? 'Salvataggio...' : 'Conferma Scheda'}
-                        </button>
+                    {/* LISTA ESERCIZI DINAMICA */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 pl-4">
+                            <Dumbbell size={20} className="text-primary" />
+                            <h3 className="font-black uppercase italic text-sm tracking-widest">Programmazione Esercizi</h3>
+                        </div>
+
+                        <div className="grid gap-4">
+                            {data.exercises.map((row, i) => (
+                                <div key={i} className="bg-sidebar border border-sidebar-border rounded-[2.5rem] p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-end shadow-sm hover:border-primary/50 transition-all relative group">
+                                    
+                                    {/* SETTIMANA */}
+                                    <div className="md:col-span-1">
+                                        <Label className="text-[9px] font-black uppercase italic mb-2 block ml-2 opacity-50 tracking-tighter text-center">Sett.</Label>
+                                        <select 
+                                            value={row.week_number} 
+                                            onChange={e => updateRow(i, 'week_number', parseInt(e.target.value))} 
+                                            className="w-full h-12 bg-background border-none rounded-xl text-xs font-black appearance-none text-center focus:ring-2 focus:ring-black"
+                                        >
+                                            {[...Array(data.num_weeks)].map((_, idx) => (
+                                                <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* GIORNO */}
+                                    <div className="md:col-span-2">
+                                        <Label className="text-[9px] font-black uppercase italic mb-2 block ml-2 opacity-50 tracking-tighter text-center">Giorno</Label>
+                                        <select 
+                                            value={row.day_of_week} 
+                                            onChange={e => updateRow(i, 'day_of_week', e.target.value)} 
+                                            className="w-full h-12 bg-background border-none rounded-xl text-xs font-black uppercase italic focus:ring-2 focus:ring-black"
+                                        >
+                                            {['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'].map(d => <option key={d} value={d}>{d}</option>)}
+                                        </select>
+                                    </div>
+
+                                    {/* ESERCIZIO */}
+                                    <div className="md:col-span-3">
+                                        <Label className="text-[9px] font-black uppercase italic mb-2 block ml-2 opacity-50 tracking-tighter">Selezione Esercizio</Label>
+                                        <select 
+                                            value={row.exercise_id} 
+                                            onChange={e => updateRow(i, 'exercise_id', e.target.value)} 
+                                            className="w-full h-12 bg-background border-none rounded-xl text-[11px] font-black uppercase italic focus:ring-2 focus:ring-black" 
+                                            required
+                                        >
+                                            <option value="">Scegli...</option>
+                                            {exercises_list.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
+                                        </select>
+                                    </div>
+
+                                    {/* DETTAGLI TECNICI */}
+                                    <div className="md:col-span-5 grid grid-cols-3 gap-3">
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Serie</Label>
+                                            <Input 
+                                                type="number" 
+                                                min="1" 
+                                                value={row.sets} 
+                                                onChange={e => updateRow(i, 'sets', e.target.value)} 
+                                                placeholder="1" 
+                                                className="h-12 bg-background border-none rounded-xl text-center font-black" 
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Reps</Label>
+                                            <Input type="text" value={row.reps} onChange={e => updateRow(i, 'reps', e.target.value)} placeholder="10" className="h-12 bg-background border-none rounded-xl text-center font-black" required />
+                                        </div>
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase italic mb-2 block text-center opacity-50">Recupero</Label>
+                                            <Input type="text" value={row.rest_time} onChange={e => updateRow(i, 'rest_time', e.target.value)} placeholder="90''" className="h-12 bg-background border-none rounded-xl text-center font-black" required />
+                                        </div>
+                                    </div>
+
+                                    {/* ELIMINA RIGA */}
+                                    <div className="md:col-span-1 flex justify-center pb-1">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => removeRow(i)} 
+                                            className="p-3 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                        >
+                                            <Trash2 size={20}/>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ACTIONS FOOTER */}
+                    <div className="flex flex-col md:flex-row gap-6 pt-10 border-t border-sidebar-border">
+                        <Button 
+                            type="button" 
+                            onClick={addRow} 
+                            variant="outline"
+                            className="h-16 flex-1 md:flex-none md:px-10 border-2 border-zinc-200 rounded-2xl font-black uppercase italic text-xs tracking-widest hover:bg-zinc-100 hover:border-zinc-300 transition-all shadow-sm"
+                        >
+                            <Plus size={18} className="mr-2" /> Aggiungi Esercizio
+                        </Button>
+                        
+                        <Button 
+                            type="submit" 
+                            disabled={processing} 
+                            className="h-16 md:ml-auto md:px-16 bg-black text-white rounded-2xl font-black uppercase italic text-sm tracking-widest shadow-2xl hover:bg-zinc-800 transition-all disabled:opacity-50"
+                        >
+                            <Save size={18} className="mr-2" /> {processing ? 'Salvataggio...' : 'Conferma Scheda'}
+                        </Button>
                     </div>
                 </form>
+
+                {/* Footer Decorativo */}
+                <p className="text-center text-[9px] font-black uppercase italic opacity-20 tracking-[0.5em] mt-10">
+                    TEMPRA Performance Lab - Sistema di Programmazione
+                </p>
             </div>
         </AppLayout>
     );
