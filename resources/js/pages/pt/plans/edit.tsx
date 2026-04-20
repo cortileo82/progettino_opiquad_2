@@ -16,8 +16,15 @@ interface Props {
 
 export default function EditPlan({ client, exercises_list, plan }: Props) {
 
+    interface PlanFormState {
+        user_id: number;
+        name: string;
+        num_weeks: number | ""; 
+        exercises: any[];
+    }
+
     // Mantengo esattamente la logica di inizializzazione originale
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm<PlanFormState>({
         user_id: plan.user_id,
         name: plan.name,
         num_weeks: plan.num_weeks,
@@ -110,7 +117,7 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
                                     onChange={e => {
                                         const val = e.target.value;         
                                         // Se l'utente cancella tutto, si salva la stringa vuota per non bloccarlo
-                                        setData('num_weeks', val === '' ? '' : parseInt(val));
+                                        setData('num_weeks', val === '' ? 1 : parseInt(val));
                                     }}
                                     onBlur={() => {
                                         // Quando l'utente clicca fuori, se ha lasciato vuoto o messo 0, forziamo a 1
