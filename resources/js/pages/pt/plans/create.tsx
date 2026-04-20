@@ -10,7 +10,14 @@ interface Props { client: { id: number; name: string }; exercises_list: Exercise
 
 export default function CreatePlan({ client, exercises_list }: Props) {
 
-    const { data, setData, post, processing, errors } = useForm({
+    interface PlanFormState {
+        user_id: number;
+        name: string;
+        num_weeks: number | ""; 
+        exercises: any[];
+    }
+
+    const { data, setData, post, processing, errors } = useForm<PlanFormState>({
         user_id: client.id,
         name: '',
         num_weeks: 4,
