@@ -39,8 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $role = auth()->user()->role;
         return match ($role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'pt'    => redirect()->route('pt.dashboard'),
+            Role::ADMIN->value => redirect()->route('admin.dashboard'),
+            Role::PT->value    => redirect()->route('pt.dashboard'),
             default => redirect()->route('client.dashboard'),
         };
     })->name('dashboard');

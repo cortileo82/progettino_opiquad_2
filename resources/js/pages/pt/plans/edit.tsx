@@ -16,14 +16,22 @@ interface Props {
 
 export default function EditPlan({ client, exercises_list, plan }: Props) {
 
+    interface ExerciseFormRow {
+        exercise_id: string | number;
+        week_number: number;
+        day_of_week: string;
+        sets: string | number;
+        reps: string | number;
+        rest_time: string;
+    }
+
     interface PlanFormState {
         user_id: number;
         name: string;
-        num_weeks: number | ""; 
-        exercises: any[];
+        num_weeks: number | ""; // Si permette il vuoto temporaneo per una UX fluida
+        exercises: ExerciseFormRow[];
     }
 
-    // Mantengo esattamente la logica di inizializzazione originale
     const { data, setData, put, processing, errors } = useForm<PlanFormState>({
         user_id: plan.user_id,
         name: plan.name,

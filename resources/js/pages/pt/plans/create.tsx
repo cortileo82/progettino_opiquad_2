@@ -10,11 +10,20 @@ interface Props { client: { id: number; name: string }; exercises_list: Exercise
 
 export default function CreatePlan({ client, exercises_list }: Props) {
 
+    interface ExerciseFormRow {
+        exercise_id: string | number;
+        week_number: number;
+        day_of_week: string;
+        sets: string | number;
+        reps: string | number;
+        rest_time: string;
+    }
+
     interface PlanFormState {
         user_id: number;
         name: string;
-        num_weeks: number | ""; 
-        exercises: any[];
+        num_weeks: number | ""; // Si permette il vuoto temporaneo per una UX fluida
+        exercises: ExerciseFormRow[];
     }
 
     const { data, setData, post, processing, errors } = useForm<PlanFormState>({

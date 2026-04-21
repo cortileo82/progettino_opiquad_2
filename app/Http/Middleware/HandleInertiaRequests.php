@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Role;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,9 +40,9 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-                'isAdmin' => $request->user() ? $request->user()->role === 'admin': false,
-                'isPT' => $request->user() ? $request->user()->role === 'pt' : false,
-                'isClient' => $request->user() ? $request->user()->role === 'client' : false
+                'isAdmin' => $request->user() ? $request->user()->role === Role::ADMIN->value: false,
+                'isPT' => $request->user() ? $request->user()->role === Role::PT->value : false,
+                'isClient' => $request->user() ? $request->user()->role === Role::CLIENT->value : false
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

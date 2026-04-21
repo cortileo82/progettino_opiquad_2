@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
+use App\Models\Plan;
 
 class StorePlanRequest extends FormRequest
 {
