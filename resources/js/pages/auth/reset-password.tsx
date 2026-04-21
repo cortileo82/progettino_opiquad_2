@@ -156,7 +156,7 @@ export default function ResetPassword({ token, email }: Props) {
     );
 }
 
-ResetPassword.layout = {
+/*ResetPassword.layout = {
     title: 'Reset Password - TEMPRA',
     description: 'Imposta le tue nuove credenziali di accesso.',
-};
+};*/

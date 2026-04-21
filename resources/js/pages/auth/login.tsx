@@ -34,7 +34,7 @@ export default function Login({ status, canResetPassword, canRegister }: Props) 
                     TEMPRA
                 </h1>
                 <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground mt-2">
-                    Performance LAB
+                    Accedi alla tua area riservata
                 </p>
             </div>
 
@@ -142,4 +142,4 @@ export default function Login({ status, canResetPassword, canRegister }: Props) 
     );
 }
 
-Login.layout = { title: 'Login - TEMPRA', description: 'Accedi al tuo pannello di controllo.' };
+//Login.layout = { title: 'Login - TEMPRA', description: 'Accedi al tuo pannello di controllo.' };

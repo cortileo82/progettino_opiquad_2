@@ -149,4 +149,4 @@ export default function Register() {
     );
 }
 
-Register.layout = { title: 'TEMPRA | Register', description: 'Crea il tuo profilo atleta per iniziare il tuo percorso.' };
+//Register.layout = { title: 'TEMPRA | Register', description: 'Crea il tuo profilo atleta per iniziare il tuo percorso.' };
