@@ -107,7 +107,7 @@ export default function MyClients({ clients, stats }: any) {
 
                 {/* Footer Decorativo */}
                 <p className="text-center text-[9px] font-black uppercase italic opacity-20 tracking-[0.5em] mt-10">
-                    TEMPRA Performance Management
+                    TEMPRA Performance Lab
                 </p>
             </div>
         </AppLayout>
