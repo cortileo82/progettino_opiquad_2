@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
-use App\Enums\MuscleGroup;
+use App\Models\MuscleGroup;
 use App\Http\Requests\ExerciseRequest;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;

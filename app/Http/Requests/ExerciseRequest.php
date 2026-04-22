@@ -31,6 +31,7 @@ class ExerciseRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'muscle_group_id' => 'required|exists:muscle_groups,id',
         ];
     }
-}            'muscle_group' => 'required|exists:muscle_groups,id',
+}

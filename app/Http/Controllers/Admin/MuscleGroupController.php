@@ -43,7 +43,7 @@ class MuscleGroupController extends Controller
     {
         // PROTEZIONE INTEGRITÀ REFERENZIALE
         if ($muscleGroup->exercises()->exists()) {
-            return redirect('/admin/muscle-groups')->with('error', 'Impossibile eliminare questo gruppo muscolare perché contiene degli esercizi.');
+            return redirect('/admin/muscle-groups')->with('error', 'It is not possible delete this muscle group because associated to at least one exercise.');
         }
 
         $muscleGroup->delete();

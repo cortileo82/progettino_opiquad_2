@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Trash2, Dumbbell, Plus } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Pencil, Trash2, Dumbbell, Plus, Info } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
@@ -15,6 +15,8 @@ interface Props {
 }
 
 export default function MuscleGroupIndex({ muscleGroups = [] }: Props) {
+    const { flash } = usePage().props as any;
+
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [groupToDelete, setGroupToDelete] = useState<MuscleGroup | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -64,6 +66,22 @@ export default function MuscleGroupIndex({ muscleGroups = [] }: Props) {
                         </Link>
                     </div>
                 </div>
+
+                {/* --- SEZIONE FLASH MESSAGES --- */}
+                {flash.error && (
+                    <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-4 rounded-xl flex items-center gap-3">
+                        <Info size={20} />
+                        <span className="font-bold text-sm tracking-wide uppercase">{flash.error}</span>
+                    </div>
+                )}
+                
+                {flash.success && (
+                    <div className="mb-6 bg-green-500/10 border border-green-500/20 text-green-500 px-6 py-4 rounded-xl flex items-center gap-3">
+                        <Info size={20} />
+                        <span className="font-bold text-sm tracking-wide uppercase">{flash.success}</span>
+                    </div>
+                )}
+                {/* ------------------------------ */}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {muscleGroups.length > 0 ? (
