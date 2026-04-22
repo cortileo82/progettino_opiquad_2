@@ -60,7 +60,7 @@ class UserController extends Controller
         User::create([
             'name' => $validated['first_name'] . ' ' . $validated['last_name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($request['password']),
             'role' => $validated['role'],
             'trainer_id' => $trainerId,
         ]);
@@ -77,21 +77,31 @@ class UserController extends Controller
     {
         // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in UpdateUserRequest
 
-        $validated = $request->validated();
+        $validated = $request;
 
-        if (!empty($validated['password'])) {
+        /*if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
-        }
+        }*/
 
-        $trainerId = null;
-        if ($validated['role'] === \App\Enums\Role::CLIENT->value && $request->trainer_id !== 'none' && !empty($request->trainer_id)) {
-            $trainerId = $request->trainer_id;
-        }
+       if ($validated['role'] === \App\Enums\Role::CLIENT->value) {
+            $selectedTrainer = $request->input('trainer_id');
+
+            if ($selectedTrainer === 'none' || empty($selectedTrainer)) {
+                // Se seleziona 'libero', puliamo il campo nel database
+                $user->trainer_id = null;
+            } else {
+                // Se seleziona un ID, lo assegniamo
+                $user->trainer_id = $selectedTrainer;
+            }
+        } else {
+        // Se l'utente non è un cliente, forziamo il trainer a null
+        $user->trainer_id = null;
+    }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
-        $user->trainer_id = $trainerId;
+        //$user->trainer_id = $trainerId;
         $user->save();
 
         return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');

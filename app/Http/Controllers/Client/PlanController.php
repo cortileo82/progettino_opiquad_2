@@ -16,8 +16,6 @@ class PlanController extends Controller
     public function current(Request $request)
     {
         $user = $request->user();
-        
-        // Recupero ottimizzato: non si scarica tutto il DB in RAM per filtrarlo in PHP.
         // Si lascia che sia il Database a fare il lavoro sporco.
         $plan = Plan::with(['trainer', 'exercises'])
             ->where('user_id', $user->id)
@@ -26,13 +24,8 @@ class PlanController extends Controller
                 // Si sfrutta l'attributo 'is_active', già definito nel Model Plan
                 return $p->is_active; 
             });
-
-        if (!$plan) {
-            return Inertia::render('client/plan/show', ['plan' => null]);
-        }
-
         return Inertia::render('client/plan/show', [
-            'plan' => $this->formatPlanData($plan)
+            'plan' => $plan ? $this->formatPlanData($plan) : null
         ]);
     }
 
