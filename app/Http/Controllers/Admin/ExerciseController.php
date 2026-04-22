@@ -3,8 +3,7 @@
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
 use App\Enums\MuscleGroup;
-use App\Http\Requests\StoreExerciseRequest;
-use App\Http\Requests\UpdateExerciseRequest;
+use App\Http\Requests\ExerciseRequest;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
@@ -27,11 +26,11 @@ class ExerciseController extends Controller
         ]);
     }
 
-    public function store(StoreExerciseRequest $request)
+    public function store(ExerciseRequest $request)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in StoreExerciseRequest
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in ExerciseRequest
 
-        Exercise::create($request->validated());
+        Exercise::create($request->all());
         return redirect('/admin/exercises')->with('success', 'Esercizio creato!');
     }
 
@@ -45,11 +44,11 @@ class ExerciseController extends Controller
         ]);
     }
 
-    public function update(UpdateExerciseRequest $request, Exercise $exercise)
+    public function update(ExerciseRequest $request, Exercise $exercise)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in UpdateExerciseRequest
+        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in ExerciseRequest
 
-        $exercise->update($request->validated());
+        $exercise->update($request->all());
         return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato!');
     }
 
@@ -61,7 +60,7 @@ class ExerciseController extends Controller
         // 2. Pulizia delle relazioni (Previene il crash del DB)
         // Questo cancella tutte le righe dalla tabella pivot 'plan_exercises' 
         // che contengono questo specifico esercizio.
-        $exercise->plans()->detach();
+        //$exercise->plans()->detach();
 
         // 3. Eliminazione fisica
         $exercise->delete();

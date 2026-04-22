@@ -292,17 +292,6 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
                                 </div>
                             )}
                         </div>
-
-                        <div className="pt-4 border-t border-sidebar-border">
-                            <Label className="text-red-500 text-[9px] font-black uppercase tracking-[0.3em] mb-3 block">Cambia Password (Opzionale)</Label>
-                            <Input 
-                                type="password" 
-                                placeholder="LASCIAR VUOTO PER NON CAMBIARE" 
-                                className="rounded-xl border-sidebar-border bg-background h-12 font-bold text-center text-[9px] tracking-[0.2em] focus:ring-2 focus:ring-red-500/20 placeholder:opacity-50" 
-                                onChange={e => setData('password', e.target.value)} 
-                            />
-                        </div>
-
                         <DialogFooter className="gap-3 mt-6 sm:flex-row flex-col">
                             <Button 
                                 type="button" 
