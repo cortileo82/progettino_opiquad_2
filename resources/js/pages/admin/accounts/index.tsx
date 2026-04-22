@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal'; // Import del nuovo modal
+import { ActionButton } from '@/components/custom/action-button';
 import { 
     Pencil, 
     Trash2, 
@@ -120,14 +121,10 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
                             </p>
                         </div>
                         
-                        <Link href="/admin/accounts/create">
-                            <Button className="bg-zinc-950 hover:bg-zinc-900 text-white rounded-2xl px-8 py-6 h-auto flex items-center gap-4 transition-all shadow-2xl active:scale-95 group border border-white/5">
-                                <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-                                <span className="font-black uppercase italic tracking-[0.2em] text-xs">
-                                    Nuovo Utente
-                                </span>
-                            </Button>
-                        </Link>
+                        <ActionButton 
+                            href="/admin/accounts/create" 
+                            label="Nuovo Utente" 
+                        />
                     </div>
                 </div>
 
