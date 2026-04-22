@@ -61,20 +61,10 @@ export default function ExerciseIndex({ exercises = [] }: Props) {
                             <h1 className="text-4xl font-black tracking-tighter uppercase italic text-foreground leading-none"> Gestione Esercizi </h1>
                             <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.2em] opacity-70"> Archivio tecnico e modifiche degli esercizi disponibili. </p>
                         </div>
-<<<<<<< HEAD
-                        
                         <ActionButton 
                             href="/admin/exercises/create" 
                             label="Nuovo Esercizio" 
                         />
-=======
-                        <Link href="/admin/exercises/create">
-                            <Button className="bg-zinc-950 hover:bg-zinc-900 text-white rounded-2xl px-8 py-6 h-auto flex items-center gap-4 transition-all shadow-2xl active:scale-95 group border border-white/5">
-                                <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-                                <span className="font-black uppercase italic tracking-[0.2em] text-xs"> Nuovo Esercizio </span>
-                            </Button>
-                        </Link>
->>>>>>> demo
                     </div>
                 </div>
 
