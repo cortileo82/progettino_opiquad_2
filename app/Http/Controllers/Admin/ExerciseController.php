@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
-use App\Enums\MuscleGroup;
+use App\Models\MuscleGroup;
 use App\Http\Requests\ExerciseRequest;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -13,8 +13,11 @@ class ExerciseController extends Controller
     {
         Gate::authorize('viewAny', Exercise::class);
 
-        $exercises = Exercise::latest()->get();
-        return Inertia::render('admin/exercises/index', ['exercises' => $exercises]);
+        $exercises = Exercise::with('muscleGroup')->orderBy('name')->get();
+
+        return Inertia::render('admin/exercises/index', [
+            'exercises' => $exercises
+        ]);
     }
 
     public function create()
@@ -22,7 +25,7 @@ class ExerciseController extends Controller
         Gate::authorize('create', Exercise::class);
 
         return Inertia::render('admin/exercises/create', [
-            'muscleGroups' => MuscleGroup::values(),
+            'muscleGroups' => MuscleGroup::getForDropDown(),
         ]);
     }
 
@@ -40,7 +43,7 @@ class ExerciseController extends Controller
 
         return Inertia::render('admin/exercises/edit', [
             'exercise' => $exercise,
-            'muscleGroups' => MuscleGroup::values(),
+            'muscleGroups' => MuscleGroup::getForDropDown(),
         ]);
     }
 
@@ -65,6 +68,6 @@ class ExerciseController extends Controller
         // 3. Eliminazione fisica
         $exercise->delete();
 
-        return redirect('/admin/exercises')->with('success', 'Esercizio eliminato con successo!');
+        return redirect('/admin/exercises')->with('success', 'Exercise deleted successfully!');
     }
 }

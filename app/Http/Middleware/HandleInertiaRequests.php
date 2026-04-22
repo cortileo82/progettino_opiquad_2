@@ -45,6 +45,12 @@ class HandleInertiaRequests extends Middleware
                 'isClient' => $request->user() ? $request->user()->role === Role::CLIENT->value : false
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+
+            // Messaggi di successo e/o di errore passati al frontend.
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
         ];
     }
 }

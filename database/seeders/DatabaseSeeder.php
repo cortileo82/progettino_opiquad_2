@@ -4,12 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-// Importazione corretta dei modelli e dei trait necessari
 use App\Models\User;
 use App\Models\Exercise;
 use App\Models\Plan;
 use App\Models\PlanExercise;
-use App\Enums\MuscleGroup;
+use App\Models\MuscleGroup;
 
 class DatabaseSeeder extends Seeder
 {
@@ -58,18 +57,42 @@ class DatabaseSeeder extends Seeder
             'trainer_id' => $pt2->id,
         ]);
 
-        // 2. CREAZIONE ESERCIZI BASE
+        // 2. CREAZIONE GRUPPI MUSCOLARI (I tuoi vecchi Enum trasformati in record DB)
+        $muscleGroupsList = [
+            'Alti Pettorali',
+            'Pettorali',
+            'Schiena Alta',
+            'Laterali',
+            'Schiena Bassa',
+            'Quadricipiti',
+            'Bicipiti Femorali',
+            'Deltoidi Anteriori',
+            'Deltoidi Laterali',
+            'Deltoidi Posteriori',
+            'Bicipiti',
+            'Tricipiti',
+            'Addome',
+            'Cardio',
+            'Collo'
+        ];
+
+        $mg = []; // Array associativo per recuperare gli ID
+        foreach ($muscleGroupsList as $groupName) {
+            $mg[$groupName] = MuscleGroup::create(['name' => $groupName]);
+        }
+
+        // 3. CREAZIONE ESERCIZI BASE (Mappati con i nuovi nomi esatti)
         $exercisesData = [
-            ['name' => 'Panca Piana', 'description' => 'Bilanciere al petto.', 'muscle_group' => MuscleGroup::LOWER_CHEST->value],
-            ['name' => 'Squat', 'description' => 'Accosciata con bilanciere.', 'muscle_group' => MuscleGroup::QUADS->value],
-            ['name' => 'Stacco da Terra', 'description' => 'Sollevamento da terra.', 'muscle_group' => MuscleGroup::LOWER_BACK->value],
-            ['name' => 'Trazioni', 'description' => 'Trazioni alla sbarra.', 'muscle_group' => MuscleGroup::UPPER_BACK->value],
-            ['name' => 'Shoulder Press', 'description' => 'Spinta sopra la testa.', 'muscle_group' => MuscleGroup::DELT_ANT->value],
-            ['name' => 'Curl Bicipiti', 'description' => 'Flessione braccia.', 'muscle_group' => MuscleGroup::BICEPS->value],
-            ['name' => 'French Press', 'description' => 'Estensione tricipiti.', 'muscle_group' => MuscleGroup::TRICEPS->value],
-            ['name' => 'Leg Extension', 'description' => 'Isolamento quadricipiti.', 'muscle_group' => MuscleGroup::QUADS->value],
-            ['name' => 'Leg Curl', 'description' => 'Isolamento femorali.', 'muscle_group' => MuscleGroup::HAMSTRINGS->value],
-            ['name' => 'Crunch', 'description' => 'Addominali a terra.', 'muscle_group' => MuscleGroup::ABS->value],
+            ['name' => 'Panca Piana', 'description' => 'Bilanciere al petto.', 'muscle_group_id' => $mg['Pettorali']->id],
+            ['name' => 'Squat', 'description' => 'Accosciata con bilanciere.', 'muscle_group_id' => $mg['Quadricipiti']->id],
+            ['name' => 'Stacco da Terra', 'description' => 'Sollevamento da terra.', 'muscle_group_id' => $mg['Schiena Bassa']->id],
+            ['name' => 'Trazioni', 'description' => 'Trazioni alla sbarra.', 'muscle_group_id' => $mg['Schiena Alta']->id],
+            ['name' => 'Shoulder Press', 'description' => 'Spinta sopra la testa.', 'muscle_group_id' => $mg['Deltoidi Anteriori']->id],
+            ['name' => 'Curl Bicipiti', 'description' => 'Flessione braccia.', 'muscle_group_id' => $mg['Bicipiti']->id],
+            ['name' => 'French Press', 'description' => 'Estensione tricipiti.', 'muscle_group_id' => $mg['Tricipiti']->id],
+            ['name' => 'Leg Extension', 'description' => 'Isolamento quadricipiti.', 'muscle_group_id' => $mg['Quadricipiti']->id],
+            ['name' => 'Leg Curl', 'description' => 'Isolamento femorali.', 'muscle_group_id' => $mg['Bicipiti Femorali']->id],
+            ['name' => 'Crunch', 'description' => 'Addominali a terra.', 'muscle_group_id' => $mg['Addome']->id],
         ];
 
         $exercises = [];
@@ -77,36 +100,40 @@ class DatabaseSeeder extends Seeder
             $exercises[] = Exercise::create($ex);
         }
 
-        // 3. CREAZIONE SCHEDE (Utilizzando la colonna 'num_weeks')
+        // 4. CREAZIONE SCHEDE
         $plan1 = Plan::create([
             'user_id' => $client1->id,
             'pt_id' => $pt1->id,
             'name' => 'Scheda Massa A',
-            'num_weeks' => '4' // Modificato da duration a num_weeks
+            'num_weeks' => 4
         ]);
 
         $plan2 = Plan::create([
             'user_id' => $client2->id,
             'pt_id' => $pt2->id,
             'name' => 'Definizione Invernale',
-            'num_weeks' => '8' // Modificato da duration a num_weeks
+            'num_weeks' => 8
         ]);
 
-        // 4. ASSEGNAZIONE ESERCIZI ALLE SCHEDE
+        // 5. ASSEGNAZIONE ESERCIZI ALLE SCHEDE
         PlanExercise::create([
             'plan_id' => $plan1->id,
             'exercise_id' => $exercises[0]->id, // Panca
+            'week_number' => 1,
             'day_of_week' => 'Lunedì',
             'sets' => 4,
-            'reps' => 8
+            'reps' => 8,
+            'rest_time' => "90''"
         ]);
 
         PlanExercise::create([
             'plan_id' => $plan2->id,
             'exercise_id' => $exercises[1]->id, // Squat
+            'week_number' => 1,
             'day_of_week' => 'Mercoledì',
             'sets' => 5,
-            'reps' => 5
+            'reps' => 5,
+            'rest_time' => "120''"
         ]);
     }
 }

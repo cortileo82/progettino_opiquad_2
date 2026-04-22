@@ -3,12 +3,14 @@
 use App\Models\User;
 use App\Models\Exercise;
 use App\Models\Plan; 
+use App\Models\MuscleGroup;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 
 // Controllers Admin
 use App\Http\Controllers\Admin\ExerciseController;
+use App\Http\Controllers\Admin\MuscleGroupController;
 use App\Http\Controllers\Admin\UserController;
 
 // Controllers PT
@@ -21,7 +23,7 @@ use App\Http\Controllers\PT\ExerciseCatalogController;
 // Controllers Client
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
-use App\Http\Controllers\Client\PlanHistoryController; // Nuovo Controller per lo storico
+use App\Http\Controllers\Client\PlanHistoryController; 
 
 // ------------------------------------------------
 // ROTTE PUBBLICHE
@@ -63,6 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('dashboard');
 
         Route::resource('exercises', ExerciseController::class);
+        Route::resource('muscle-groups', MuscleGroupController::class);
 
         Route::get('/accounts', [UserController::class, 'index'])->name('accounts.index');
         Route::get('/accounts/create', [UserController::class, 'create'])->name('accounts.create');
