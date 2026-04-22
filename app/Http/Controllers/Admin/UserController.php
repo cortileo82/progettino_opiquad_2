@@ -65,7 +65,7 @@ class UserController extends Controller
             'trainer_id' => $trainerId,
         ]);
 
-        return Inertia::render('admin/accounts/success');
+        return redirect('/admin/accounts')->with('success', 'Account creato con successo!');
     }
 
     /**
