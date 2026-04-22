@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Requests;
-use App\Enums\MuscleGroup; 
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -27,7 +26,7 @@ class StoreExerciseRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'muscle_group' => ['required', Rule::enum(MuscleGroup::class)], // Si verifica che il MuscleGroup sia valido
+            'muscle_group_id' => 'required|exists:muscle_groups,id',
         ];
     }
 }

@@ -26,7 +26,7 @@ class UpdateExerciseRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'muscle_group' => ['nullable', Rule::enum(MuscleGroup::class)],
+            'muscle_group_id' => 'required|exists:muscle_groups,id',
         ];
     }
 }

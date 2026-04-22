@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Exercise extends Model
 {
@@ -16,7 +17,7 @@ class Exercise extends Model
     protected $fillable = [
         'name',
         'description',
-        'muscle_group',
+        'muscle_group_id',
     ];
 
     /**
@@ -29,11 +30,16 @@ class Exercise extends Model
         return $this->belongsToMany(Plan::class, 'plan_exercises')
             ->withPivot([
                 'day_of_week', 
-                'week_number', // Aggiunto per coerenza con la nuova migrazione
+                'week_number', 
                 'sets', 
                 'reps', 
-                'rest_time'    // Aggiunto per completezza
+                'rest_time'   
             ])
             ->withTimestamps();
+    }
+
+    public function muscleGroup(): BelongsTo
+    {
+        return $this->belongsTo(MuscleGroup::class);
     }
 }
