@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MuscleGroup;
 use App\Http\Requests\MuscleGroupRequest;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class MuscleGroupController extends Controller

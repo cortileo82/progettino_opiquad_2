@@ -18,7 +18,7 @@ class UserController extends Controller
         Gate::authorize('viewAny', User::class);
         $users = User::with(['trainer', 'roles'])->latest()->get();
         
-        // Utilizzo query scope di Spatie per prendere solo i PT
+        // Utilizzo della query scope di Spatie per prendere solo i PT
         $personalTrainers = User::role('pt')->orderBy('name')->get(['id', 'name']);
         
         return Inertia::render('admin/accounts/index', [
@@ -30,10 +30,16 @@ class UserController extends Controller
     public function create()
     {
         Gate::authorize('create', User::class);
-        $personalTrainers = User::role('pt')->orderBy('name')->get(['id', 'name']);
         
         return Inertia::render('admin/accounts/create', [
-            'personalTrainers' => $personalTrainers
+            // 1. Tutti i PT per il secondo menu a tendina
+            'personalTrainers' => User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']),
+            
+            // 2. TUTTI i ruoli presenti nel DB (Core + Custom come Nutrizionista)
+            'availableRoles' => Role::orderBy('name')->get(['name']), 
+            
+            // 3. Passiamo la costante "client" per la logica UI di React
+            'clientRoleSlug' => User::ROLE_CLIENT 
         ]);
     }
 
@@ -41,19 +47,16 @@ class UserController extends Controller
     {
         Gate::authorize('create', User::class);
         
+        // I dati sono già stati filtrati dalla Request. 
+        // Se il ruolo non era 'client', 'trainer_id' è stato rimosso in automatico.
         $validated = $request->validated();
-        $trainerId = null;
-        
-        if ($request->role === 'client' && $request->pt_id !== 'none') {
-            $trainerId = $request->pt_id;
-        }
 
-        // 1. Creazione record DB (SENZA il campo role)
+        // 1. Creazione record DB 
         $user = User::create([
             'name' => $validated['first_name'] . ' ' . $validated['last_name'],
             'email' => $validated['email'],
             'password' => Hash::make($request['password']),
-            'trainer_id' => $trainerId,
+            'trainer_id' => $validated['trainer_id'] ?? null,
         ]);
 
         // 2. Assegnazione ruolo nel DB di Spatie
@@ -68,22 +71,18 @@ class UserController extends Controller
         
         $validated = $request->validated();
 
-        if ($request->role === 'client') {
-            $selectedTrainer = $request->input('trainer_id');
-            $user->trainer_id = ($selectedTrainer === 'none' || empty($selectedTrainer)) ? null : $selectedTrainer;
-        } else {
-            $user->trainer_id = null;
-        }
-
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        // Rimosso l'aggiornamento della password hardcodato per sicurezza se non viene cambiata
+
+        // Se è un cliente, si aggiorna col valore validato. 
+        // Altrimenti, se non lo è, la request ha rimosso il campo e lo si mette a null a prescindere.
+        $user->trainer_id = array_key_exists('trainer_id', $validated) ? $validated['trainer_id'] : null;
         
         $user->save();
 
         // Sincronizza il ruolo (cancella il vecchio, imposta il nuovo)
-        if ($request->has('role')) {
-            $user->syncRoles($request->role);
+        if (isset($validated['role'])) {
+            $user->syncRoles($validated['role']);
         }
 
         return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
@@ -92,6 +91,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         Gate::authorize('delete', $user);
+
         $user->delete();
         
         return redirect('/admin/accounts')->with('success', 'Utente rimosso.');

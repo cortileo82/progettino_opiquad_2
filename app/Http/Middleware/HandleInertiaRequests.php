@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
 
-            // Messaggi specific, di successo e di errore passati al frontend.
+            // Messaggi specifici, di successo e di errore passati al frontend.
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),

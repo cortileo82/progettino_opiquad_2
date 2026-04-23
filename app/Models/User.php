@@ -16,6 +16,10 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_PT = 'pt';
+    public const ROLE_CLIENT = 'client';
+
     /**
      * I campi che possono essere assegnati massivamente.
      * Ho aggiunto tutti i campi necessari per il form di modifica.

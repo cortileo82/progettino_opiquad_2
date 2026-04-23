@@ -34,7 +34,7 @@ class ExerciseController extends Controller
         Gate::authorize('create', Exercise::class);
 
         Exercise::create($request->all());
-        return redirect('/admin/exercises')->with('success', 'Esercizio creato!');
+        return redirect('/admin/exercises')->with('success', 'Exercise created!');
     }
 
     public function edit(Exercise $exercise)

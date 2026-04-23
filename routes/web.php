@@ -7,14 +7,21 @@ use App\Models\MuscleGroup;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
+
+// ---- Controller per l'Admin ----
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\Admin\MuscleGroupController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
+
+// ---- Controller per il Personal Trainer ----
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController as PTPlanController;
 use App\Http\Controllers\PT\ShowClientPlansController;
 use App\Http\Controllers\PT\ExerciseCatalogController;
+
+// ---- Controller per il Cliente ----
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
 use App\Http\Controllers\Client\PlanHistoryController;
@@ -55,6 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('exercises', ExerciseController::class);
         Route::resource('muscle-groups', MuscleGroupController::class);
         Route::resource('accounts', UserController::class)->except(['show']);
+        Route::resource('roles', RoleController::class);
     });
 
     // ==============================================

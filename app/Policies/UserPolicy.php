@@ -6,17 +6,13 @@ use App\Models\User;
 
 class UserPolicy
 {
-    /**
-     * Può vedere la lista degli utenti?
-     */
+    // Permessso vista utenti (es.: clienti propri)
     public function viewAny(User $user): bool
     {
         return $user->can('users:read:any') || $user->can('users:read:own');
     }
 
-    /**
-     * Può vedere i dettagli di uno specifico utente (es. profilo)?
-     */
+    // Permesso vista dettagli di un utente
     public function view(User $user, User $model): bool
     {
         if ($user->can('users:read:any')) return true;
@@ -29,17 +25,13 @@ class UserPolicy
         return false;
     }
 
-    /**
-     * Può creare un nuovo utente?
-     */
+    // Permesso creazione di un utente
     public function create(User $user): bool
     {
         return $user->can('users:create');
     }
 
-    /**
-     * Può aggiornare i dati di uno specifico utente?
-     */
+    // Permesso aggiornamento di un utente
     public function update(User $user, User $model): bool
     {
         if ($user->can('users:update:any')) return true;
@@ -52,17 +44,15 @@ class UserPolicy
         return false;
     }
 
-    /**
-     * Può cancellare uno specifico utente?
-     */
+    // Permesso cancellaizone di un utente
     public function delete(User $user, User $model): bool
     {
-        // Regola suprema per tutti: nessuno può cancellare se stesso (prevenzione suicidio digitale)
+        // Regola per tutti: nessuno può cancellare se stesso (prevenzione suicidio digitale)
         if ($user->id === $model->id) {
             return false;
         }
 
-        // Solo chi ha l'autorità assoluta (es. Admin) può cancellare account in questo dominio
+        // Solo chi ha l'autorità assoluta (es. Admin) può cancellare account
         return $user->can('users:delete:any');
     }
 }

@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
+use App\Policies\RolePolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        // Si collega il modello "Role" esterno di Spatie alla "RolePolicy" interna
+        Gate::policy(Role::class, RolePolicy::class);
     }
 
     /**
