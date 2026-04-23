@@ -13,9 +13,7 @@ class UpdatePlanRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $plan = $this->route('plan');
-        // Si delega a PlanPolicy se il PT può modificare tale scheda
-        return Gate::allows('update', $plan);
+        return true;
     }
 
     /**

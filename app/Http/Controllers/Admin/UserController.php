@@ -48,7 +48,7 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in StoreUserRequest
+        Gate::authorize('create', User::class);
 
         $validated = $request->validated();
 

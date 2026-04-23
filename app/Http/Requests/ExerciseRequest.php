@@ -12,13 +12,7 @@ class ExerciseRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Se la rotta ha un parametro 'exercise', siamo in fase di Update
-        if ($this->route('exercise')) {
-            return Gate::allows('update', $this->route('exercise'));
-        }
-
-        // Altrimenti siamo in fase di Create (Store)
-        return Gate::allows('create', Exercise::class);
+        return true;
     }
 
     /**

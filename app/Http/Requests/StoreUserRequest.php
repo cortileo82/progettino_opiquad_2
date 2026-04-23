@@ -15,7 +15,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Gate::allows('create', User::class);    // UserPolicy determina se l'utente loggato può salvare utenti
+        return true;
     }
 
     /**
@@ -29,8 +29,8 @@ class StoreUserRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8', // La password è OBBLIGATORIA
-            'role'     => ['required', Rule::enum(Role::class)],   // Solo i 3 ruoli prestabiliti sono accettati
+            'password' => 'required|string|min:8',
+            'role'     => 'required|string|exists:roles,name',   // Solo i ruoli prestabiliti sono accettati
             'trainer_id' => 'nullable|exists:users,id',
         ];
     }

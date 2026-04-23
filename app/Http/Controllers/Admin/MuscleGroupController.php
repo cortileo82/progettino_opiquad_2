@@ -12,6 +12,8 @@ class MuscleGroupController extends Controller
 {
     public function index()
     {
+        Gate::authorize('viewAny', MuscleGroup::class);
+
         $muscleGroups = MuscleGroup::orderBy('name')->get();
 
         return Inertia::render('admin/musclegroups/index', ['muscleGroups' => $muscleGroups,]);
@@ -19,28 +21,38 @@ class MuscleGroupController extends Controller
 
     public function create()
     {
+        Gate::authorize('create', MuscleGroup::class);
+
         return Inertia::render('admin/musclegroups/create');
     }
 
     public function store(MuscleGroupRequest $request)
     {
+        Gate::authorize('create', MuscleGroup::class);
+
         MuscleGroup::create($request->validated());
         return redirect('/admin/muscle-groups')->with('success', 'Muscle group created successfully!');
     }
 
     public function edit(MuscleGroup $muscleGroup)
     {
+        Gate::authorize('update', $muscleGroup);
+
         return Inertia::render('admin/musclegroups/create', ['muscleGroup' => $muscleGroup,]);
     }
 
     public function update(MuscleGroupRequest $request, MuscleGroup $muscleGroup)
     {
+        Gate::authorize('update', MuscleGroup::class);
+
         $muscleGroup->update($request->validated());
         return redirect('/admin/muscle-groups')->with('success', 'Muscle group updated successfully!');
     }
 
     public function destroy(MuscleGroup $muscleGroup)
     {
+        Gate::authorize('delete', $muscleGroup);
+
         // PROTEZIONE INTEGRITÀ REFERENZIALE
         if ($muscleGroup->exercises()->exists()) {
             return redirect('/admin/muscle-groups')->with('error', 'It is not possible delete this muscle group because associated to at least one exercise.');

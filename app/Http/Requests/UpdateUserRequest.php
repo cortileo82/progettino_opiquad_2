@@ -15,10 +15,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Si recupera l'id dell'utente dall'URL
-        $userToUpdate = $this->route('user');
-        
-        return Gate::allows('update', $userToUpdate);
+        return true;
     }
 
     /**
@@ -35,7 +32,7 @@ class UpdateUserRequest extends FormRequest
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email,' . $userId,    // L'email deve essere unica, TRANNE per la riga con questo ID
             'password' => 'nullable|string|min:8',                                          // Nullable
-            'role'     => ['required', Rule::enum(Role::class)],                            // Solo i 3 ruoli prestabiliti sono accettati
+            'role'     => 'required|string|exists:roles,name',                              // Solo i ruoli prestabiliti sono accettati
             'trainer_id' => 'nullable|exists:users,id',                                     // Nullable
         ];
     }

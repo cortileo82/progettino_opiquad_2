@@ -66,7 +66,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('exercises', ExerciseController::class);
         Route::resource('muscle-groups', MuscleGroupController::class);
+        Route::resource('roles', RolesController::class);
 
+        Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::get('/accounts', [UserController::class, 'index'])->name('accounts.index');
         Route::get('/accounts/create', [UserController::class, 'create'])->name('accounts.create');
         Route::post('/accounts', [UserController::class, 'store'])->name('accounts.store');

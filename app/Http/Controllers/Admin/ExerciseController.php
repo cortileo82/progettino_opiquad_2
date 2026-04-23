@@ -31,7 +31,7 @@ class ExerciseController extends Controller
 
     public function store(ExerciseRequest $request)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in ExerciseRequest
+        Gate::authorize('create', Exercise::class);
 
         Exercise::create($request->all());
         return redirect('/admin/exercises')->with('success', 'Esercizio creato!');
@@ -49,7 +49,7 @@ class ExerciseController extends Controller
 
     public function update(ExerciseRequest $request, Exercise $exercise)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in ExerciseRequest
+        Gate::authorize('update', Exercise::class);
 
         $exercise->update($request->all());
         return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato!');
