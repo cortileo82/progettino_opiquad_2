@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm, router, Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ConfirmationModal } from '@/components/ui/confirmation-modal'; // Import del nuovo modal
-import { ActionButton } from '@/components/custom/action-button';
+import { Head, router, Link } from '@inertiajs/react';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
+import { HeaderNew } from '@/components/custom/header-new';
 import { 
     Pencil, 
     Trash2, 
@@ -14,24 +11,8 @@ import {
     Mail, 
     Plus,
     UserCircle,
-    ShieldCheck
+    UserPlus
 } from 'lucide-react';
-
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogFooter, 
-    DialogHeader, 
-    DialogTitle 
-} from '@/components/ui/dialog';
-
-import { 
-    Select, 
-    SelectContent, 
-    SelectItem, 
-    SelectTrigger, 
-    SelectValue 
-} from '@/components/ui/select';
 
 interface User {
     id: number;
@@ -48,45 +29,14 @@ interface Props {
     auth: { user: User };
 }
 
-export default function Index({ users = [], personalTrainers = [], auth }: Props) {
-    const [isEditOpen, setIsEditOpen] = useState(false);
+export default function Index({ users = [], auth }: Props) {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [userToDelete, setUserToDelete] = useState<number | null>(null);
     const [expandedId, setExpandedId] = useState<number | null>(null);
-
-    const { data, setData, patch, processing, reset, errors } = useForm({
-        name: '',
-        email: '',
-        trainer_id: '' as string | number,
-        password: '',
-        role: '',
-    });
+    const [processing, setProcessing] = useState(false);
 
     const toggleExpand = (id: number) => {
         setExpandedId(expandedId === id ? null : id);
-    };
-
-    // Gestione Modale Modifica
-    const openEditModal = (user: User) => {
-        setSelectedUser(user);
-        setData({
-            name: user.name || '',
-            email: user.email || '',
-            role: user.role || 'client',
-            trainer_id: user.trainer_id ? user.trainer_id.toString() : 'none',
-            password: '',
-        });
-        setIsEditOpen(true);
-    };
-
-    const handleUpdate = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedUser) return;
-        patch(`/admin/accounts/${selectedUser.id}`, {
-            onSuccess: () => { setIsEditOpen(false); reset(); },
-            preserveScroll: true,
-        });
     };
 
     // Gestione Modale Eliminazione
@@ -97,9 +47,14 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
 
     const handleConfirmDelete = () => {
         if (!userToDelete) return;
+        
         router.delete(`/admin/accounts/${userToDelete}`, {
             preserveScroll: true,
-            onSuccess: () => setIsDeleteOpen(false),
+            onBefore: () => setProcessing(true),
+            onFinish: () => {
+                setProcessing(false);
+                setIsDeleteOpen(false);
+            },
         });
     };
 
@@ -109,27 +64,18 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
 
             <div className="w-full p-6 md:p-10">
                 
-                {/* Header Uniformato */}
-                <div className="mb-10 border-b border-sidebar-border pb-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div>
-                            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-foreground leading-none">
-                                Gestione Account
-                            </h1>
-                            <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.2em] opacity-70">
-                                Controllo accessi, ruoli e anagrafica di sistema.
-                            </p>
-                        </div>
-                        
-                        <ActionButton 
-                            href="/admin/accounts/create" 
-                            label="Nuovo Utente" 
-                        />
-                    </div>
-                </div>
+                {/* Header con componente */}
+                <HeaderNew 
+                    title="Gestione Utenti"
+                    subtitle="Gestione completa degli utenti del sistema."
+                    icon={UserPlus}
+                    buttonText="Nuovo utente"
+                    buttonHref="/admin/accounts/create"
+                    buttonIcon={<Plus size={16} />} 
+                />
 
                 {/* Lista Cards */}
-                <div className="space-y-4">
+                <div className="space-y-4 mt-6">
                     {users.map((user) => (
                         <div 
                             key={user.id} 
@@ -159,12 +105,14 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
 
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-2 border-r border-sidebar-border pr-5">
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); openEditModal(user); }}
+                                        {/* LINK ALLA PAGINA EDIT (Sostituisce la modale) */}
+                                        <Link 
+                                            href={`/admin/accounts/${user.id}/edit`}
+                                            onClick={(e) => e.stopPropagation()}
                                             className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all"
                                         >
                                             <Pencil size={18} />
-                                        </button>
+                                        </Link>
                                         
                                         {user.id !== auth.user.id && (
                                             <button 
@@ -214,101 +162,16 @@ export default function Index({ users = [], personalTrainers = [], auth }: Props
                 </div>
             </div>
 
-            {/* MODALE ELIMINAZIONE (Il tuo nuovo ConfirmationModal) */}
+            {/* MODALE ELIMINAZIONE */}
             <ConfirmationModal
                 isOpen={isDeleteOpen}
                 onClose={() => setIsDeleteOpen(false)}
                 onConfirm={handleConfirmDelete}
                 loading={processing}
                 title="Elimina Account"
-                description="Sei sicuro? Questa azione cancellerà l'utente e tutti i piani di allenamento associati. Non potrai tornare indietro."
+                description="Sei sicuro? Questa azione cancellerà l'utente e tutti i dati associati. L'operazione è irreversibile."
                 confirmText="Sì, Elimina Definitivamente"
             />
-
-            {/* Modale Modifica */}
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent className="rounded-[2.5rem] border-2 border-sidebar-border bg-sidebar p-8 shadow-2xl max-w-md">
-                    <DialogHeader className="mb-6 text-center sm:text-left">
-                        <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3">
-                            <ShieldCheck className="text-primary" size={28} />
-                            Modifica Account
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    <form onSubmit={handleUpdate} className="space-y-5">
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Nome Utente</Label>
-                            <Input 
-                                value={data.name} 
-                                onChange={e => setData('name', e.target.value)} 
-                                className="rounded-xl border-sidebar-border bg-background h-12 font-bold uppercase italic focus:ring-2 focus:ring-primary/20 transition-all" 
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Email</Label>
-                            <Input 
-                                type="email"
-                                value={data.email} 
-                                onChange={e => setData('email', e.target.value)} 
-                                className="rounded-xl border-sidebar-border bg-background h-12 font-bold focus:ring-2 focus:ring-primary/20 transition-all" 
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Ruolo</Label>
-                                <Select value={data.role} onValueChange={(v) => setData('role', v)}>
-                                    <SelectTrigger className="rounded-xl border-sidebar-border bg-background h-12 font-black uppercase italic text-[10px] tracking-widest">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-sidebar border-sidebar-border rounded-xl">
-                                        <SelectItem value="admin" className="font-black italic uppercase text-[10px] p-3">ADMIN</SelectItem>
-                                        <SelectItem value="pt" className="font-black italic uppercase text-[10px] p-3">PT</SelectItem>
-                                        <SelectItem value="client" className="font-black italic uppercase text-[10px] p-3">CLIENT</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {data.role === 'client' && (
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] ml-1">Personal Trainer</Label>
-                                    <Select value={data.trainer_id.toString()} onValueChange={(v) => setData('trainer_id', v)}>
-                                        <SelectTrigger className="rounded-xl border-sidebar-border bg-background h-12 font-black uppercase italic text-[10px] tracking-widest">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-sidebar border-sidebar-border rounded-xl">
-                                            <SelectItem value="none" className="font-black italic uppercase text-[10px] p-3 italic">LIBERO</SelectItem>
-                                            {personalTrainers?.map((pt) => (
-                                                <SelectItem key={pt.id} value={pt.id.toString()} className="font-black italic uppercase text-[10px] p-3">
-                                                    {pt.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )}
-                        </div>
-                        <DialogFooter className="gap-3 mt-6 sm:flex-row flex-col">
-                            <Button 
-                                type="button" 
-                                variant="outline" 
-                                onClick={() => setIsEditOpen(false)}
-                                className="h-12 flex-1 rounded-xl border-sidebar-border font-black uppercase italic text-[10px] tracking-widest"
-                            >
-                                Annulla
-                            </Button>
-                            <Button 
-                                type="submit" 
-                                disabled={processing} 
-                                className="h-12 flex-1 bg-zinc-950 text-white rounded-xl font-black uppercase italic text-[10px] tracking-widest shadow-xl hover:bg-zinc-900"
-                            >
-                                {processing ? 'Salvataggio...' : 'Aggiorna'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
         </AppLayout>
     );
 }

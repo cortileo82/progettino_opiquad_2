@@ -107,6 +107,23 @@ class UserController extends Controller
         return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
     }
 
+    public function edit(User $user)
+    {
+        // 1. Controllo sicurezza: l'admin può modificare questo utente?
+        Gate::authorize('update', $user);
+
+        // 2. Recuperiamo la lista dei PT (serve per il dropdown nel form)
+        $personalTrainers = User::where('role', 'pt')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        // 3. Mandiamo l'utente alla pagina React che abbiamo creato
+        return Inertia::render('admin/accounts/edit', [
+            'user' => $user,
+            'personalTrainers' => $personalTrainers
+        ]);
+    }
+
     /**
      * Elimina un utente dal sistema.
      */

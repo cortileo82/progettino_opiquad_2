@@ -1,11 +1,12 @@
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormCard } from '@/components/custom/form-card';
 import { InputGroup } from '@/components/custom/input-group';
 import { FormButton } from '@/components/custom/form-button';
+import { HeaderNew } from '@/components/custom/header-new';
 import { Select } from 'antd';
 
 interface PT {
@@ -38,31 +39,17 @@ export default function Create({ personalTrainers }: Props) {
 
             <div className="w-full p-6 md:p-10 italic uppercase">
                 
-                {/* HEADER */}
-                <div className="mb-8 border-b border-sidebar-border pb-6">
-                    <div className="flex items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl font-extrabold tracking-tighter text-foreground">
-                                Crea Nuovo Account
-                            </h1>
-                            <p className="text-muted-foreground text-sm font-medium mt-1 normal-case not-italic">
-                                Registra un nuovo profilo nel sistema gestionale.
-                            </p>
-                        </div>
-                        
-                        <Link href="/admin/accounts">
-                            <Button variant="outline" className="border-sidebar-border rounded-lg px-6 py-2.5 h-auto flex items-center gap-3 transition-all active:scale-95">
-                                <ArrowLeft size={14} />
-                                <span className="font-black tracking-[0.2em] text-[10px]">
-                                    Annulla
-                                </span>
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Uso il componente che ho creato (form-card,input-group e form-button)
-                */}
+                 {/* Header con componente */}
+                <HeaderNew 
+                    title="Crea nuovo account"
+                    subtitle="Registra un nuovo profilo nel sistema gestionale."
+                    icon={UserPlus}
+                    buttonText="Annulla"
+                    buttonHref="/admin/accounts"
+                    buttonIcon={<ArrowLeft size={16} />}
+                />
+                
+                {/* Uso il componente che ho creato (form-card,input-group e form-button)*/}
                 <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
                     <FormCard>
                         <InputGroup 

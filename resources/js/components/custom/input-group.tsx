@@ -1,9 +1,11 @@
 import React from 'react';
 import { Input, Select } from 'antd';
 import { cn } from '@/lib/utils';
+import { LucideIcon } from 'lucide-react';
 
 interface InputGroupProps {
     label: string;
+    icon?: LucideIcon; // Aggiunta l'icona opzionale
     error?: string;
     type?: 'text' | 'email' | 'password' | 'textarea' | 'select';
     rows?: number;
@@ -17,6 +19,7 @@ interface InputGroupProps {
 
 export function InputGroup({ 
     label, 
+    icon: Icon, // Estraiamo l'icona come componente
     error, 
     type = 'text', 
     children, 
@@ -27,7 +30,6 @@ export function InputGroup({
 }: InputGroupProps) {
     
     const renderInput = () => {
-        // h-[54px] è la misura chiave per pareggiare la Select
         const baseClass = "w-full rounded-xl border border-sidebar-border bg-background px-4 focus:border-primary focus:ring-1 focus:ring-primary transition-all font-bold text-sm outline-none italic text-foreground placeholder:text-muted-foreground/50";
         const standardHeight = "h-[54px]";
         
@@ -37,8 +39,7 @@ export function InputGroup({
                 <Select
                     {...props}
                     value={value}
-                    // AntD Select ha bisogno di h-[54px] applicato sia via classe che via stile inline a volte
-                    className={cn("w-full text-sm font-bold", standardHeight)}
+                    className={cn("w-full text-sm font-bold ant-custom-select", standardHeight)}
                     onChange={(val) => onChange && onChange(val)}
                 >
                     {children}
@@ -54,8 +55,6 @@ export function InputGroup({
                     rows={props.rows || 4}
                     value={value}
                     onChange={(e) => onChange && onChange(e.target.value)}
-                    // La textarea non ha h-[54px] perché deve essere più alta, 
-                    // ma usiamo lo stesso padding e bordo per coerenza
                     className={cn(baseClass, "py-4 resize-none min-h-[120px]", error && "border-red-500")}
                 />
             );
@@ -70,7 +69,6 @@ export function InputGroup({
                 value={value}
                 type={type}
                 onChange={(e: any) => onChange && onChange(e.target.value)}
-                // Applichiamo h-[54px] e px-4 (padding orizzontale) per matchare la Select
                 className={cn(
                     baseClass, 
                     standardHeight,
@@ -83,12 +81,15 @@ export function InputGroup({
 
     return (
         <div className={cn("space-y-3", className)}>
-            <label className="text-[10px] font-black tracking-[0.2em] text-muted-foreground block ml-1 uppercase">
+            <label className="text-[10px] font-black tracking-[0.2em] text-muted-foreground block ml-1 uppercase flex items-center gap-2 italic">
+                {Icon && <Icon size={12} className="text-muted-foreground/70" />}
                 {label}
             </label>
+            
             {renderInput()}
+            
             {error && (
-                <p className="text-[10px] text-red-500 font-black tracking-widest mt-1 uppercase ml-1">
+                <p className="text-[10px] text-red-500 font-black tracking-widest mt-1 uppercase ml-1 italic">
                     {error}
                 </p>
             )}

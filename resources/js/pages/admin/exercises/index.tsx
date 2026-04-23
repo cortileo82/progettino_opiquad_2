@@ -5,6 +5,8 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { ActionButton } from '@/components/custom/action-button';
+import { HeaderNew } from '@/components/custom/header-new';
+
 
 interface MuscleGroup {
     id: number;
@@ -53,20 +55,18 @@ export default function ExerciseIndex({ exercises = [] }: Props) {
     return (
         <AppLayout breadcrumbs={[{ title: 'Gestione Esercizi', href: '/admin/exercises' }]}>
             <Head title="Gestione Esercizi" />
-            <div className="w-full p-6 md:p-10">
+
+            <div className="w-full p-6 md:p-10">   
                 
-                <div className="mb-10 border-b border-sidebar-border pb-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div>
-                            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-foreground leading-none"> Gestione Esercizi </h1>
-                            <p className="text-muted-foreground text-[10px] font-bold mt-2 uppercase tracking-[0.2em] opacity-70"> Archivio tecnico e modifiche degli esercizi disponibili. </p>
-                        </div>
-                        <ActionButton 
-                            href="/admin/exercises/create" 
-                            label="Nuovo Esercizio" 
-                        />
-                    </div>
-                </div>
+                {/* Header con componente */}
+                <HeaderNew 
+                title="Gestione Esercizi"
+                subtitle="Gestione completa degli esercizi."
+                icon={Dumbbell}
+                buttonText="Nuovo Esercizio"
+                buttonHref="/admin/exercises/create"
+                buttonIcon={<Plus size={16} />} 
+                />
 
                 <div className="space-y-4">
                     {exercises && exercises.length > 0 ? (
