@@ -15,7 +15,7 @@ export default function CreateMuscleGroup() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Utilizzo dell'URL senza trattini come richiesto
-        post('/admin/musclegroups');
+        post('/admin/muscle-groups');
     };
 
     return (
@@ -35,7 +35,7 @@ export default function CreateMuscleGroup() {
                     subtitle="Inserisci una nuova categoria anatomica nel database."
                     icon={BicepsFlexed}
                     buttonText="Indietro"
-                    buttonHref="/admin/musclegroups"
+                    buttonHref="/admin/muscle-groups"
                     buttonIcon={<ArrowLeft size={16} />}
                 />
 

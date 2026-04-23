@@ -41,7 +41,7 @@ const allNavItems: SidebarItem[] = [
     },
     {
         title: 'Gestione Gruppi Muscolari',
-        href: '/admin/musclegroups',
+        href: '/admin/muscle-groups',
         icon: BicepsFlexed, 
         roles: ['admin'],
     },

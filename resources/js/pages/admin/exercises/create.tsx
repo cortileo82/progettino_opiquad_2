@@ -57,8 +57,8 @@ export default function CreateExercise({ muscleGroups = [] }: Props) {
                         buttonHref="/admin/exercises"
                         buttonIcon={<ArrowLeft size={16} />}
                     />
-                    
-                {/* Form di creazione */}
+
+                {/* Form di creazione con componente */}
                 <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
                     <FormCard>
                         {/* 1. NOME ESERCIZIO */}

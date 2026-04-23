@@ -5,7 +5,7 @@ import { HeaderNew } from '@/components/custom/header-new';
 import { InputGroup } from '@/components/custom/input-group';
 import { FormButton } from '@/components/custom/form-button';
 import { Select } from 'antd';
-import { Save, ArrowLeft, Dumbbell, AlignLeft, Target } from 'lucide-react';
+import { Save, ArrowLeft, Dumbbell } from 'lucide-react';
 
 interface MuscleGroup {
     id: number;
@@ -16,7 +16,7 @@ interface Exercise {
     id: number;
     name: string;
     description?: string;
-    muscle_group_id: number | string;
+    muscle_group_id: number | string | null;
 }
 
 interface Props {
@@ -24,41 +24,42 @@ interface Props {
     muscleGroups: MuscleGroup[];
 }
 
-export default function EditExercise({ exercise, muscleGroups }: Props) {
+export default function EditExercise({ exercise, muscleGroups = [] }: Props) {
+    // Check di sicurezza: se exercise non esiste, non renderizzare nulla che possa crashare
+    if (!exercise) {
+        return <div className="p-10 text-white italic">Caricamento dati esercizio...</div>;
+    }
+
     const { data, setData, put, processing, errors } = useForm({
-        name: exercise.name,
-        muscle_group_id: exercise.muscle_group_id,
+        name: exercise.name || '',
+        muscle_group_id: exercise.muscle_group_id ?? '',
         description: exercise.description || ''
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Nota: per gli aggiornamenti standard usiamo put (o patch se preferisci)
         put(`/admin/exercises/${exercise.id}`);
     };
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Esercizi', href: '/admin/exercises' }, { title: 'Modifica', href: '#' }]}>
-            <Head title={`Modifica ${exercise.name}`} />
+            {/* Proteggiamo anche il titolo della pagina */}
+            <Head title={`Modifica ${exercise?.name || 'Esercizio'}`} />
             
             <div className="w-full p-6 md:p-10 italic uppercase">
                 
-                {/* Header con componente*/}
                 <HeaderNew 
                     title="Modifica Esercizio"
-                    subtitle={`Stai aggiornando: ${exercise.name}`}
+                    subtitle={`Stai aggiornando: ${exercise?.name || '---'}`}
                     icon={Dumbbell}
                     buttonText="Annulla"
                     buttonHref="/admin/exercises"
                     buttonIcon={<ArrowLeft size={16} />}
                 />
 
-                {/*Form creato con i componenti*/}
-
                 <form onSubmit={handleSubmit} className="max-w-4xl space-y-8 mt-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 rounded-[2.5rem] border-2 border-sidebar-border bg-sidebar shadow-sm">
                         
-                        {/* NOME ESERCIZIO */}
                         <InputGroup
                             label="Nome dell'Esercizio"
                             value={data.name}
@@ -67,23 +68,22 @@ export default function EditExercise({ exercise, muscleGroups }: Props) {
                             required
                         />
 
-                        {/* GRUPPO MUSCOLARE */}
                         <InputGroup
                             label="Gruppo Muscolare"
                             type="select"
                             value={data.muscle_group_id}
-                            onChange={(val: string | number) => setData('muscle_group_id', val)}
+                            onChange={(val: any) => setData('muscle_group_id', val)}
                             error={errors.muscle_group_id}
                         >
-                            <Select.Option value="" disabled>SELEZIONA GRUPPO...</Select.Option>
-                            {muscleGroups.map((group) => (
+                            <Select.Option value="">SELEZIONA GRUPPO...</Select.Option>
+                            {/* Verifichiamo che muscleGroups sia un array prima del map */}
+                            {Array.isArray(muscleGroups) && muscleGroups.map((group) => (
                                 <Select.Option key={group.id} value={group.id}>
-                                    {group.name.toUpperCase()}
+                                    {group.name?.toUpperCase() || 'SENZA NOME'}
                                 </Select.Option>
                             ))}
                         </InputGroup>
 
-                        {/* DESCRIZIONE */}
                         <div className="md:col-span-2">
                             <InputGroup
                                 label="Descrizione (Opzionale)"
@@ -96,7 +96,6 @@ export default function EditExercise({ exercise, muscleGroups }: Props) {
                         </div>
                     </div>
 
-                    {/* BOTTONE SALVATAGGIO */}
                     <FormButton 
                         processing={processing} 
                         label="Salva Modifiche" 
