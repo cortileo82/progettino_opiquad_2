@@ -11,7 +11,7 @@ interface HeaderNewProps {
     buttonText?: string; 
     buttonHref?: string;
     buttonIcon?: React.ReactNode;
-    actions?: React.ReactNode; 
+    actions?: React.ReactNode; // Qui passerai la Search Bar
     className?: string;
 }
 
@@ -26,44 +26,47 @@ export function HeaderNew({
     className 
 }: HeaderNewProps) {
     return (
-        <div className={cn("mb-8 border-b border-sidebar-border pb-6 italic uppercase", className)}>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className={cn("mb-10 border-b border-sidebar-border pb-8", className)}>
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                 
                 {/* SINISTRA: Icona e Titoli */}
-                <div className="flex items-center gap-4">
-                    <div className="rounded-2xl bg-primary/10 p-3 text-primary shrink-0 flex items-center justify-center">
-                        <Icon size={28} strokeWidth={2.5} />
+                <div className="flex items-start gap-6">
+                    <div className="rounded-[1.25rem] bg-foreground text-background p-4 shrink-0 shadow-xl flex items-center justify-center">
+                        <Icon size={32} strokeWidth={2.5} />
                     </div>
-                    <div>
-                        <h1 className="text-3xl font-extrabold tracking-tighter text-foreground leading-none">
+                    <div className="flex flex-col">
+                        <h1 className="text-5xl font-black tracking-tighter text-foreground leading-[0.9] uppercase italic">
                             {title}
                         </h1>
-                        <p className="text-muted-foreground text-sm font-medium mt-1 normal-case not-italic">
+                        <p className="text-muted-foreground text-[10px] font-black mt-3 uppercase tracking-[0.3em] opacity-70">
                             {subtitle}
                         </p>
                     </div>
                 </div>
                 
-                {/* DESTRA: Area Pulsanti */}
-                <div className="flex items-center gap-3">
+                {/* DESTRA: Search Bar e Pulsanti */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                     
-                    {/* Pulsante Unico Semplificato (Forzato Nero) */}
+                    {/* Area per Azioni Custom (es. Search Bar) */}
+                    {actions && (
+                        <div className="w-full lg:w-96">
+                            {actions}
+                        </div>
+                    )}
+
+                    {/* Pulsante d'azione principale */}
                     {buttonHref && buttonText && (
-                        <Link href={buttonHref}>
+                        <Link href={buttonHref} className="w-full sm:w-auto">
                             <Button 
-                                // Ho aggiunto !bg-zinc-950 e !text-white per "vincere" contro il blu di AntD
-                                className="!bg-zinc-950 hover:!bg-zinc-800 !text-white border-none rounded-xl px-8 h-[54px] flex items-center gap-3 transition-all shadow-lg active:scale-95 group"
+                                className="!bg-zinc-950 hover:!bg-zinc-800 !text-white border-none rounded-2xl px-8 h-14 flex items-center justify-center gap-3 transition-all shadow-2xl active:scale-95 group w-full sm:w-auto"
                             >
-                                {buttonIcon || <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />}
-                                <span className="font-black uppercase italic tracking-[0.2em] text-[11px] !text-white">
+                                {buttonIcon || <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />}
+                                <span className="font-black uppercase italic tracking-[0.15em] text-[11px] !text-white">
                                     {buttonText}
                                 </span>
                             </Button>
                         </Link>
                     )}
-
-                    {/* Altri pulsanti */}
-                    {actions}
                     
                 </div>
             </div>

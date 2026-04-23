@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { UserPlus, FileText, PlusCircle, ArrowRight, Users, Mail } from 'lucide-react';
+import { HeaderNew } from '@/components/custom/header-new';
 
 export default function MyClients({ clients, stats }: any) {
     return (
@@ -9,25 +10,15 @@ export default function MyClients({ clients, stats }: any) {
 
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
-                {/* HEADER SEZIONE */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-sidebar-border pb-8">
-                    <div>
-                        <h1 className="text-4xl font-black uppercase italic tracking-tighter text-foreground leading-none">
-                            I Miei <span className="text-primary">Atleti</span>
-                        </h1>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-3 opacity-70">
-                            Gestione della lista atleti e monitoraggio performance.
-                        </p>
-                    </div>
-
-                    <Link 
-                        href="/pt/clients/assign" 
-                        className="group flex items-center gap-3 bg-zinc-950 text-white px-8 py-4 rounded-2xl hover:bg-zinc-900 transition-all shadow-xl active:scale-95 border border-white/5"
-                    >
-                        <UserPlus size={18} className="group-hover:scale-110 transition-transform" />
-                        <span className="font-black uppercase italic text-xs tracking-widest">Associa Cliente</span>
-                    </Link>
-                </div>
+                {/* HEADER con componenti */}
+                <HeaderNew 
+                    title="I Miei Atleti"
+                    subtitle="Gestione della lista atleti associati e monitoraggio performance."
+                    icon={Users} 
+                    buttonText="Associa Cliente"
+                    buttonHref="/pt/clients/assign"
+                    buttonIcon={<UserPlus size={16} />}
+                />
 
                 {/* GRID ATLETI */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

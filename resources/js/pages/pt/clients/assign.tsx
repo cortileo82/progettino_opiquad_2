@@ -2,6 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { UserPlus, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import { HeaderNew } from '@/components/custom/header-new';
 
 // 1. Definiamo cosa c'è dentro un cliente
 interface Client {
@@ -34,16 +35,14 @@ export default function Assign({ availableClients }: Props) {
             <Head title="Associa Nuovi Clienti" />
 
             <div className="flex h-full flex-1 flex-col gap-6 p-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold italic uppercase tracking-tighter">Bacheca Nuovi Atleti</h1>
-                    </div>
-                    {/* Anche qui usiamo l'URL statico /pt/dashboard */}
-                    <Link href="/pt/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-                        <ArrowLeft className="h-4 w-4" />
-                        Torna alla Dashboard
-                    </Link>
-                </div>
+                <HeaderNew 
+                    title="Bacheca Nuovi Atleti"
+                    subtitle="Seleziona e associa i nuovi atleti al tuo profilo"
+                    icon={UserPlus} 
+                    buttonText="Dashboard"
+                    buttonHref="/pt/dashboard"
+                    buttonIcon={<ArrowLeft size={16} />}
+                />
 
                 <div className="grid gap-4">
                     {availableClients && availableClients.length > 0 ? (

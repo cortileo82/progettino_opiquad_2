@@ -8,16 +8,16 @@ import {
 interface ResourceListProps {
     items: any[];
     type: 'users' | 'exercises' | 'muscle-groups';
-    onDelete: (id: number) => void;
-    editBaseUrl: string;
+    onDelete?: (id: number) => void;
+    editBaseUrl?: string;
     authUserId?: number; 
+    readOnly?: boolean; 
 }
 
-export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId }: ResourceListProps) {
+export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId, readOnly = false }: ResourceListProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
     const toggleExpand = (id: number) => {
-        // Disabilitiamo l'espansione per i gruppi muscolari visto che non hanno dettagli extra
         if (type === 'muscle-groups') return;
         setExpandedId(expandedId === id ? null : id);
     };
@@ -52,11 +52,15 @@ export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId }:
                                     {item.name}
                                 </span>
                                 
-                                {/* SOTTOTITOLO DINAMICO */}
+                                {/* SOTTOTITOLO DINAMICO CON FIX CATEGORIA */}
                                 {type !== 'muscle-groups' && (
                                     <span className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-primary">
                                         {type === 'users' && item.role}
-                                        {type === 'exercises' && (item.muscle_group?.name || 'Senza Categoria')}
+                                        {type === 'exercises' && (
+                                            item.muscle_group?.name || // Se è oggetto (DB)
+                                            item.muscle_group ||       // Se è stringa
+                                            'Senza Categoria'          // Fallback
+                                        )}
                                     </span>
                                 )}
                             </div>
@@ -64,29 +68,34 @@ export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId }:
 
                         {/* AZIONI E CONTROLLI */}
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 border-r border-sidebar-border pr-5">
-                                {/* TASTO MODIFICA */}
-                                <Link 
-                                    href={`${editBaseUrl}/${item.id}/edit`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all"
-                                >
-                                    <Pencil size={18} />
-                                </Link>
-                                
-                                {/* TASTO ELIMINA (Protezione per l'utente loggato) */}
-                                {item.id !== authUserId && (
-                                    <button 
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
-                                        className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                )}
-                            </div>
                             
-                            {/* INDICATORE ESPANSIONE (Nascosto per i gruppi muscolari) */}
+                            {!readOnly && (
+                                <div className="flex items-center gap-2 border-r border-sidebar-border pr-5">
+                                    {/* MODIFICA */}
+                                    {editBaseUrl && (
+                                        <Link 
+                                            href={`${editBaseUrl}/${item.id}/edit`}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all"
+                                        >
+                                            <Pencil size={18} />
+                                        </Link>
+                                    )}
+                                    
+                                    {/* ELIMINA */}
+                                    {item.id !== authUserId && onDelete && (
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
+                                            className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            
+                            {/* FRECCIA ESPANSIONE */}
                             {type !== 'muscle-groups' && (
                                 <ChevronDown 
                                     size={20} 
@@ -96,7 +105,7 @@ export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId }:
                         </div>
                     </div>
 
-                    {/* CORPO ESPANDIBILE (Visualizzato solo per Utenti ed Esercizi) */}
+                    {/* CORPO ESPANDIBILE */}
                     {expandedId === item.id && type !== 'muscle-groups' && (
                         <div className="px-10 pb-10 pt-2 bg-background/30 border-t border-sidebar-border/50 animate-in fade-in slide-in-from-top-4 duration-500">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
@@ -128,7 +137,6 @@ export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId }:
     );
 }
 
-// Sottocomponente interno per i dettagli
 function DetailBox({ label, value, icon: Icon, isTextArea = false }: { label: string, value: string, icon: any, isTextArea?: boolean }) {
     return (
         <div className="space-y-3">

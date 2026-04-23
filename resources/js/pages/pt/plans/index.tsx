@@ -68,6 +68,9 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                     </Link>
                 </div>
 
+
+
+
                 {/* GRID SCHEDE */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {clientPlans.map((plan) => (

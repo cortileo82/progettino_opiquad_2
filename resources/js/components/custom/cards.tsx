@@ -15,7 +15,7 @@ export function Card({ label, value, icon: Icon, className }: CardProps) {
             "flex items-center gap-6 rounded-2xl border border-sidebar-border bg-sidebar p-8 shadow-sm hover:border-primary/50 transition-all w-full", 
             className
         )}>
-            {/* Icona più grande */}
+
             <div className="rounded-2xl bg-primary/10 p-4 text-primary shrink-0">
                 <Icon size={32} />
             </div>
