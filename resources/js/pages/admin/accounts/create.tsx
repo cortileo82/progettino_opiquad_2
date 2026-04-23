@@ -3,25 +3,41 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { Save, ArrowLeft, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// 1. Definiamo come sono fatti i dati in ingresso dal Controller
 interface PT {
     id: number;
     name: string;
 }
 
-interface Props {
-    personalTrainers: { id: number; name: string }[];
-    availableRoles: { name: string }[]; // Riceviamo la lista dal DB
-    clientRoleSlug: string; // Riceviamo 'client' come costante
+interface Role {
+    name: string;
 }
 
-export default function Create({ personalTrainers }: Props) {
-    // 1. Allineamento con StoreUserRequest: pt_id diventa trainer_id
-    const { data, setData, post, processing, errors } = useForm({
+interface Props {
+    personalTrainers: PT[];
+    availableRoles: Role[];
+    clientRoleSlug: string;
+}
+
+// 2. Definiamo come è fatto il nostro Form (RISOLVE L'ERRORE "NEVER")
+interface FormData {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    role: string;
+    trainer_id: string;
+}
+
+export default function Create({ personalTrainers, availableRoles, clientRoleSlug }: Props) {
+    
+    // 3. Diciamo a useForm di usare l'interfaccia FormData
+    const { data, setData, post, processing, errors } = useForm<FormData>({
         first_name: '',
         last_name: '',
         email: '',
         password: '',
-        role: clientRoleSlug, // Corrisponde alle stringhe esatte nel DB Spatie
+        role: clientRoleSlug, // Ora questa variabile esiste ed è destrutturata dalle Props
         trainer_id: ''
     });
 
@@ -66,7 +82,6 @@ export default function Create({ personalTrainers }: Props) {
                                 onChange={e => setData('first_name', e.target.value)} 
                                 className="w-full rounded-xl border border-sidebar-border bg-background p-4 focus:border-primary focus:ring-1 focus:ring-primary transition-all font-bold text-sm outline-none italic"
                             />
-                            {/* Visualizzazione degli errori di validazione del backend */}
                             {errors.first_name && <p className="text-red-500 text-xs normal-case not-italic">{errors.first_name}</p>}
                         </div>
 
@@ -107,24 +122,28 @@ export default function Create({ personalTrainers }: Props) {
                             {errors.password && <p className="text-red-500 text-xs normal-case not-italic">{errors.password}</p>}
                         </div>
 
-                        {/* SELETTORE RUOLO: Ora è 100% dinamico */}
+                        {/* RUOLO DINAMICO */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black"> Ruolo </label>
-                            <select 
-                                value={data.role} 
-                                onChange={e => setData('role', e.target.value)} 
-                                className="..."
-                            >
-                                {availableRoles.map((role) => (
-                                    <option key={role.name} value={role.name}>
-                                        {role.name.toUpperCase()}
-                                    </option>
-                                ))}
-                            </select>
+                            <label className="text-[10px] font-black tracking-[0.2em] text-muted-foreground block ml-1"> Ruolo </label>
+                            <div className="relative">
+                                <select 
+                                    value={data.role} 
+                                    onChange={e => setData('role', e.target.value)} 
+                                    className="w-full rounded-xl border border-sidebar-border bg-background p-4 pr-10 focus:border-primary focus:ring-1 focus:ring-primary font-black text-xs transition-all outline-none italic appearance-none cursor-pointer"
+                                >
+                                    {availableRoles.map((r) => (
+                                        <option key={r.name} value={r.name}>
+                                            {r.name.toUpperCase()}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                            </div>
+                            {errors.role && <p className="text-red-500 text-xs normal-case not-italic">{errors.role}</p>}
                         </div>
 
-                        {/* ASSEGNAZIONE PT (Visibile solo se il ruolo è 'client') */}
-                        <div className={`space-y-3 transition-all duration-300 ${data.role === 'client' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none h-0 md:h-auto overflow-hidden'}`}>
+                        {/* ASSEGNAZIONE PT (Dinamica basata su clientRoleSlug) */}
+                        <div className={`space-y-3 transition-all duration-300 ${data.role === clientRoleSlug ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none h-0 md:h-auto overflow-hidden'}`}>
                             <label className="text-[10px] font-black tracking-[0.2em] text-muted-foreground block ml-1"> Assegna a Personal Trainer </label>
                             <div className="relative">
                                 <select 
