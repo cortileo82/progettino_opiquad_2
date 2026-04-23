@@ -44,6 +44,12 @@ const allNavItems: SidebarItem[] = [
         icon: Dumbbell,
         roles: ['admin'], // Di solito la gestione totale è solo admin
     },
+    {
+        title: 'Gruppi Muscolari',
+        href: '/admin/muscle-groups',
+        icon: Dumbbell,
+        roles: ['admin'],
+    },
     /*{
         title: 'I Miei Clienti',
         href: '/pt/clients', 
