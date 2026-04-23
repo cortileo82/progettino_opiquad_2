@@ -39,6 +39,9 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
+                // Togliere tutto, passare a frontend direttamente i permessi che l'utente ha per fare quello che deve fare
+                // Perciò per esempio non controllare se è pt per cancellare un scheda, ma se nei permessi passati da qua c'è "plans:delete".
+
                 'user' => $request->user(),
                 'isAdmin' => $request->user() ? $request->user()->role === Role::ADMIN->value: false,
                 'isPT' => $request->user() ? $request->user()->role === Role::PT->value : false,
