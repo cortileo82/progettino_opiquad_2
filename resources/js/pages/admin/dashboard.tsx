@@ -93,7 +93,7 @@ export default function Dashboard({ stats, exercises }: Props) {
                                     </div>
                                 ))
                             ) : (
-                                /* Utilizzo del nuovo componente EmptyState */
+                                /* Componente per pagina vuota */
                                 <EmptyState 
                                     message="Nessun esercizio presente nel database" 
                                     icon={Dumbbell} 

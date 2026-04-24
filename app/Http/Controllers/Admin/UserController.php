@@ -79,9 +79,6 @@ class UserController extends Controller
 
         $validated = $request;
 
-        /*if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }*/
 
        if ($validated['role'] === \App\Enums\Role::CLIENT->value) {
             $selectedTrainer = $request->input('trainer_id');
