@@ -1,13 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { 
-    LayoutGrid, 
-    Dumbbell, 
-    Users, 
-    ClipboardList, 
-    BookOpenCheck, 
-    History, 
-    Layers
-} from 'lucide-react';
+import { LayoutGrid, Dumbbell, Users, ClipboardList, BookOpenCheck, History, Layers, ShieldCheck } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -16,71 +8,76 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-// ARCHITETTURA: Cambiamo 'roles' in 'permissions'
 interface SidebarItem extends NavItem {
-    permissions: string[]; 
+    permissions: string[];
 }
 
-// Definiamo le voci in base a "Cosa può fare l'utente" e non "Chi è"
 const allNavItems: SidebarItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
-        permissions: [], // Array vuoto = accessibile a tutti gli utenti loggati
+        permissions: [], 
     },
     {
         title: 'Gestione Esercizi',
         href: '/admin/exercises',
         icon: Dumbbell,
-        permissions: ['read:exercises'], // Usa i permessi CRUD generati dal Seeder
+        permissions: ['exercises:read'],
     },
     {
-        title: 'Gruppi Muscolari', // <-- LA TUA NUOVA VOCE
-        href: '/admin/muscle-groups', // <-- Kebab-case architetturale
+        title: 'Gruppi Muscolari',
+        href: '/admin/muscle-groups',
         icon: Layers,
-        permissions: ['read:muscle-groups'], // Solo chi ha questo permesso la vedrà
+        permissions: ['muscle-groups:read'], 
     },
     {
         title: 'Gestione Utenti',
-        href: '/admin/accounts',
+        href: '/admin/users',
         icon: Users,
-        permissions: ['read:users'],
+        // Un admin legge tutti (:any), un PT legge i suoi (:own). Si mostra il link in entrambi i casi.
+        permissions: ['users:read:any', 'users:read:own'] 
+    },
+    {
+        title: 'Gestione Ruoli',
+        href: '/admin/roles',
+        icon: ShieldCheck,
+        permissions: ['roles:read']
     },
     {
         title: 'Catalogo Esercizi',
         href: '/pt/exercises/catalog',
         icon: BookOpenCheck,
-        // Esempio: Il PT vede questa voce perché non ha accesso all'admin completo
-        permissions: ['read:exercises', 'create:plans'], 
+        permissions: ['exercises:read']
     },
     {
         title: 'La Mia Scheda',
         href: '/client/my-plan',
         icon: ClipboardList,
-        permissions: ['read:plans'],
+        // Un admin legge tutte le schede (:any), un cliente legge la sua (:own).
+        permissions: ['plans:read:any', 'plans:read:own']
     },
     {
         title: 'Storico Schede',
         href: '/client/history',
         icon: History,
-        permissions: ['read:plans'],
+        permissions: ['plans:read:any', 'plans:read:own']
     }
 ];
 
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
-    // Recuperiamo i permessi che abbiamo inviato dal middleware HandleInertiaRequests
     const { auth } = usePage().props as any;
-    const userPermissions = auth.permissions || []; 
+    
+    // Array piatto di permessi fornito da HandleInertiaRequests.php
+    const userPermissions: string[] = auth.permissions || [];
 
-    // Filtriamo la sidebar in modo dinamico
     const filteredNavItems = allNavItems.filter((item) => {
-        // Se non richiede permessi speciali (es. Dashboard), mostralo
+        // Se l'elemento non richiede permessi (es. Dashboard), mostralo sempre
         if (item.permissions.length === 0) return true;
         
-        // Altrimenti, controlla se l'utente ha ALMENO UNO dei permessi richiesti per quella voce
+        // Mostralo se l'utente possiede ALMENO UNO dei permessi richiesti per quel link
         return item.permissions.some(permission => userPermissions.includes(permission));
     });
 

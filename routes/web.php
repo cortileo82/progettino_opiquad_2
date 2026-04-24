@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use App\Models\User;
 use App\Models\Exercise;
@@ -7,21 +7,15 @@ use App\Models\MuscleGroup;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
-
-// ---- Controller per l'Admin ----
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\Admin\MuscleGroupController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
-
-// ---- Controller per il Personal Trainer ----
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController as PTPlanController;
 use App\Http\Controllers\PT\ShowClientPlansController;
 use App\Http\Controllers\PT\ExerciseCatalogController;
-
-// ---- Controller per il Cliente ----
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
 use App\Http\Controllers\Client\PlanHistoryController;
@@ -31,27 +25,36 @@ Route::inertia('/', 'welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    // Il redirect della Dashboard usa Spatie per leggere il ruolo in RAM
+    
+    // 1. MOTORE DI SMISTAMENTO (ENTRY POINT)
     Route::get('/dashboard', function () {
         $user = auth()->user();
         
-        if ($user->hasRole('admin')) return redirect()->route('admin.dashboard');
-        if ($user->hasRole('pt')) return redirect()->route('pt.dashboard');
+        if ($user->hasRole(User::ROLE_ADMIN)) return redirect()->route('admin.dashboard');
+        if ($user->hasRole(User::ROLE_PT)) return redirect()->route('pt.dashboard');
+        if ($user->hasRole(User::ROLE_CLIENT)) return redirect()->route('client.dashboard');
         
-        return redirect()->route('client.dashboard');
+        // Fallback per tutti i ruoli custom (es. Nutrizionista, Segreteria)
+        return redirect()->route('default.dashboard');
     })->name('dashboard');
 
-    // ==============================================
-    // AREA ADMIN (Protezione delegata alle Policy)
-    // ==============================================
+    // 2. DASHBOARD GENERICA PER RUOLI CUSTOM
+    Route::get('/welcome-on-board', function () {
+        return Inertia::render('dashboard/generic', [
+            // Si estrae il nome del ruolo per personalizzare il saluto
+            'role' => auth()->user()->roles->first()?->name ?? 'Utente'
+        ]);
+    })->name('default.dashboard');
+
+    // ==========================================
+    // AREA ADMIN
+    // ==========================================
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', function () {
             return Inertia::render('admin/dashboard', [
-                // Usiamo il model scope di Spatie per contare gli utenti per ruolo
                 'stats' => [
-                    'total_clients' => User::role('client')->count(),
-                    'total_pts' => User::role('pt')->count(),
+                    'total_clients' => User::role(User::ROLE_CLIENT)->count(),
+                    'total_pts' => User::role(User::ROLE_PT)->count(),
                     'total_exercises' => Exercise::count(),
                     'total_workouts' => Plan::count(),
                 ],
@@ -61,13 +64,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('exercises', ExerciseController::class);
         Route::resource('muscle-groups', MuscleGroupController::class);
-        Route::resource('accounts', UserController::class)->except(['show']);
+        Route::resource('users', UserController::class)->except(['show']);
         Route::resource('roles', RoleController::class);
     });
 
-    // ==============================================
-    // AREA PT (Protezione delegata alle Policy)
-    // ==============================================
+    // ==========================================
+    // AREA PT
+    // ==========================================
     Route::prefix('pt')->name('pt.')->group(function () {
         Route::get('/dashboard', PTDashboard::class)->name('dashboard');
         Route::get('/exercises/catalog', ExerciseCatalogController::class)->name('exercises.catalog');
@@ -82,16 +85,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/plans/{plan}', [PTPlanController::class, 'delete'])->name('plans.delete');
     });
 
-    // ==============================================
-    // AREA CLIENT (Protezione delegata alle Policy)
-    // ==============================================
+    // ==========================================
+    // AREA CLIENT
+    // ==========================================
     Route::prefix('client')->name('client.')->group(function () {
         Route::get('/dashboard', ClientDashboard::class)->name('dashboard');
         Route::get('/my-plan', [ClientPlanController::class, 'current'])->name('plan.current');
         Route::get('/history', [ClientPlanController::class, 'history'])->name('history');
         Route::get('/plans/{plan}', [ClientPlanController::class, 'show'])->name('plans.show');
     });
-    
 });
 
 require __DIR__.'/settings.php';

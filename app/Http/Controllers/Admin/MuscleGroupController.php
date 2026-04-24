@@ -44,7 +44,7 @@ class MuscleGroupController extends Controller
 
     public function update(MuscleGroupRequest $request, MuscleGroup $muscleGroup)
     {
-        Gate::authorize('update', MuscleGroup::class);
+        Gate::authorize('update', $muscleGroup);
 
         $muscleGroup->update($request->validated());
         return redirect('/admin/muscle-groups')->with('success', 'Muscle group updated successfully!');

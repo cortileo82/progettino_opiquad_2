@@ -18,14 +18,15 @@ class UserController extends Controller
     public function index()
     {
         Gate::authorize('viewAny', User::class);
-        $users = User::with(['trainer', 'roles'])->latest()->get();
+        $users = User::with(['trainer', 'roles'])->latest()->get(); 
+        $personalTrainers = User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']);
         
-        // Utilizzo della query scope di Spatie per prendere solo i PT
-        $personalTrainers = User::role('pt')->orderBy('name')->get(['id', 'name']);
-        
-        return Inertia::render('admin/accounts/index', [
+        return Inertia::render('admin/users/index', [
             'users' => $users,
-            'personalTrainers' => $personalTrainers
+            'personalTrainers' => $personalTrainers,
+            'availableRoles' => \Spatie\Permission\Models\Role::orderBy('name')->get(['name']),
+            'clientRoleSlug' => User::ROLE_CLIENT,
+            'adminRoleSlug' => User::ROLE_ADMIN,
         ]);
     }
 
@@ -33,7 +34,7 @@ class UserController extends Controller
     {
         Gate::authorize('create', User::class);
         
-        return Inertia::render('admin/accounts/create', [
+        return Inertia::render('admin/users/create', [
             // 1. Tutti i PT per il secondo menu a tendina
             'personalTrainers' => User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']),
             
@@ -64,7 +65,7 @@ class UserController extends Controller
         // 2. Assegnazione ruolo nel DB di Spatie
         $user->assignRole($request->role);
 
-        return Inertia::render('admin/accounts/success');
+        return Inertia::render('admin/users/success');
     }
 
     public function update(UpdateUserRequest $request, User $user)
@@ -87,7 +88,7 @@ class UserController extends Controller
             $user->syncRoles($validated['role']);
         }
 
-        return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
+        return redirect('/admin/users')->with('success', 'Utente aggiornato con successo!');
     }
 
     public function destroy(User $user)
@@ -96,6 +97,6 @@ class UserController extends Controller
 
         $user->delete();
         
-        return redirect('/admin/accounts')->with('success', 'Utente rimosso.');
+        return redirect('/admin/users')->with('success', 'Utente rimosso.');
     }
 }

@@ -9,11 +9,10 @@ class ExerciseCatalogController extends Controller
 {
     public function __invoke()
     {
-        // Usiamo la policy che avevamo scritto appositamente
         Gate::authorize('viewCatalog', Exercise::class);
 
-        $exercises = Exercise::orderBy('muscle_group')->orderBy('name')->get();
-        
+        $exercises = Exercise::with('muscleGroup')->orderBy('name')->get();
+
         return Inertia::render('pt/catalog', [
             'exercises' => $exercises
         ]);

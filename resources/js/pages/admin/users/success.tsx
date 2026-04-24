@@ -37,7 +37,7 @@ export default function Success() {
                         </Button>
                     </Link>
 
-                    <Link href="/admin/accounts">
+                    <Link href="/admin/users">
                         <Button variant="outline" className="border-sidebar-border rounded-xl px-8 py-4 h-auto flex items-center gap-3 transition-all active:scale-95 group">
                             <span className="font-black uppercase italic tracking-[0.2em] text-[11px]">
                                 Gestione Account

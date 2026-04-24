@@ -49,7 +49,7 @@ class ExerciseController extends Controller
 
     public function update(ExerciseRequest $request, Exercise $exercise)
     {
-        Gate::authorize('update', Exercise::class);
+        Gate::authorize('update', $exercise);
 
         $exercise->update($request->all());
         return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato!');

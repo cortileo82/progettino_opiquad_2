@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\MuscleGroup;
 
 class MuscleGroupPolicy
 {
@@ -14,11 +15,11 @@ class MuscleGroupPolicy
         return $user->can('muscle-groups:create');
     }
 
-    public function update(User $user, Exercise $exercise): bool {
+    public function update(User $user, MuscleGroup $muscleGroup): bool {
         return $user->can('muscle-groups:update');
     }
 
-    public function delete(User $user, Exercise $exercise): bool {
+    public function delete(User $user, MuscleGroup $muscleGroup): bool {
         return $user->can('muscle-groups:delete');
     }
 }

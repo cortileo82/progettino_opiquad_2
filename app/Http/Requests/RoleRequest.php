@@ -23,14 +23,20 @@ class RoleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('route')?->id;
+        // Si stabilisce se si sta modificando un ruolo esistente estraendolo dalla rotta
+        $role = $this->route('role');
+        $roleId = is_object($role) ? $role->id : $role;
 
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('roles', 'name')->ignore($roleId)],
-            // Si valida che l'input 'permissions' sia un array
+            'name' => [
+                'required', 
+                'string', 
+                'max:255', 
+                // Se l'ID esiste (modifica), lo si ignora nel controllo unique. 
+                // Se non esiste (creazione), si fa il controllo normale.
+                Rule::unique('roles', 'name')->ignore($roleId) 
+            ],
             'permissions' => ['nullable', 'array'],
-            // Si valida che ogni elemento dell'array esista davvero nel DB di Spatie
-            'permissions.*' => ['string', 'exists:permissions,name']
         ];
     }
 }

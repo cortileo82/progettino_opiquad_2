@@ -74,7 +74,7 @@ class RoleController extends Controller
     }
 
     public function destroy(Role $role) {
-        Gate::authorize('delete', Role::class);
+        Gate::authorize('delete', $role);
         $role->delete();
         return redirect('/admin/roles')->with('success', 'Role deleted successfully!');
     }

@@ -4,10 +4,17 @@ import { ChevronDown, Dumbbell, Info, Search } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Input } from '@/components/ui/input';
 
+// 1. Diciamo a TypeScript come è fatto il modello relazionale inviato da Laravel
+interface MuscleGroup {
+    id: number;
+    name: string;
+}
+
+// 2. Aggiorniamo l'Esercizio: muscle_group ora è un oggetto, non una stringa
 interface Exercise {
     id: number;
     name: string;
-    muscle_group: string;
+    muscle_group?: MuscleGroup; 
     description?: string;
 }
 
@@ -23,10 +30,10 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
         setExpandedId(expandedId === id ? null : id);
     };
 
-    // Filtro rapido lato client per performance istantanee
+    // 3. Correzione della logica di ricerca: navighiamo dentro l'oggetto per cercare il .name
     const filteredExercises = exercises.filter(ex => 
         ex.name.toLowerCase().includes(search.toLowerCase()) || 
-        (ex.muscle_group && ex.muscle_group.toLowerCase().includes(search.toLowerCase()))
+        (ex.muscle_group?.name && ex.muscle_group.name.toLowerCase().includes(search.toLowerCase()))
     );
 
     const breadcrumbs = [
@@ -36,10 +43,8 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Catalogo Tecnico Esercizi" />
-
+            
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
-                
-                {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-sidebar-border pb-8">
                     <div>
                         <h1 className="text-5xl font-black tracking-tighter uppercase italic text-foreground">
@@ -49,40 +54,24 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                             Database tecnico degli esercizi disponibili
                         </p>
                     </div>
-
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                         <Input 
                             placeholder="FILTRA PER NOME O MUSCOLO..." 
-                            className="pl-12 bg-sidebar border-sidebar-border rounded-xl h-14 uppercase italic font-black text-xs tracking-widest focus:ring-foreground/20"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            className="pl-12 bg-sidebar border-sidebar-border rounded-xl h-14 uppercase italic font-black text-xs tracking-widest focus:ring-foreground/20" 
+                            value={search} 
+                            onChange={(e) => setSearch(e.target.value)} 
                         />
                     </div>
                 </div>
 
-                {/* Grid/List Section */}
                 <div className="grid gap-4">
                     {filteredExercises.length > 0 ? (
                         filteredExercises.map((ex) => (
-                            <div 
-                                key={ex.id} 
-                                className={`group bg-sidebar border transition-all duration-300 rounded-2xl overflow-hidden ${
-                                    expandedId === ex.id 
-                                    ? 'border-foreground ring-1 ring-foreground/10' 
-                                    : 'border-sidebar-border hover:border-foreground/30'
-                                }`}
-                            >
-                                <div 
-                                    className="flex items-center justify-between p-6 cursor-pointer select-none" 
-                                    onClick={() => toggleExpand(ex.id)}
-                                >
+                            <div key={ex.id} className={`group bg-sidebar border transition-all duration-300 rounded-2xl overflow-hidden ${expandedId === ex.id ? 'border-foreground ring-1 ring-foreground/10' : 'border-sidebar-border hover:border-foreground/30'}`}>
+                                <div className="flex items-center justify-between p-6 cursor-pointer select-none" onClick={() => toggleExpand(ex.id)}>
                                     <div className="flex items-center gap-6">
-                                        <div className={`p-4 rounded-xl transition-all duration-500 ${
-                                            expandedId === ex.id 
-                                            ? 'bg-foreground text-background scale-110' 
-                                            : 'bg-background text-muted-foreground group-hover:text-foreground'
-                                        }`}>
+                                        <div className={`p-4 rounded-xl transition-all duration-500 ${expandedId === ex.id ? 'bg-foreground text-background scale-110' : 'bg-background text-muted-foreground group-hover:text-foreground'}`}>
                                             <Dumbbell size={20} />
                                         </div>
                                         <div className="flex flex-col">
@@ -90,19 +79,18 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                                                 {ex.name}
                                             </span>
                                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-0.5">
-                                                Gruppo muscolare: <span className="text-foreground">{ex.muscle_group}</span>
+                                                Gruppo muscolare: 
+                                                {/* 4. Correzione HTML: Estraiamo il .name dall'oggetto relazionale in modo sicuro */}
+                                                <span className="text-foreground ml-1">
+                                                    {ex.muscle_group?.name || 'NON ASSEGNATO'}
+                                                </span>
                                             </span>
                                         </div>
                                     </div>
-
                                     <div className="flex items-center gap-4">
-                                        <ChevronDown 
-                                            size={20} 
-                                            className={`text-muted-foreground transition-transform duration-500 ${expandedId === ex.id ? 'rotate-180 text-foreground' : ''}`} 
-                                        />
+                                        <ChevronDown size={20} className={`text-muted-foreground transition-transform duration-500 ${expandedId === ex.id ? 'rotate-180 text-foreground' : ''}`} />
                                     </div>
                                 </div>
-
                                 {expandedId === ex.id && (
                                     <div className="px-6 pb-8 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <div className="grid gap-4 bg-background/40 rounded-xl p-6 border border-sidebar-border/50">
@@ -123,7 +111,9 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-sidebar-border rounded-3xl opacity-50">
                             <Dumbbell size={40} className="mb-4 text-muted-foreground" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em]">Nessun esercizio trovato</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em]">
+                                Nessun esercizio trovato
+                            </p>
                         </div>
                     )}
                 </div>

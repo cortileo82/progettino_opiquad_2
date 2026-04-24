@@ -43,11 +43,11 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/accounts');
+        post('/admin/users');
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/accounts' }, { title: 'Nuovo Utente', href: '#' }]}>
+        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }, { title: 'Nuovo Utente', href: '#' }]}>
             <Head title="Crea Nuovo Account" />
             
             <div className="w-full p-6 md:p-10 italic uppercase">
@@ -61,7 +61,7 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
                                 Registra un nuovo profilo nel sistema gestionale.
                             </p>
                         </div>
-                        <Link href="/admin/accounts">
+                        <Link href="/admin/users">
                             <Button variant="outline" className="border-sidebar-border rounded-lg px-6 py-2.5 h-auto flex items-center gap-3 transition-all active:scale-95">
                                 <ArrowLeft size={14} />
                                 <span className="font-black tracking-[0.2em] text-[10px]"> Annulla </span>
