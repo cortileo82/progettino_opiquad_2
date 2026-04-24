@@ -6,38 +6,58 @@ use App\Models\User;
 class PlanPolicy
 {
     public function viewAny(User $user): bool {
-        return false;
+        return $user->can('plans:read');
     }
 
     public function view(User $user, Plan $plan): bool
     {
-        // Se l'utente loggato è il proprietario della scheda (il cliente stesso) -> PUÒ PASSARE
-        if ($user->id === $plan->user_id) {
+        // 1. Si fa passare l'Admin
+        if ($user->can('plans:read:any')) {
             return true;
         }
 
-        // Altrimenti, si applica la logica del PT (attuale trainer o creatore).
-        // Nessun User::find(), perché si usa la relazione definita nel Model.
-        // Si controlla che il client esista (->client) prima di chiamarne la proprietà (->trainer_id)
-        $isCurrentTrainer = $plan->client && ($user->id === $plan->client->trainer_id);
-        $isOriginalAuthor = $user->id === $plan->pt_id;
+        // 2. Si fa passare chi il permesso di leggere le schede che gli riguardano
+        if ($user->can('plans:read:own')) {
+            
+            // Può vederla se: è il cliente (proprietario) || è il PT che l'ha creata || è l'attuale PT assegnato al cliente.
+            return $user->id === $plan->user_id                                 // Cliente proprietario della scheda
+                || $user->id === $plan->pt_id                                   // PT creatore della scheda
+                || ($plan->client && $user->id === $plan->client->trainer_id);  // PT attuale del cliente
+                                                // Nessun User::find(), perché si usa la relazione definita nel Model.
+                                                // Si controlla che il client esista (->client) prima di chiamarne la proprietà (->trainer_id)
+                
+        }
 
-        return $isCurrentTrainer || $isOriginalAuthor;
+        // 3. Fallback di sicurezza
+        return false;
     }
 
     public function create(User $user, User $client): bool
     {
-        return $user->id === $client->trainer_id;
+        return $user->can('plans:create');
     }
 
     public function update(User $user, Plan $plan): bool
     {
-        // Evita il crash se $plan->client è null
-        if (!$plan->client) {
-            return false;
+        // 1. Si fa passare l'Admin
+        if ($user->can('plans:update:any')) {
+            return true;
         }
 
-        return $user->id === $plan->client->trainer_id;
+        // 2. Si fa passare chi il permesso di leggere le schede che gli riguardano
+        if ($user->can('plans:update:own')) {
+            
+            // Può vederla se: è il cliente (proprietario) || ( è il PT che l'ha creata && è l'attuale PT assegnato al cliente ).
+            return $user->id === $plan->user_id                                         // Cliente proprietario della scheda
+                || ( $user->id === $plan->pt_id                                         // PT creatore della scheda
+                    && ($plan->client && $user->id === $plan->client->trainer_id) );    // PT attuale del cliente
+                                                // Nessun User::find(), perché si usa la relazione definita nel Model.
+                                                // Si controlla che il client esista (->client) prima di chiamarne la proprietà (->trainer_id)
+                
+        }
+
+        // 3. Fallback di sicurezza
+        return false;
     }
 
     public function delete(User $user, Plan $plan): bool
@@ -46,14 +66,8 @@ class PlanPolicy
             return false;
         }
 
-        return $user->id === $plan->client->trainer_id;
-    }
-
-    public function restore(User $user, Plan $plan): bool {
-        return false;
-    }
-
-    public function forceDelete(User $user, Plan $plan): bool {
-        return false;
+        // Un PT può modificare solo le schede che ha creato lui || che sono di suoi clienti attuali
+        return $user->id === $plan->pt_id 
+            || ($plan->client && $user->id === $plan->client->trainer_id);
     }
 }

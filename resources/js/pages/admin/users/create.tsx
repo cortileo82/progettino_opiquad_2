@@ -9,34 +9,53 @@ import { FormButton } from '@/components/custom/form-button';
 import { HeaderNew } from '@/components/custom/header-new';
 import { Select } from 'antd';
 
+// 1. Definiamo come sono fatti i dati in ingresso dal Controller
 interface PT {
     id: number;
     name: string;
 }
 
-interface Props {
-    personalTrainers: PT[];
+interface Role {
+    name: string;
 }
 
-export default function Create({ personalTrainers }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
+interface Props {
+    personalTrainers: PT[];
+    availableRoles: Role[];
+    clientRoleSlug: string;
+}
+
+// 2. Definiamo come è fatto il nostro Form (RISOLVE L'ERRORE "NEVER")
+interface FormData {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    role: string;
+    trainer_id: string;
+}
+
+export default function Create({ personalTrainers, availableRoles, clientRoleSlug }: Props) {
+    
+    // 3. Diciamo a useForm di usare l'interfaccia FormData
+    const { data, setData, post, processing, errors } = useForm<FormData>({
         first_name: '',
         last_name: '',
         email: '',
         password: '',
-        role: 'client',
-        pt_id: '',
+        role: clientRoleSlug, // Ora questa variabile esiste ed è destrutturata dalle Props
+        trainer_id: ''
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/accounts');
+        post('/admin/users');
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/accounts' }, { title: 'Nuovo Utente', href: '#' }]}>
+        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }, { title: 'Nuovo Utente', href: '#' }]}>
             <Head title="Crea Nuovo Account" />
-
+            
             <div className="w-full p-6 md:p-10 italic uppercase">
                 
                  {/* Header con componente */}

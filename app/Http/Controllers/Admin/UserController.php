@@ -1,9 +1,11 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -13,123 +15,88 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    /**
-     * Visualizza la lista di tutti gli utenti.
-     */
     public function index()
     {
         Gate::authorize('viewAny', User::class);
-
-        // Carichiamo gli utenti con il loro trainer (Eager Loading)
-        $users = User::with('trainer')->latest()->get();
+        $users = User::with(['trainer', 'roles'])->latest()->get(); 
+        $personalTrainers = User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']);
         
-        // Recuperiamo i PT per il dropdown della modale di modifica
-        $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
-
-        return Inertia::render('admin/accounts/index', [
+        return Inertia::render('admin/users/index', [
             'users' => $users,
-            'personalTrainers' => $personalTrainers
+            'personalTrainers' => $personalTrainers,
+            'availableRoles' => \Spatie\Permission\Models\Role::orderBy('name')->get(['name']),
+            'clientRoleSlug' => User::ROLE_CLIENT,
+            'adminRoleSlug' => User::ROLE_ADMIN,
         ]);
     }
 
-    /**
-     * Mostra il form per creare un nuovo utente.
-     */
     public function create()
     {
         Gate::authorize('create', User::class);
-
-        $personalTrainers = User::where('role', 'pt')->orderBy('name')->get(['id', 'name']);
-
-        return Inertia::render('admin/accounts/create', [
-            'personalTrainers' => $personalTrainers
+        
+        return Inertia::render('admin/users/create', [
+            // 1. Tutti i PT per il secondo menu a tendina
+            'personalTrainers' => User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']),
+            
+            // 2. TUTTI i ruoli presenti nel DB (Core + Custom come Nutrizionista)
+            'availableRoles' => Role::orderBy('name')->get(['name']), 
+            
+            // 3. Passiamo la costante "client" per la logica UI di React
+            'clientRoleSlug' => User::ROLE_CLIENT 
         ]);
     }
 
     public function store(StoreUserRequest $request)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in StoreUserRequest
-
+        Gate::authorize('create', User::class);
+        
+        // I dati sono già stati filtrati dalla Request. 
+        // Se il ruolo non era 'client', 'trainer_id' è stato rimosso in automatico.
         $validated = $request->validated();
 
-        $trainerId = null;
-        if ($validated['role'] === \App\Enums\Role::CLIENT->value && $request->pt_id !== 'none') {
-            $trainerId = $request->pt_id;
-        }
-
-        User::create([
+        // 1. Creazione record DB 
+        $user = User::create([
             'name' => $validated['first_name'] . ' ' . $validated['last_name'],
             'email' => $validated['email'],
             'password' => Hash::make($request['password']),
-            'role' => $validated['role'],
-            'trainer_id' => $trainerId,
+            'trainer_id' => $validated['trainer_id'] ?? null,
         ]);
 
-        return redirect('/admin/accounts')->with('success', 'Account creato con successo!');
-    }
+        // 2. Assegnazione ruolo nel DB di Spatie
+        $user->assignRole($request->role);
 
-    /**
-     * Il metodo edit non è implementato in quanto il form di modifica di un utente appare
-     * attraverso un popup e non una pagina dedicata.
-     */
+        return Inertia::render('admin/users/success');
+    }
 
     public function update(UpdateUserRequest $request, User $user)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in UpdateUserRequest
-
-        $validated = $request;
-
-
-       if ($validated['role'] === \App\Enums\Role::CLIENT->value) {
-            $selectedTrainer = $request->input('trainer_id');
-
-            if ($selectedTrainer === 'none' || empty($selectedTrainer)) {
-                // Se seleziona 'libero', puliamo il campo nel database
-                $user->trainer_id = null;
-            } else {
-                // Se seleziona un ID, lo assegniamo
-                $user->trainer_id = $selectedTrainer;
-            }
-        } else {
-        // Se l'utente non è un cliente, forziamo il trainer a null
-        $user->trainer_id = null;
-    }
+        Gate::authorize('update', $user);
+        
+        $validated = $request->validated();
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->role = $validated['role'];
-        //$user->trainer_id = $trainerId;
+
+        // Se è un cliente, si aggiorna col valore validato. 
+        // Altrimenti, se non lo è, la request ha rimosso il campo e lo si mette a null a prescindere.
+        $user->trainer_id = array_key_exists('trainer_id', $validated) ? $validated['trainer_id'] : null;
+        
         $user->save();
 
-        return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
+        // Sincronizza il ruolo (cancella il vecchio, imposta il nuovo)
+        if (isset($validated['role'])) {
+            $user->syncRoles($validated['role']);
+        }
+
+        return redirect('/admin/users')->with('success', 'Utente aggiornato con successo!');
     }
 
-    public function edit(User $user)
-    {
-        // 1. Controllo sicurezza: l'admin può modificare questo utente?
-        Gate::authorize('update', $user);
-
-        // 2. Recuperiamo la lista dei PT (serve per il dropdown nel form)
-        $personalTrainers = User::where('role', 'pt')
-            ->orderBy('name')
-            ->get(['id', 'name']);
-
-        // 3. Mandiamo l'utente alla pagina React che abbiamo creato
-        return Inertia::render('admin/accounts/edit', [
-            'user' => $user,
-            'personalTrainers' => $personalTrainers
-        ]);
-    }
-
-    /**
-     * Elimina un utente dal sistema.
-     */
     public function destroy(User $user)
     {
         Gate::authorize('delete', $user);
 
         $user->delete();
-
-        return redirect('/admin/accounts')->with('success', 'Utente rimosso.');
+        
+        return redirect('/admin/users')->with('success', 'Utente rimosso.');
     }
 }

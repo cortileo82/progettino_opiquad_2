@@ -1,105 +1,85 @@
 import { Link, usePage } from '@inertiajs/react';
-import { 
-    LayoutGrid, 
-    Dumbbell, 
-    Users, 
-    ClipboardList,
-    BookOpenCheck,
-    History,
-    BicepsFlexed,
-    Plus,
-    UserPlus 
-} from 'lucide-react';
+import { LayoutGrid, Dumbbell, Users, ClipboardList, BookOpenCheck, History, Layers, ShieldCheck } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-// Estendiamo il tipo NavItem per includere i ruoli
 interface SidebarItem extends NavItem {
-    roles: string[];
+    permissions: string[];
 }
 
-// 1. Definiamo i link aggiornati con i prefissi corretti
 const allNavItems: SidebarItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
-        roles: ['admin', 'pt', 'client'],
-    },
-    {
-        title: 'Gestione Gruppi Muscolari',
-        href: '/admin/muscle-groups',
-        icon: BicepsFlexed, 
-        roles: ['admin'],
+        permissions: [], 
     },
     {
         title: 'Gestione Esercizi',
-        href: '/admin/exercises', // AGGIUNTO /admin
+        href: '/admin/exercises',
         icon: Dumbbell,
-        roles: ['admin'], // Di solito la gestione totale è solo admin
+        permissions: ['exercises:read'],
     },
     {
         title: 'Gruppi Muscolari',
         href: '/admin/muscle-groups',
-        icon: Dumbbell,
-        roles: ['admin'],
-    },
-    /*{
-        title: 'I Miei Clienti',
-        href: '/pt/clients', 
-        icon: Users,
-        roles: ['pt'],
-    },*/
-    {
-        title: 'La Mia Scheda',
-        href: '/client/my-plan', 
-        icon: ClipboardList,
-        roles: ['client'],
+        icon: Layers,
+        permissions: ['muscle-groups:read'], 
     },
     {
         title: 'Gestione Utenti',
-        href: '/admin/accounts', 
+        href: '/admin/users',
         icon: Users,
-        roles: ['admin'],
+        // Un admin legge tutti (:any), un PT legge i suoi (:own). Si mostra il link in entrambi i casi.
+        permissions: ['users:read:any', 'users:read:own'] 
+    },
+    {
+        title: 'Gestione Ruoli',
+        href: '/admin/roles',
+        icon: ShieldCheck,
+        permissions: ['roles:read']
     },
     {
         title: 'Catalogo Esercizi',
         href: '/pt/exercises/catalog',
-        icon: BookOpenCheck, 
-        roles: ['pt'],
+        icon: BookOpenCheck,
+        permissions: ['exercises:read']
+    },
+    {
+        title: 'La Mia Scheda',
+        href: '/client/my-plan',
+        icon: ClipboardList,
+        // Un admin legge tutte le schede (:any), un cliente legge la sua (:own).
+        permissions: ['plans:read:any', 'plans:read:own']
     },
     {
         title: 'Storico Schede',
         href: '/client/history',
-        icon: History, 
-        roles: ['client'],
-    },
-  
+        icon: History,
+        permissions: ['plans:read:any', 'plans:read:own']
+    }
 ];
 
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { auth } = usePage().props as any;
-    const user = auth.user;
+    
+    // Array piatto di permessi fornito da HandleInertiaRequests.php
+    const userPermissions: string[] = auth.permissions || [];
 
-    // Filtriamo gli elementi in base al ruolo dell'utente loggato
-    const filteredNavItems = allNavItems.filter((item) => 
-        item.roles.includes(user?.role || '')
-    );
+    const filteredNavItems = allNavItems.filter((item) => {
+        // Se l'elemento non richiede permessi (es. Dashboard), mostralo sempre
+        if (item.permissions.length === 0) return true;
+        
+        // Mostralo se l'utente possiede ALMENO UNO dei permessi richiesti per quel link
+        return item.permissions.some(permission => userPermissions.includes(permission));
+    });
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -114,11 +94,9 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-
             <SidebarContent>
                 <NavMain items={filteredNavItems} />
             </SidebarContent>
-
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />

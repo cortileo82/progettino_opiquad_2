@@ -1,40 +1,58 @@
-<?php namespace App\Policies;
+<?php 
+
+namespace App\Policies;
 
 use App\Models\User;
-use App\Enums\Role;
 
 class UserPolicy
 {
-    // Solo l'admin può vedere la lista utenti
-    public function viewAny(User $user): bool {
-        return $user->role === Role::ADMIN->value;
+    // Permessso vista utenti (es.: clienti propri)
+    public function viewAny(User $user): bool
+    {
+        return $user->can('users:read:any') || $user->can('users:read:own');
     }
 
-    // Regola custom (già corretta)
-    public function viewPlans(User $user, User $client): bool {
-        return $user->id === $client->trainer_id;
-    }
+    // Permesso vista dettagli di un utente
+    public function view(User $user, User $model): bool
+    {
+        if ($user->can('users:read:any')) return true;
 
-    // Solo l'admin può creare utenti
-    public function create(User $user): bool {
-        return $user->role === Role::ADMIN->value;
-    }
+        if ($user->can('users:read:own')) {
+            // È se stesso OPPURE è un suo cliente
+            return $user->id === $model->id || $user->id === $model->trainer_id;
+        }
 
-    // Solo l'admin può modificare utenti
-    public function update(User $user, User $model): bool {
-        return $user->role === Role::ADMIN->value;
-    }
-
-    // L'admin può cancellare, MA non se stesso
-    public function delete(User $user, User $model): bool {
-        return $user->role === Role::ADMIN->value && $user->id !== $model->id;
-    }
-
-    public function restore(User $user, User $model): bool {
         return false;
     }
 
-    public function forceDelete(User $user, User $model): bool {
+    // Permesso creazione di un utente
+    public function create(User $user): bool
+    {
+        return $user->can('users:create');
+    }
+
+    // Permesso aggiornamento di un utente
+    public function update(User $user, User $model): bool
+    {
+        if ($user->can('users:update:any')) return true;
+
+        if ($user->can('users:update:own')) {
+            // È se stesso (per cambiare la propria password) OPPURE è un suo cliente
+            return $user->id === $model->id || $user->id === $model->trainer_id;
+        }
+
         return false;
+    }
+
+    // Permesso cancellaizone di un utente
+    public function delete(User $user, User $model): bool
+    {
+        // Regola per tutti: nessuno può cancellare se stesso (prevenzione suicidio digitale)
+        if ($user->id === $model->id) {
+            return false;
+        }
+
+        // Solo chi ha l'autorità assoluta (es. Admin) può cancellare account
+        return $user->can('users:delete:any');
     }
 }

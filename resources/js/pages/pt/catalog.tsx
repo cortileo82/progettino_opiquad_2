@@ -9,7 +9,7 @@ import { HeaderNew } from '@/components/custom/header-new';
 interface Exercise {
     id: number;
     name: string;
-    muscle_group: string;
+    muscle_group?: MuscleGroup; 
     description?: string;
 }
 
@@ -25,10 +25,10 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
         setExpandedId(expandedId === id ? null : id);
     };
 
-    // Filtro rapido lato client per performance istantanee
+    // 3. Correzione della logica di ricerca: navighiamo dentro l'oggetto per cercare il .name
     const filteredExercises = exercises.filter(ex => 
         ex.name.toLowerCase().includes(search.toLowerCase()) || 
-        (ex.muscle_group && ex.muscle_group.toLowerCase().includes(search.toLowerCase()))
+        (ex.muscle_group?.name && ex.muscle_group.name.toLowerCase().includes(search.toLowerCase()))
     );
 
     const breadcrumbs = [
@@ -38,7 +38,7 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Catalogo Tecnico Esercizi" />
-
+            
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
                 {/* Header con componente */}

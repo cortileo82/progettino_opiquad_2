@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\Role;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,14 +39,16 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-                'isAdmin' => $request->user() ? $request->user()->role === Role::ADMIN->value: false,
-                'isPT' => $request->user() ? $request->user()->role === Role::PT->value : false,
-                'isClient' => $request->user() ? $request->user()->role === Role::CLIENT->value : false
+                // Estrae un array piatto con tutti i permessi dell'utente
+                'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : [],
+                // Prende il nome del primo ruolo dell'utente, utile solo per label visive
+                'role' => $request->user() ? $request->user()->roles->first()?->name : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
 
-            // Messaggi di successo e/o di errore passati al frontend.
+            // Messaggi specifici, di successo e di errore passati al frontend.
             'flash' => [
+                'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],

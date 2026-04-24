@@ -15,10 +15,7 @@ class StorePlanRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $client = User::find($this->input('user_id'));
-        if(!$client) return false;
-
-        return Gate::allows('create', [Plan::class, $client]);
+        return true;
     }
 
     /**

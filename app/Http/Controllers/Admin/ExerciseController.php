@@ -46,10 +46,10 @@ class ExerciseController extends Controller
      */
     public function store(ExerciseRequest $request)
     {
-        // L'autorizzazione avviene già dentro ExerciseRequest
-        Exercise::create($request->all());
+        Gate::authorize('create', Exercise::class);
 
-        return redirect('/admin/exercises')->with('success', 'Esercizio creato con successo!');
+        Exercise::create($request->all());
+        return redirect('/admin/exercises')->with('success', 'Exercise created!');
     }
 
     /**
@@ -70,7 +70,8 @@ class ExerciseController extends Controller
      */
     public function update(ExerciseRequest $request, Exercise $exercise)
     {
-        // L'autorizzazione avviene già dentro ExerciseRequest
+        Gate::authorize('update', $exercise);
+
         $exercise->update($request->all());
 
         return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato con successo!');

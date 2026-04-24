@@ -19,15 +19,22 @@ interface User {
     id: number;
     name: string;
     email: string;
-    role: string;
+    roles: { name: string }[];
     trainer_id: number | null;
-    trainer?: { id: number; name: string; };
+    trainer?: { id: number; name: string };
+}
+
+interface Role {
+    name: string;
 }
 
 interface Props {
     users: User[];
     personalTrainers: { id: number; name: string }[];
     auth: { user: User };
+    availableRoles: Role[];
+    clientRoleSlug: string;
+    adminRoleSlug: string;
 }
 
 export default function Index({ users = [], auth }: Props) {
@@ -40,7 +47,6 @@ export default function Index({ users = [], auth }: Props) {
         setExpandedId(expandedId === id ? null : id);
     };
 
-    // Gestione Modale Eliminazione
     const openDeleteModal = (id: number) => {
         setUserToDelete(id);
         setIsDeleteOpen(true);
@@ -60,9 +66,8 @@ export default function Index({ users = [], auth }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/accounts' }]}>
+        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }]}>
             <Head title="Gestione Account" />
-
             <div className="w-full p-6 md:p-10">
                 
                 {/* Header con componente */}
