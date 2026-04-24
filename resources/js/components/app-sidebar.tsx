@@ -6,6 +6,7 @@ import {
     ClipboardList,
     BookOpenCheck,
     History,
+    BicepsFlexed,
     Plus,
     UserPlus 
 } from 'lucide-react';
@@ -37,6 +38,12 @@ const allNavItems: SidebarItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
         roles: ['admin', 'pt', 'client'],
+    },
+    {
+        title: 'Gestione Gruppi Muscolari',
+        href: '/admin/muscle-groups',
+        icon: BicepsFlexed, 
+        roles: ['admin'],
     },
     {
         title: 'Gestione Esercizi',
@@ -80,6 +87,7 @@ const allNavItems: SidebarItem[] = [
         icon: History, 
         roles: ['client'],
     },
+  
 ];
 
 const footerNavItems: NavItem[] = [];

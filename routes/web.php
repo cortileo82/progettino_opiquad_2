@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     'total_exercises' => Exercise::count(),
                     'total_workouts'  => Plan::count(),
                 ],
-                'exercises' => Exercise::latest()->take(10)->get(),
+                'exercises' => Exercise::with('muscleGroup')->latest()->take(10)->get(),
             ]);
         })->name('dashboard');
 
@@ -73,6 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/accounts/{user}/edit', [UserController::class, 'edit'])->name('accounts.edit');
         Route::patch('/accounts/{user}', [UserController::class, 'update'])->name('accounts.update');
         Route::delete('/accounts/{user}', [UserController::class, 'destroy'])->name('accounts.destroy');
+
     });
 
     // ------------------------------------------------

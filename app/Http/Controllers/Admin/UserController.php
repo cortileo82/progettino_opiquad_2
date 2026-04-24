@@ -65,7 +65,7 @@ class UserController extends Controller
             'trainer_id' => $trainerId,
         ]);
 
-        return Inertia::render('admin/accounts/success');
+        return redirect('/admin/accounts')->with('success', 'Account creato con successo!');
     }
 
     /**
@@ -79,9 +79,6 @@ class UserController extends Controller
 
         $validated = $request;
 
-        /*if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }*/
 
        if ($validated['role'] === \App\Enums\Role::CLIENT->value) {
             $selectedTrainer = $request->input('trainer_id');
@@ -105,6 +102,23 @@ class UserController extends Controller
         $user->save();
 
         return redirect('/admin/accounts')->with('success', 'Account aggiornato con successo!');
+    }
+
+    public function edit(User $user)
+    {
+        // 1. Controllo sicurezza: l'admin può modificare questo utente?
+        Gate::authorize('update', $user);
+
+        // 2. Recuperiamo la lista dei PT (serve per il dropdown nel form)
+        $personalTrainers = User::where('role', 'pt')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        // 3. Mandiamo l'utente alla pagina React che abbiamo creato
+        return Inertia::render('admin/accounts/edit', [
+            'user' => $user,
+            'personalTrainers' => $personalTrainers
+        ]);
     }
 
     /**

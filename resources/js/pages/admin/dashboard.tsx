@@ -1,13 +1,17 @@
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { HeaderNew } from '@/components/custom/header-new';
+import { Card } from '@/components/custom/cards';
+import { EmptyState } from '@/components/custom/empty-state';
 import { 
     Users, 
     Dumbbell, 
     UserCheck, 
     History,
     ArrowUpRight,
-    ClipboardList 
+    ClipboardList,
+    LayoutDashboard 
 } from 'lucide-react';
 
 interface Stats {
@@ -17,10 +21,15 @@ interface Stats {
     total_workouts: number; 
 }
 
+interface MuscleGroup {
+    id: number;
+    name: string;
+}
+
 interface Exercise {
     id: number;
     name: string;
-    muscle_group?: string;
+    muscle_group?: MuscleGroup;
 }
 
 interface Props {
@@ -37,63 +46,19 @@ export default function Dashboard({ stats, exercises }: Props) {
 
             <div className="flex flex-col gap-8 p-6 max-w-[1600px] mx-auto w-full">
                 
-                {/* Intestazione */}
-                <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-foreground uppercase italic">
-                        Benvenuto, {auth.user.name}
-                    </h1>
-                    <p className="text-muted-foreground font-medium">
-                        Panoramica attuale del sistema.
-                    </p>
-                </div>
+                {/* Intestazione con componente */}
+                <HeaderNew 
+                    title="Benvenuto" 
+                    subtitle="Panoramica attuale del sistema." 
+                    icon={LayoutDashboard}
+                />
 
-                {/* --- SEZIONE CARDS STATISTICHE --- */}
-                <div className="grid gap-4 grid-cols-2 xl:grid-cols-4">
-                    
-                    {/* Card Clienti */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
-                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
-                            <Users size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Clienti</p>
-                            <p className="text-2xl font-bold">{stats?.total_clients ?? 0}</p>
-                        </div>
-                    </div>
-
-                    {/* Card Personal Trainer */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
-                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
-                            <UserCheck size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Trainer</p>
-                            <p className="text-2xl font-bold">{stats?.total_pts ?? 0}</p>
-                        </div>
-                    </div>
-
-                    {/* Card Esercizi */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
-                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
-                            <Dumbbell size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Esercizi</p>
-                            <p className="text-2xl font-bold">{stats?.total_exercises ?? 0}</p>
-                        </div>
-                    </div>
-
-                    {/* Card Schede Allenamento */}
-                    <div className="flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-foreground/30 transition-colors">
-                        <div className="rounded-xl bg-foreground/5 p-3 text-foreground">
-                            <ClipboardList size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Schede</p>
-                            <p className="text-2xl font-bold">{stats?.total_workouts ?? 0}</p>
-                        </div>
-                    </div>
-
+                {/* Cards statistiche con componente */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-4">
+                    <Card label="Clienti" value={stats?.total_clients ?? 0} icon={Users}/>
+                    <Card label="Trainer" value={stats?.total_pts ?? 0} icon={UserCheck}/>
+                    <Card label="Esercizi" value={stats?.total_exercises ?? 0} icon={Dumbbell}/>
+                    <Card label="Schede" value={stats?.total_workouts ?? 0} icon={ClipboardList}/>
                 </div>
 
                 {/* --- SEZIONE ULTIMI ESERCIZI --- */}
@@ -123,14 +88,16 @@ export default function Dashboard({ stats, exercises }: Props) {
                                             </span>
                                         </div>
                                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter bg-background px-2 py-1 rounded border border-sidebar-border">
-                                            {ex.muscle_group || 'N/A'}
+                                            {ex.muscle_group?.name || 'N/A'}
                                         </span>
                                     </div>
                                 ))
                             ) : (
-                                <div className="p-10 text-center text-muted-foreground italic text-sm font-medium">
-                                    Nessun esercizio presente nel database.
-                                </div>
+                                /* Componente per pagina vuota */
+                                <EmptyState 
+                                    message="Nessun esercizio presente nel database" 
+                                    icon={Dumbbell} 
+                                />
                             )}
                         </div>
                     </div>

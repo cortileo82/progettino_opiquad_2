@@ -21,9 +21,26 @@ class Exercise extends Model
     ];
 
     /**
+     * Relazione PRINCIPALE (Snake Case)
+     * Usata dai nuovi controller e dal frontend React.
+     */
+    public function muscle_group(): BelongsTo
+    {
+        return $this->belongsTo(MuscleGroup::class, 'muscle_group_id');
+    }
+
+    /**
+     * ALIAS DI COMPATIBILITÀ (Camel Case)
+     * Questo metodo serve a risolvere l'errore "RelationNotFoundException [muscleGroup]".
+     * Qualsiasi parte del sistema che cerca ancora il vecchio nome verrà reindirizzata qui.
+     */
+    public function muscleGroup(): BelongsTo
+    {
+        return $this->muscle_group();
+    }
+
+    /**
      * Relazione Molti-a-Molti con la tabella Plans.
-     * * Un esercizio può essere presente in molte schede diverse.
-     * Sincronizziamo i campi pivot con quelli definiti nel modello Plan.
      */
     public function plans(): BelongsToMany
     {
@@ -36,10 +53,5 @@ class Exercise extends Model
                 'rest_time'   
             ])
             ->withTimestamps();
-    }
-
-    public function muscleGroup(): BelongsTo
-    {
-        return $this->belongsTo(MuscleGroup::class);
     }
 }

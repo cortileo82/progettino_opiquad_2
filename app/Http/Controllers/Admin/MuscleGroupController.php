@@ -12,7 +12,7 @@ class MuscleGroupController extends Controller
 {
     public function index()
     {
-        $muscleGroups = MuscleGroup::orderBy('name')->get();
+        $muscleGroups = MuscleGroup::orderBy('name')->paginate(10);
 
         return Inertia::render('admin/musclegroups/index', ['muscleGroups' => $muscleGroups,]);
     }
@@ -30,7 +30,7 @@ class MuscleGroupController extends Controller
 
     public function edit(MuscleGroup $muscleGroup)
     {
-        return Inertia::render('admin/musclegroups/create', ['muscleGroup' => $muscleGroup,]);
+        return Inertia::render('admin/musclegroups/edit', ['muscleGroup' => $muscleGroup,]);
     }
 
     public function update(MuscleGroupRequest $request, MuscleGroup $muscleGroup)
@@ -43,7 +43,7 @@ class MuscleGroupController extends Controller
     {
         // PROTEZIONE INTEGRITÀ REFERENZIALE
         if ($muscleGroup->exercises()->exists()) {
-            return redirect('/admin/muscle-groups')->with('error', 'It is not possible delete this muscle group because associated to at least one exercise.');
+            return redirect('/admin/muscle-groups')->with('error', 'Non è possibile eliminare il gruppo muscolare perchè sono asscoiati esercizi.');
         }
 
         $muscleGroup->delete();

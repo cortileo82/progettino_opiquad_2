@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers\Admin;
+<?php 
+
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
@@ -9,17 +11,27 @@ use Inertia\Inertia;
 
 class ExerciseController extends Controller
 {
+    /**
+     * Visualizza la lista degli esercizi.
+     */
     public function index()
     {
         Gate::authorize('viewAny', Exercise::class);
 
-        $exercises = Exercise::with('muscleGroup')->orderBy('name')->get();
+        // FIX: Caricamento della relazione 'muscle_group'
+        $exercises = Exercise::with('muscle_group')
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('admin/exercises/index', [
             'exercises' => $exercises
         ]);
     }
 
+    /**
+     * Mostra il form di creazione.
+     */
     public function create()
     {
         Gate::authorize('create', Exercise::class);
@@ -29,14 +41,20 @@ class ExerciseController extends Controller
         ]);
     }
 
+    /**
+     * Salva un nuovo esercizio.
+     */
     public function store(ExerciseRequest $request)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in ExerciseRequest
-
+        // L'autorizzazione avviene già dentro ExerciseRequest
         Exercise::create($request->all());
-        return redirect('/admin/exercises')->with('success', 'Esercizio creato!');
+
+        return redirect('/admin/exercises')->with('success', 'Esercizio creato con successo!');
     }
 
+    /**
+     * Mostra il form di modifica.
+     */
     public function edit(Exercise $exercise)
     {
         Gate::authorize('update', $exercise);
@@ -47,27 +65,28 @@ class ExerciseController extends Controller
         ]);
     }
 
+    /**
+     * Aggiorna l'esercizio esistente.
+     */
     public function update(ExerciseRequest $request, Exercise $exercise)
     {
-        // Non serve l'autorizzazione da parte del Gate, in quanto la richiesta viene già autorizzata in ExerciseRequest
-
+        // L'autorizzazione avviene già dentro ExerciseRequest
         $exercise->update($request->all());
-        return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato!');
+
+        return redirect('/admin/exercises')->with('success', 'Esercizio aggiornato con successo!');
     }
 
+    /**
+     * Rimuove l'esercizio dal database.
+     */
     public function destroy(Exercise $exercise)
     {
-        // 1. Autorizzazione
         Gate::authorize('delete', $exercise);
 
-        // 2. Pulizia delle relazioni (Previene il crash del DB)
-        // Questo cancella tutte le righe dalla tabella pivot 'plan_exercises' 
-        // che contengono questo specifico esercizio.
-        //$exercise->plans()->detach();
-
-        // 3. Eliminazione fisica
+        // Elimina l'esercizio (le relazioni pivot plan_exercises 
+        // dovrebbero essere gestite via onDelete('cascade') nel database)
         $exercise->delete();
 
-        return redirect('/admin/exercises')->with('success', 'Exercise deleted successfully!');
+        return redirect('/admin/exercises')->with('success', 'Esercizio eliminato con successo!');
     }
 }
