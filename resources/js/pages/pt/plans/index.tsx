@@ -43,7 +43,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
 
     return (
         <AppLayout breadcrumbs={[
-            { title: 'I Miei Atleti', href: '/pt/dashboard' }, 
+            { title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, 
             { title: `Schede di ${client.name}`, href: '#' }
         ]}>
             <Head title={`Schede - ${client.name}`} />

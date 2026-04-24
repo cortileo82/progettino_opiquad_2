@@ -39,12 +39,12 @@ export default function Assign({ availableClients = [] }: Props) {
                 
                 {/* Header con componente custom */}
                 <HeaderNew 
-                    title="Bacheca Nuovi Atleti"
-                    subtitle="Seleziona e associa i nuovi atleti al tuo profilo professionale."
+                    title="Bacheca Nuovi Atleti" 
+                    subtitle="Seleziona e associa i nuovi atleti al tuo profilo professionale." 
                     icon={UserPlus} 
-                    buttonText="Dashboard"
-                    buttonHref="/pt/dashboard"
-                    buttonIcon={<ArrowLeft size={16} />}
+                    buttonText="I Miei Atleti" 
+                    buttonHref="/pt/clients/manage-clients" 
+                    buttonIcon={<ArrowLeft size={16} />} 
                 />
 
                 <div className="grid gap-4 mt-4">

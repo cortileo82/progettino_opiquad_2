@@ -72,7 +72,7 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }, { title: 'Modifica Scheda', href: '#' }]}>
+        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, { title: 'Modifica Scheda', href: '#' }]}>
             <Head title={`Modifica: ${plan.name} - TEMPRA`} />
             
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">

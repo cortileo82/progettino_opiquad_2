@@ -59,7 +59,7 @@ export default function CreatePlan({ client, exercises_list }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }, { title: 'Nuova Scheda', href: '#' }]}>
+        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, { title: 'Nuova Scheda', href: '#' }]}>
             <Head title="Crea Scheda - TEMPRA" />
             
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
@@ -76,10 +76,10 @@ export default function CreatePlan({ client, exercises_list }: Props) {
                     </div>
 
                     <Link 
-                        href="/pt/dashboard" 
+                        href="/pt/clients/manage-clients" 
                         className="group flex items-center gap-2 text-[10px] font-black uppercase italic text-zinc-400 hover:text-black transition-all tracking-widest"
                     >
-                        <ChevronLeft size={14} /> Torna alla Dashboard
+                        <ChevronLeft size={14} /> Torna ai tuoi Atleti
                     </Link>
                 </div>
 

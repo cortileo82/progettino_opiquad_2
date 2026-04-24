@@ -7,15 +7,20 @@ use App\Models\MuscleGroup;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
+
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\Admin\MuscleGroupController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
+
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
+use App\Http\Controllers\PT\ManageClientsController;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController as PTPlanController;
 use App\Http\Controllers\PT\ShowClientPlansController;
 use App\Http\Controllers\PT\ExerciseCatalogController;
+
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
 use App\Http\Controllers\Client\PlanHistoryController;
@@ -50,18 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // AREA ADMIN
     // ==========================================
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('admin/dashboard', [
-                'stats' => [
-                    'total_clients' => User::role(User::ROLE_CLIENT)->count(),
-                    'total_pts' => User::role(User::ROLE_PT)->count(),
-                    'total_exercises' => Exercise::count(),
-                    'total_workouts' => Plan::count(),
-                ],
-                'exercises' => Exercise::with('muscleGroup')->latest()->take(10)->get(),
-            ]);
-        })->name('dashboard');
-
+        Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
         Route::resource('exercises', ExerciseController::class);
         Route::resource('muscle-groups', MuscleGroupController::class);
         Route::resource('users', UserController::class)->except(['show']);
@@ -73,6 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ==========================================
     Route::prefix('pt')->name('pt.')->group(function () {
         Route::get('/dashboard', PTDashboard::class)->name('dashboard');
+        Route::get('/clients/manage-clients', ManageClientsController::class)->name('clients.manage-clients');
         Route::get('/exercises/catalog', ExerciseCatalogController::class)->name('exercises.catalog');
         Route::get('/clients/assign', [ClientAssignmentController::class, 'index'])->name('clients.assign');
         Route::post('/clients/assign', [ClientAssignmentController::class, 'store'])->name('clients.store');

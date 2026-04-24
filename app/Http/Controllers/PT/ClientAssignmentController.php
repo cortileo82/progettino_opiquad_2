@@ -5,20 +5,21 @@ namespace App\Http\Controllers\PT;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ClientAssignmentController extends Controller
 {
-    /**
-     * Visualizza la lista dei clienti che non hanno ancora un PT
-     */
-    public function index()
+    public function index(Request $request)
     {
-        // Prendiamo solo gli utenti con ruolo 'client' e trainer_id NULL
-        $availableClients = User::where('role', 'client')
+        // Anche se non c'è le Policy per questo, il Gate basato sul permesso funziona
+        Gate::authorize('users:take-free-client');
+
+        $availableClients = User::role(User::ROLE_CLIENT)
             ->whereNull('trainer_id')
             ->select('id', 'name', 'email')
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('pt/clients/assign', [
@@ -26,26 +27,29 @@ class ClientAssignmentController extends Controller
         ]);
     }
 
-    /**
-     * Associa il PT loggato al cliente selezionato
-     */
     public function store(Request $request)
     {
-        $request->validate([
-            'client_id' => 'required|exists:users,id',
+        Gate::authorize('users:take-free-client');
+
+        $validated = $request->validate([
+            'client_id' => [
+                'required',
+                'integer',
+                // Sicurezza: Il DB deve confermare che l'ID esiste E che non ha già un trainer
+                // Questo previene hack dove un PT altera l'HTML per rubare il cliente di un altro
+                Rule::exists('users', 'id')->whereNull('trainer_id')
+            ],
         ]);
 
-        // Troviamo il cliente e verifichiamo che sia ancora "libero"
-        $client = User::where('role', 'client')
-            ->whereNull('trainer_id')
-            ->findOrFail($request->client_id);
+        // Si applica nuovamente lo scope di Spatie 
+        // per assicurarci che l'ID passato non sia quello di un altro Admin o PT
+        $client = User::role(User::ROLE_CLIENT)->findOrFail($validated['client_id']);
 
-        // Aggiorniamo il trainer_id con l'ID del PT loggato 
         $client->update([
-            'trainer_id' => Auth::id()
+            'trainer_id' => $request->user()->id
         ]);
 
         return redirect()->route('pt.dashboard')
-            ->with('message', "Atleta {$client->name} aggiunto con successo!");
+            ->with('success', "Hai preso in carico l'atleta {$client->name} con successo!");
     }
 }
