@@ -68,6 +68,36 @@ class UserController extends Controller
         return Inertia::render('admin/users/success');
     }
 
+    public function edit(User $user)
+    {
+        Gate::authorize('update', $user);
+
+        // Architettura Spatie: si caricano esplicitamente i ruoli dell'utente.
+        // Necessario affinché React possa fare `user.roles?.[0]?.name`
+        $user->load('roles');
+
+        // 3. Dati per le Select del form in caso di client
+        // Di conseguenza si pescano gli utenti che hanno il ruolo di Personal Trainer
+        $personalTrainers = clone User::role(User::ROLE_PT)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // Si pescano tutti i ruoli disponibili nel database
+        $availableRoles = \Spatie\Permission\Models\Role::select('name')->get();
+
+        // 4. Invio dei dati al Frontend
+        return Inertia::render('admin/users/edit', [
+            'user' => $user,
+            'personalTrainers' => $personalTrainers,
+            'availableRoles' => $availableRoles,
+            
+            // Passiamo le costanti per evitare stringhe hardcodate nel frontend
+            'clientRoleSlug' => User::ROLE_CLIENT, 
+            'adminRoleSlug'  => User::ROLE_ADMIN,
+        ]);
+    }
+
     public function update(UpdateUserRequest $request, User $user)
     {
         Gate::authorize('update', $user);

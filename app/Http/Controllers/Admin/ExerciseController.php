@@ -59,7 +59,7 @@ class ExerciseController extends Controller
     {
         Gate::authorize('update', $exercise);
 
-        return Inertia::render('admin/exercises/edit', [
+        return Inertia::render('admin/exercises/create', [
             'exercise' => $exercise,
             'muscleGroups' => MuscleGroup::getForDropDown(),
         ]);

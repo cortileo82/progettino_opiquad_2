@@ -1,7 +1,8 @@
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { ArrowLeft, Dumbbell, Save } from 'lucide-react';
 import { FormCard } from '@/components/custom/form-card';
 import { InputGroup } from '@/components/custom/input-group';
 import { FormButton } from '@/components/custom/form-button';
@@ -13,93 +14,107 @@ interface MuscleGroup {
     name: string;
 }
 
-interface Props {
-    // Ricevuti dal controller Laravel (es: 'muscleGroups' => MuscleGroup::all())
-    muscleGroups: MuscleGroup[];
+interface Exercise {
+    id: number;
+    name: string;
+    description?: string;
+    muscle_group_id: number | string | null;
 }
 
-export default function CreateExercise({ muscleGroups = [] }: Props) {
-    // Inizializziamo useForm con i campi necessari per il DB
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        muscle_group_id: '', // Usiamo l'ID per la relazione Foreign Key
-        description: ''
+interface Props {
+    exercise?: Exercise;
+    // Accettiamo entrambe le nomenclature per evitare bug di idratazione da Laravel
+    muscleGroups?: MuscleGroup[];
+    muscle_groups?: MuscleGroup[]; 
+}
+
+export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: Props) {
+    // Capiamo se siamo in modalità modifica
+    const isEdit = !!exercise?.id;
+    
+    // Normalizziamo i gruppi muscolari
+    const availableMuscleGroups = muscleGroups || muscle_groups || [];
+
+    const { data, setData, post, put, processing, errors, reset } = useForm({
+        name: exercise?.name || '',
+        muscle_group_id: exercise?.muscle_group_id ?? '',
+        description: exercise?.description || ''
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Invia i dati alla rotta store del controller
-        post('/admin/exercises', {
-            onSuccess: () => reset(),
-            preserveScroll: true
-        });
+        if (isEdit) {
+            put(`/admin/exercises/${exercise.id}`, { preserveScroll: true });
+        } else {
+            post('/admin/exercises', {
+                onSuccess: () => reset(),
+                preserveScroll: true
+            });
+        }
     };
 
+    // Variabili dinamiche per la UI
+    const pageTitle = isEdit ? "Modifica Esercizio" : "Crea Nuovo Esercizio";
+    const pageSubtitle = isEdit 
+        ? `Stai aggiornando: ${exercise.name}` 
+        : "Inserisci un nuovo esercizio nel database della piattaforma.";
+    const breadcrumbTitle = isEdit ? "Modifica" : "Nuovo";
+
     return (
-        <AppLayout 
-            breadcrumbs={[
-                { title: 'Esercizi', href: '/admin/exercises' }, 
-                { title: 'Nuovo', href: '#' }
-            ]}
-        >
-            <Head title="Aggiungi Nuovo Esercizio" />
-
-            
-            
+        <AppLayout breadcrumbs={[{ title: 'Esercizi', href: '/admin/exercises' }, { title: breadcrumbTitle, href: '#' }]}>
+            <Head title={pageTitle} />
             <div className="w-full p-6 md:p-10 italic uppercase">
-
-                {/*Header con componente*/}
+                
                 <HeaderNew 
-                        title="Crea nuovo esercizio"
-                        subtitle="Inserisci un nuovo esercizio nel database della piattaforma."
-                        icon={Dumbbell}
-                        buttonText="Annulla"
-                        buttonHref="/admin/exercises"
-                        buttonIcon={<ArrowLeft size={16} />}
-                    />
-
-                {/* Form di creazione con componente */}
-                <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
+                    title={pageTitle} 
+                    subtitle={pageSubtitle} 
+                    icon={Dumbbell} 
+                    buttonText="Annulla" 
+                    buttonHref="/admin/exercises" 
+                    buttonIcon={<ArrowLeft size={16} />} 
+                />
+                
+                <form onSubmit={handleSubmit} className="max-w-4xl space-y-8 mt-10">
                     <FormCard>
-                        {/* 1. NOME ESERCIZIO */}
                         <InputGroup 
                             label="Nome Esercizio" 
                             value={data.name} 
                             onChange={(val: string) => setData('name', val)} 
                             error={errors.name} 
+                            required
                         />
-
-                        {/* 2. GRUPPO MUSCOLARE (Select dinamica dal DB) */}
+                        
                         <InputGroup 
                             label="Gruppo Muscolare" 
                             type="select" 
                             value={data.muscle_group_id} 
-                            onChange={(val: any) => setData('muscle_group_id', val)}
+                            onChange={(val: any) => setData('muscle_group_id', val)} 
                             error={errors.muscle_group_id}
                         >
-                            {muscleGroups && muscleGroups.map((group) => (
+                            <Select.Option value="">SELEZIONA GRUPPO...</Select.Option>
+                            {availableMuscleGroups.map((group) => (
                                 <Select.Option key={group.id} value={group.id}>
-                                    {group.name.toUpperCase()}
+                                    {group.name?.toUpperCase() || 'SENZA NOME'}
                                 </Select.Option>
                             ))}
                         </InputGroup>
-
-                        {/* 3. DESCRIZIONE */}
+                        
                         <InputGroup 
                             label="Descrizione (Opzionale)" 
                             type="textarea" 
-                            className="md:col-span-2"
+                            className="md:col-span-2" 
                             value={data.description} 
                             onChange={(val: string) => setData('description', val)} 
                             error={errors.description} 
+                            rows={5}
                         />
                     </FormCard>
-
-                    {/* Bottone di invio */}
+                    
                     <div className="flex justify-end">
                         <FormButton 
                             processing={processing} 
-                            label="Crea Esercizio" 
+                            label={isEdit ? "Salva Modifiche" : "Crea Esercizio"} 
+                            icon={Save}
                         />
                     </div>
                 </form>

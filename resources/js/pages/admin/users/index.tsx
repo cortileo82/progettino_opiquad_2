@@ -1,51 +1,18 @@
 import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { ResourceList } from '@/components/custom/resource-list';
 import { HeaderNew } from '@/components/custom/header-new';
-import { 
-    Pencil, 
-    Trash2, 
-    ChevronDown, 
-    User as UserIcon, 
-    Mail, 
-    Plus,
-    UserCircle,
-    UserPlus
-} from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    roles: { name: string }[];
-    trainer_id: number | null;
-    trainer?: { id: number; name: string };
-}
-
-interface Role {
-    name: string;
-}
-
-interface Props {
-    users: User[];
-    personalTrainers: { id: number; name: string }[];
-    auth: { user: User };
-    availableRoles: Role[];
-    clientRoleSlug: string;
-    adminRoleSlug: string;
-}
+interface User { id: number; name: string; email: string; roles: { name: string }[]; trainer_id: number | null; trainer?: { id: number; name: string } }
+interface Props { users: User[]; auth: { user: User }; }
 
 export default function Index({ users = [], auth }: Props) {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<number | null>(null);
-    const [expandedId, setExpandedId] = useState<number | null>(null);
     const [processing, setProcessing] = useState(false);
-
-    const toggleExpand = (id: number) => {
-        setExpandedId(expandedId === id ? null : id);
-    };
 
     const openDeleteModal = (id: number) => {
         setUserToDelete(id);
@@ -54,53 +21,42 @@ export default function Index({ users = [], auth }: Props) {
 
     const handleConfirmDelete = () => {
         if (!userToDelete) return;
-        
-        router.delete(`/admin/accounts/${userToDelete}`, {
+        router.delete(`/admin/users/${userToDelete}`, {
             preserveScroll: true,
             onBefore: () => setProcessing(true),
-            onFinish: () => {
-                setProcessing(false);
-                setIsDeleteOpen(false);
-            },
+            onFinish: () => { setProcessing(false); setIsDeleteOpen(false); }
         });
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }]}>
+        <AppLayout breadcrumbs={[{ title: 'Gestione Utenti', href: '/admin/users' }]}>
             <Head title="Gestione Account" />
             <div className="w-full p-6 md:p-10">
-                
-                {/* Header con componente */}
                 <HeaderNew 
-                    title="Gestione Utenti"
-                    subtitle="Gestione completa degli utenti del sistema."
-                    icon={UserPlus}
-                    buttonText="Nuovo utente"
-                    buttonHref="/admin/accounts/create"
-                    buttonIcon={<Plus size={16} />} 
+                    title="Gestione Utenti" 
+                    subtitle="Gestione completa degli utenti del sistema." 
+                    icon={UserPlus} 
+                    buttonText="Nuovo utente" 
+                    buttonHref="/admin/users/create"
                 />
-
-
-                {/*Lista utenti con componente*/}
+                
                 <ResourceList 
                     items={users} 
                     type="users" 
                     onDelete={openDeleteModal} 
-                    editBaseUrl="/admin/accounts"
-                    authUserId={auth.user.id}
+                    editBaseUrl="/admin/users"
+                    authUserId={auth.user.id} 
                 />
-
             </div>
-
-            {/* MODALE ELIMINAZIONE */}
-            <ConfirmationModal
-                isOpen={isDeleteOpen}
-                onClose={() => setIsDeleteOpen(false)}
-                onConfirm={handleConfirmDelete}
-                loading={processing}
-                title="Elimina Account"
-                description="Sei sicuro? Questa azione cancellerà l'utente e tutti i dati associati. L'operazione è irreversibile."
-                confirmText="Sì, Elimina Definitivamente"
+            
+            <ConfirmationModal 
+                isOpen={isDeleteOpen} 
+                onClose={() => setIsDeleteOpen(false)} 
+                onConfirm={handleConfirmDelete} 
+                loading={processing} 
+                title="Elimina Account" 
+                description="Sei sicuro? Questa azione cancellerà l'utente e tutti i dati associati. L'operazione è irreversibile." 
+                confirmText="Sì, Elimina Definitivamente" 
             />
         </AppLayout>
     );
