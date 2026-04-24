@@ -12,7 +12,7 @@ class MuscleGroupController extends Controller
 {
     public function index()
     {
-        $muscleGroups = MuscleGroup::orderBy('name')->get();
+        $muscleGroups = MuscleGroup::orderBy('name')->paginate(10);
 
         return Inertia::render('admin/musclegroups/index', ['muscleGroups' => $muscleGroups,]);
     }

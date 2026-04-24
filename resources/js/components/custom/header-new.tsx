@@ -11,7 +11,7 @@ interface HeaderNewProps {
     buttonText?: string; 
     buttonHref?: string;
     buttonIcon?: React.ReactNode;
-    actions?: React.ReactNode; // Qui passerai la Search Bar
+    actions?: React.ReactNode; 
     className?: string;
 }
 
@@ -44,7 +44,7 @@ export function HeaderNew({
                     </div>
                 </div>
                 
-                {/* DESTRA: Search Bar e Pulsanti */}
+                {/* DESTRA: Search Bar e Pulsanti --> probabilmente da cambiare la logica per SearchBar e Pulsanti assieme */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                     
                     {/* Area per Azioni Custom (es. Search Bar) */}
@@ -67,7 +67,6 @@ export function HeaderNew({
                             </Button>
                         </Link>
                     )}
-                    
                 </div>
             </div>
         </div>

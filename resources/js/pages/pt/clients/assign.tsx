@@ -1,8 +1,9 @@
+import React, { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import { UserPlus, ArrowLeft, Users } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router } from '@inertiajs/react';
-import { UserPlus, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
 import { HeaderNew } from '@/components/custom/header-new';
+import { EmptyState } from '@/components/custom/empty-state';
 
 // 1. Definiamo cosa c'è dentro un cliente
 interface Client {
@@ -16,17 +17,17 @@ interface Props {
     availableClients: Client[];
 }
 
-export default function Assign({ availableClients }: Props) {
+export default function Assign({ availableClients = [] }: Props) {
     // Usiamo uno stato locale per gestire il caricamento del pulsante
     const [processing, setProcessing] = useState(false);
 
     const handleAssign = (clientId: number) => {
         setProcessing(true);
         
-        // Usiamo router.post con l'URL testuale diretto. 
-        // Questo bypassa completamente Ziggy e l'errore "route is not defined"
+        // Richiesta POST diretta per associare il cliente al PT
         router.post('/pt/clients/assign', { client_id: clientId }, {
             onFinish: () => setProcessing(false),
+            preserveScroll: true
         });
     };
 
@@ -34,28 +35,35 @@ export default function Assign({ availableClients }: Props) {
         <AppLayout breadcrumbs={[{ title: 'Associa Clienti', href: '/pt/clients/assign' }]}>
             <Head title="Associa Nuovi Clienti" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6 max-w-5xl mx-auto w-full">
+                
+                {/* Header con componente custom */}
                 <HeaderNew 
                     title="Bacheca Nuovi Atleti"
-                    subtitle="Seleziona e associa i nuovi atleti al tuo profilo"
+                    subtitle="Seleziona e associa i nuovi atleti al tuo profilo professionale."
                     icon={UserPlus} 
                     buttonText="Dashboard"
                     buttonHref="/pt/dashboard"
                     buttonIcon={<ArrowLeft size={16} />}
                 />
 
-                <div className="grid gap-4">
+                <div className="grid gap-4 mt-4">
                     {availableClients && availableClients.length > 0 ? (
                         availableClients.map((client: Client) => ( 
-                            <div key={client.id} className="flex items-center justify-between rounded-xl border border-sidebar-border bg-sidebar p-5 shadow-sm">
-                                <div className="flex flex-col">
-                                    <span className="font-bold text-lg">{client.name}</span>
-                                    <span className="text-sm text-muted-foreground">{client.email}</span>
+                            <div key={client.id} className="flex items-center justify-between rounded-[2rem] border border-sidebar-border bg-sidebar p-6 shadow-sm hover:border-primary/20 transition-colors">
+                                <div className="flex flex-col gap-1">
+                                    <span className="font-black uppercase italic text-lg tracking-tight text-foreground">
+                                        {client.name}
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                        {client.email}
+                                    </span>
                                 </div>
+                                
                                 <button
                                     onClick={() => handleAssign(client.id)} 
                                     disabled={processing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-bold uppercase text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="inline-flex items-center justify-center gap-3 rounded-2xl bg-zinc-950 px-6 py-3 text-[10px] font-black uppercase italic tracking-widest text-white hover:bg-zinc-900 shadow-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed border border-white/5"
                                 >
                                     <UserPlus className="h-4 w-4" />
                                     {processing ? 'Assegnazione...' : 'Prendi in carico'}
@@ -63,9 +71,11 @@ export default function Assign({ availableClients }: Props) {
                             </div>
                         ))
                     ) : (
-                        <div className="rounded-xl border border-dashed border-sidebar-border py-20 text-center">
-                            <p className="text-muted-foreground italic">Nessun atleta disponibile.</p>
-                        </div>
+                        /* Utilizzo del componente EmptyState per lista vuota */
+                        <EmptyState 
+                            message="Nessun nuovo atleta disponibile nella bacheca" 
+                            icon={Users} 
+                        />
                     )}
                 </div>
             </div>

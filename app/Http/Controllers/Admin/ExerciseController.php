@@ -18,10 +18,11 @@ class ExerciseController extends Controller
     {
         Gate::authorize('viewAny', Exercise::class);
 
-        // FIX: Caricamento della relazione 'muscle_group' (snake_case)
+        // FIX: Caricamento della relazione 'muscle_group'
         $exercises = Exercise::with('muscle_group')
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('admin/exercises/index', [
             'exercises' => $exercises

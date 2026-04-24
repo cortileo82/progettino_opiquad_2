@@ -41,7 +41,7 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
 
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
-                {/* Header Section */}
+                {/* Header con componente */}
                <HeaderNew 
                     title="CATALOGO ESERCIZI"
                     subtitle="Database tecnico degli esercizi disponibili"
@@ -59,7 +59,7 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                     }
                 />
 
-                {/* Grid/List Section */}
+                {/* Componente per viusalizzare gli esercizi */}
                 <div className="grid gap-4">
                 {filteredExercises.length > 0 ? (
                     <ResourceList 

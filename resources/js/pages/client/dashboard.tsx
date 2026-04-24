@@ -1,6 +1,9 @@
+import React from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Dumbbell, Calendar, User, Clock, CheckCircle2 } from 'lucide-react';
+import { Dumbbell, Calendar, User, Clock, CheckCircle2, LayoutDashboard } from 'lucide-react';
+import { HeaderNew } from '@/components/custom/header-new';
+import { EmptyState } from '@/components/custom/empty-state';
 
 interface Exercise {
     id: number;
@@ -36,12 +39,12 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
 
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-10">
                 
-                {/* 1. HEADER: BENVENUTO */}
-                <div>
-                    <h1 className="text-5xl font-black uppercase italic tracking-tighter text-foreground">
-                        Bentornato, <span className="text-primary">{auth.user.name}</span>
-                    </h1>
-                </div>
+                {/* Header con componente */}
+                <HeaderNew 
+                    title={`Bentornato, ${auth.user.name}`}
+                    subtitle="Ecco una panoramica del tuo percorso di allenamento."
+                    icon={LayoutDashboard}
+                />
 
                 {activePlan ? (
                     <>
@@ -117,19 +120,22 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="col-span-full py-12 text-center bg-muted/20 rounded-3xl border border-dashed border-sidebar-border">
-                                        <p className="uppercase italic font-black opacity-30 text-sm">Riposo per questa settimana</p>
+                                    <div className="col-span-full">
+                                        <EmptyState 
+                                            message="Riposo programmato per questa settimana" 
+                                            icon={Calendar} 
+                                        />
                                     </div>
                                 )}
                             </div>
                         </div>
                     </>
                 ) : (
-                    <div className="bg-sidebar border border-dashed border-sidebar-border p-20 rounded-[2rem] text-center">
-                        <Dumbbell className="mx-auto w-12 h-12 text-muted-foreground mb-4 opacity-20" />
-                        <h2 className="uppercase italic font-black text-xl opacity-30 tracking-widest">Nessun piano attivo assegnato</h2>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase mt-2">Contatta il tuo personal trainer per iniziare.</p>
-                    </div>
+                    /* Componente per db vuoto */
+                    <EmptyState 
+                        message="Nessun piano attivo assegnato. Contatta il tuo coach." 
+                        icon={Dumbbell} 
+                    />
                 )}
             </div>
         </AppLayout>

@@ -5,6 +5,8 @@ import AppLayout from '@/layouts/app-layout';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { HeaderNew } from '@/components/custom/header-new';
 import { ResourceList } from '@/components/custom/resource-list';
+import Pagination from '@/components/custom/pagination';
+import { EmptyState } from '@/components/custom/empty-state';
 
 interface MuscleGroup {
     id: number;
@@ -18,21 +20,32 @@ interface Exercise {
     muscle_group: MuscleGroup | null; 
 }
 
-interface Props {
-    exercises: Exercise[];
+// Struttura dati paginata da Laravel
+interface PaginatedExercises {
+    data: Exercise[];
+    current_page: number;
+    total: number;
+    per_page: number;
+    last_page: number;
 }
 
-export default function ExerciseIndex({ exercises = [] }: Props) {
+interface Props {
+    exercises: PaginatedExercises;
+}
+
+export default function ExerciseIndex({ exercises }: Props) {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [exerciseToDelete, setExerciseToDelete] = useState<{ id: number, name: string } | null>(null);
     const [processing, setProcessing] = useState(false);
 
+    // Estraiamo l'array di esercizi dai dati paginati
+    const exerciseList = exercises.data || [];
+
     /**
      * Gestisce l'apertura della modale di eliminazione
-     * Riceve l'ID dal componente ResourceList
      */
     const handleDeleteClick = (id: number) => {
-        const exercise = exercises.find(ex => ex.id === id);
+        const exercise = exerciseList.find(ex => ex.id === id);
         if (exercise) {
             setExerciseToDelete({ id: exercise.id, name: exercise.name });
             setIsDeleteOpen(true);
@@ -72,21 +85,28 @@ export default function ExerciseIndex({ exercises = [] }: Props) {
                 />
 
                 <div className="mt-6">
-                    {exercises && exercises.length > 0 ? (
-                        <ResourceList 
-                            items={exercises}
-                            type="exercises"
-                            onDelete={handleDeleteClick}
-                            // Assicurati che questo URL corrisponda esattamente a php artisan route:list
-                            editBaseUrl="/admin/exercises"
-                        />
-                    ) : (
-                        <div className="text-center py-32 bg-sidebar border-2 border-dashed border-sidebar-border rounded-[3rem]">
-                            <Dumbbell size={48} className="mx-auto text-muted-foreground/20 mb-6" />
-                            <p className="text-muted-foreground uppercase italic text-[10px] font-black tracking-[0.4em]"> 
-                                Database Esercizi Vuoto 
-                            </p>
+                    {exerciseList.length > 0 ? (
+                        <div className="space-y-6">
+                            <ResourceList 
+                                items={exerciseList}
+                                type="exercises"
+                                onDelete={handleDeleteClick}
+                                editBaseUrl="/admin/exercises"
+                            />
+                            
+                            <Pagination 
+                                meta={{
+                                    current_page: exercises.current_page,
+                                    total: exercises.total,
+                                    per_page: exercises.per_page
+                                }} 
+                            />
                         </div>
+                    ) : (
+                        <EmptyState 
+                            message="Database Esercizi Vuoto" 
+                            icon={Dumbbell} 
+                        />
                     )}
                 </div>
             </div>

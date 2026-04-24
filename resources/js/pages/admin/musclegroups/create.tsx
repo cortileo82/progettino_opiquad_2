@@ -32,7 +32,7 @@ export default function CreateMuscleGroup() {
                 {/* Header Uniformato */}
                 <HeaderNew 
                     title="Nuovo Gruppo"
-                    subtitle="Inserisci una nuova categoria anatomica nel database."
+                    subtitle="Inserisci una nuova categoria muscolare nel database."
                     icon={BicepsFlexed}
                     buttonText="Indietro"
                     buttonHref="/admin/muscle-groups"

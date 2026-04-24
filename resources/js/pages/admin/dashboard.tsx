@@ -2,15 +2,16 @@ import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { HeaderNew } from '@/components/custom/header-new';
-import { LayoutDashboard } from 'lucide-react';
 import { Card } from '@/components/custom/cards';
+import { EmptyState } from '@/components/custom/empty-state';
 import { 
     Users, 
     Dumbbell, 
     UserCheck, 
     History,
     ArrowUpRight,
-    ClipboardList 
+    ClipboardList,
+    LayoutDashboard 
 } from 'lucide-react';
 
 interface Stats {
@@ -19,6 +20,7 @@ interface Stats {
     total_exercises: number;
     total_workouts: number; 
 }
+
 interface MuscleGroup {
     id: number;
     name: string;
@@ -44,10 +46,14 @@ export default function Dashboard({ stats, exercises }: Props) {
 
             <div className="flex flex-col gap-8 p-6 max-w-[1600px] mx-auto w-full">
                 
-                {/* Intestazione con componente*/}
-                <HeaderNew title="Benvenuto" subtitle="Panoramica attuale del sistema." icon={LayoutDashboard}/>
+                {/* Intestazione con componente */}
+                <HeaderNew 
+                    title="Benvenuto" 
+                    subtitle="Panoramica attuale del sistema." 
+                    icon={LayoutDashboard}
+                />
 
-                {/* Cards statistiche con componente*/}
+                {/* Cards statistiche con componente */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-4">
                     <Card label="Clienti" value={stats?.total_clients ?? 0} icon={Users}/>
                     <Card label="Trainer" value={stats?.total_pts ?? 0} icon={UserCheck}/>
@@ -81,15 +87,17 @@ export default function Dashboard({ stats, exercises }: Props) {
                                                 {ex.name}
                                             </span>
                                         </div>
-                                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter bg-background px-2 py-1 rounded border border-sidebar-border">
-                                            {ex.muscle_group?.name || ex.muscle_group?.name || 'N/A'}
-                                       </span>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter bg-background px-2 py-1 rounded border border-sidebar-border">
+                                            {ex.muscle_group?.name || 'N/A'}
+                                        </span>
                                     </div>
                                 ))
                             ) : (
-                                <div className="p-10 text-center text-muted-foreground italic text-sm font-medium">
-                                    Nessun esercizio presente nel database.
-                                </div>
+                                /* Utilizzo del nuovo componente EmptyState */
+                                <EmptyState 
+                                    message="Nessun esercizio presente nel database" 
+                                    icon={Dumbbell} 
+                                />
                             )}
                         </div>
                     </div>
