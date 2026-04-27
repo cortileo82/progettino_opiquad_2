@@ -57,7 +57,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
             
             <div className="p-6 md:p-10 flex flex-col gap-10 w-full">
                 
-                {/* 1. HEADER (Utilizzo componente custom) */}
+                {/* 1. Header con componente custom */}
                 <HeaderNew 
                     title={`SCHEDE: ${client.name.toUpperCase()}`}
                     subtitle="Gestione e archivio dei programmi di allenamento assegnati."

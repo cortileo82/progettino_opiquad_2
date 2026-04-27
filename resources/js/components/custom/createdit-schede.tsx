@@ -118,7 +118,6 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
 
                                             {/* CESTINO ALLINEATO */}
                                             <div className="md:col-span-1">
-                                                {/* mt-[26px] sposta il tasto esattamente sotto l'altezza virtuale delle label */}
                                                 <button 
                                                     type="button" 
                                                     onClick={() => remove(name)}
