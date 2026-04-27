@@ -21,20 +21,20 @@ export default function Dashboard({ auth, totalClients, totalWorkoutPlans }: Pro
         <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }]}>
             <Head title="I Miei Atleti" />
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
-                {/* Header della Dashboard */}
+                
+                {/* Header con componente custom */}
                 <HeaderNew 
                     title={`BENVENUTO, ${auth.user.name.toUpperCase()}`} 
                     subtitle="Ecco il riepilogo della tua attività e dei tuoi clienti."
                     icon={LayoutDashboard}
                 />
 
-                {/* Griglia delle Card Statistiche */}
+                {/* Statistiche con componente Card custom*/}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
                     <Card 
                         label="Clienti Assegnati" 
                         value={totalClients} 
                         icon={Users} 
-                        className="border-l-4 border-l-primary" // Opzionale: un tocco di colore laterale
                     />
 
                     <Card 

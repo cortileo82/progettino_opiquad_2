@@ -40,7 +40,7 @@ export default function ShowPlan({ client, plan }: Props) {
                                 <LayoutList size={24} />
                             </div>
                             <div>
-                                <p className="text-[9px] font-black uppercase italic text-muted-foreground tracking-widest mb-1">Nome Programma</p>
+                                <p className="text-[9px] font-black uppercase italic text-muted-foreground tracking-widest mb-1">Nome Scheda</p>
                                 <p className="text-xl font-black uppercase italic tracking-tight leading-none">{plan.name}</p>
                             </div>
                         </div>
@@ -49,7 +49,7 @@ export default function ShowPlan({ client, plan }: Props) {
                                 <Calendar size={24} />
                             </div>
                             <div>
-                                <p className="text-[9px] font-black uppercase italic text-muted-foreground tracking-widest mb-1">Durata Ciclo</p>
+                                <p className="text-[9px] font-black uppercase italic text-muted-foreground tracking-widest mb-1">Durata Scheda</p>
                                 <p className="text-xl font-black uppercase italic tracking-tight leading-none">{plan.num_weeks} Settimane</p>
                             </div>
                         </div>
@@ -83,7 +83,6 @@ export default function ShowPlan({ client, plan }: Props) {
                                     <div className="grid grid-cols-4 gap-4 md:gap-8 relative z-10 w-full md:w-auto mt-4 md:mt-0">
                                         <div className="flex flex-col items-center">
                                             <div className="flex items-center gap-1 text-muted-foreground mb-1">
-                                                <Repeat size={12} />
                                                 <span className="text-[9px] font-black uppercase italic tracking-tighter text-center">Serie</span>
                                             </div>
                                             <span className="text-2xl font-black italic tabular-nums leading-none">{ex.pivot.sets}</span>
@@ -91,7 +90,6 @@ export default function ShowPlan({ client, plan }: Props) {
                                         
                                         <div className="flex flex-col items-center">
                                             <div className="flex items-center gap-1 text-muted-foreground mb-1">
-                                                <LayoutList size={12} />
                                                 <span className="text-[9px] font-black uppercase italic tracking-tighter text-center">Reps</span>
                                             </div>
                                             <span className="text-2xl font-black italic tabular-nums leading-none">{ex.pivot.reps}</span>
@@ -109,6 +107,7 @@ export default function ShowPlan({ client, plan }: Props) {
                                         
                                         <div className="flex flex-col items-center">
                                             <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                                                <span className="text-[9px] font-black uppercase italic tracking-tighter text-center">Rest (s)</span>
                                                 <Clock size={12} />
                                                 <span className="text-[9px] font-black uppercase italic tracking-tighter text-center">Rest</span>
                                             </div>
