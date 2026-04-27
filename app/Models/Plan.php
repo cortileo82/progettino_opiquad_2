@@ -41,7 +41,7 @@ class Plan extends Model
     public function exercises(): BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'plan_exercises')
-            ->withPivot(['day_of_week', 'week_number', 'sets', 'reps', 'rest_time'])
+            ->withPivot(['day_of_week', 'week_number', 'sets', 'reps', 'rest_time', 'weight_kg'])
             ->withTimestamps();
     }
 }

@@ -13,13 +13,14 @@ interface Exercise {
         sets: string;
         reps: string;
         rest_time: string;
+        weight_kg: string | number;
     };
 }
 
 interface Props {
     plan: {
         name: string;
-        trainer: string;
+        trainer: string | null;
         start_date: string;
         total_weeks: number;
         weeks: Record<string, Record<string, Exercise[]>>;
@@ -61,11 +62,15 @@ export default function MyPlan({ plan }: Props) {
                         <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4">
                             <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                Coach: <span className="text-foreground">{plan.trainer}</span>
+                                Allenatore: <span className="text-foreground">{plan.trainer || 'Staff Tecnico'}</span>
                             </div>
                             <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                                 Inizio: <span className="text-foreground">{plan.start_date}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                Formato: <span className="text-foreground">(Serie x Ripetizioni)</span>
                             </div>
                         </div>
                     </div>
@@ -81,7 +86,7 @@ export default function MyPlan({ plan }: Props) {
                                     : 'bg-background border-sidebar-border text-muted-foreground hover:border-primary/50'
                                 }`}
                             >
-                                WK {w}
+                                Sett. {w}
                             </button>
                         ))}
                     </div>
@@ -118,11 +123,15 @@ export default function MyPlan({ plan }: Props) {
                                             <div className="flex items-center gap-4 mt-3">
                                                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
                                                     <Repeat size={12} className="text-primary" />
-                                                    {ex.pivot.sets}x{ex.pivot.reps}
+                                                    {ex.pivot.sets} x {ex.pivot.reps}
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
+                                                    <Dumbbell size={12} className="text-primary" />
+                                                    {ex.pivot.weight_kg} kg
                                                 </div>
                                                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
                                                     <Timer size={12} className="text-primary" />
-                                                    {ex.pivot.rest_time}''
+                                                    {ex.pivot.rest_time}
                                                 </div>
                                             </div>
                                         </div>

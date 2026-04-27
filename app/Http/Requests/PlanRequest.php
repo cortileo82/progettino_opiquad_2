@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Plan;
 
-class StorePlanRequest extends FormRequest
+class PlanRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -39,6 +39,7 @@ class StorePlanRequest extends FormRequest
             'exercises.*.day_of_week' => 'required|string',
             'exercises.*.week_number' => 'required|integer|min:1',
             'exercises.*.rest_time'   => 'nullable|string',
+            'exercises.*.weight_kg' => 'nullable|numeric|min:0',
         ];
     }
 }

@@ -19,12 +19,9 @@ class PlanExercise extends Model
         'day_of_week',
         'sets',
         'reps',
+        'weight_kg',
     ];
 
-    /**
-     * RELAZIONI (Utili per il futuro)
-     */
-    
     // Una riga della tabella appartiene a un esercizio specifico
     public function exercise()
     {

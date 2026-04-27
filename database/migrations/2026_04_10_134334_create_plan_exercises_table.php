@@ -32,6 +32,8 @@ return new class extends Migration
             // Numero di ripetizioni 
             $table->integer('reps');
 
+            $table->double('weight_kg')->default(0);
+
             $table->string('rest_time')->nullable();
 
             $table->timestamps();

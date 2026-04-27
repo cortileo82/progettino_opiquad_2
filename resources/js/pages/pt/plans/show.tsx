@@ -94,7 +94,7 @@ export default function ShowPlan({ client, plan }: Props) {
                                     </div>
 
                                     {/* DATI TECNICI (Griglia stats) */}
-                                    <div className="grid grid-cols-3 gap-4 md:gap-12 relative z-10">
+                                    <div className="grid grid-cols-4 gap-4 md:gap-12 relative z-10">
                                         <div className="flex flex-col items-center">
                                             <div className="flex items-center gap-1 text-muted-foreground mb-1">
                                                 <Repeat size={12} />
@@ -109,6 +109,16 @@ export default function ShowPlan({ client, plan }: Props) {
                                                 <span className="text-[9px] font-black uppercase italic tracking-tighter">Reps</span>
                                             </div>
                                             <span className="text-2xl font-black italic tabular-nums leading-none">{ex.pivot.reps}</span>
+                                        </div>
+
+                                        <div className="flex flex-col items-center">
+                                            <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                                                <Dumbbell size={12} />
+                                                <span className="text-[9px] font-black uppercase italic tracking-tighter">Kg</span>
+                                            </div>
+                                            <span className="text-2xl font-black italic tabular-nums leading-none text-primary">
+                                                {ex.pivot.weight_kg ? ex.pivot.weight_kg : '-'}
+                                            </span>
                                         </div>
 
                                         <div className="flex flex-col items-center">

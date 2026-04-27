@@ -1,63 +1,56 @@
-<?php namespace App\Http\Controllers\Client;
+<?php 
+
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Carbon\Carbon;
 
 class PlanController extends Controller
 {
-    /**
-     * Dashboard: Mostra la scheda attiva
-     */
     public function current(Request $request)
     {
         $user = $request->user();
-        // Si lascia che sia il Database a fare il lavoro sporco.
-        $plan = Plan::with(['trainer', 'exercises'])
+
+        // Si filtra in SQL usando where('is_active', true)
+        // Questo è immensamente più veloce e scalabile del filter() in RAM.
+        $plan = Plan::with(['trainer:id,name', 'exercises'])
             ->where('user_id', $user->id)
-            ->get()
-            ->first(function ($p) {
-                // Si sfrutta l'attributo 'is_active', già definito nel Model Plan
-                return $p->is_active; 
-            });
+            ->where('is_active', true)
+            ->latest()
+            ->first();
+
         return Inertia::render('client/plan/show', [
             'plan' => $plan ? $this->formatPlanData($plan) : null
         ]);
     }
 
-    /**
-     * Storico: Mostra solo le schede passate
-     */
     public function history(Request $request)
     {
         $user = $request->user();
 
-        $pastPlans = Plan::with('trainer')
+        // Si filtra lo storico via SQL. 
+        // Estraiamo solo i campi necessari del trainer.
+        $pastPlans = Plan::with('trainer:id,name')
             ->where('user_id', $user->id)
+            ->where('is_active', false)
             ->latest()
-            ->get()
-            ->filter(function ($p) {
-                // Si usa l'attributo del Model, se non è attiva, è passata.
-                return !$p->is_active; 
-            })->values();
+            ->get();
 
         return Inertia::render('client/history/index', [
             'pastPlans' => $pastPlans
         ]);
     }
 
-    /**
-     * Dettaglio: Visualizza una scheda specifica dallo storico
-     */
     public function show(Plan $plan)
     {
         Gate::authorize('view', $plan);
 
-        $plan->load(['trainer', 'exercises']);
+        // Ottimizziamo il load estraendo solo id e name del trainer
+        $plan->load(['trainer:id,name', 'exercises']);
 
         return Inertia::render('client/plan/show', [
             'plan' => $this->formatPlanData($plan),
@@ -65,24 +58,19 @@ class PlanController extends Controller
         ]);
     }
 
-    /**
-     * Formattazione dati per la fruizione lato React
-     */
-    private function formatPlanData(Plan $plan)
+    private function formatPlanData(Plan $plan): array
     {
-        $structuredPlan = $plan->exercises
-            ->groupBy('pivot.week_number')
-            ->map(function ($weekExercises) {
-                return $weekExercises->groupBy('pivot.day_of_week');
-            });
+        $structuredPlan = $plan->exercises->groupBy('pivot.week_number')->map(function ($weekExercises) {
+            return $weekExercises->groupBy('pivot.day_of_week');
+        });
 
         return [
-            'id'           => $plan->id,
-            'name'         => $plan->name,
-            'trainer'      => $plan->trainer->name ?? 'STAFF TECNICO',
-            'start_date'   => Carbon::parse($plan->created_at)->format('d/m/Y'),
-            'total_weeks'  => $plan->num_weeks,
-            'weeks'        => $structuredPlan,
+            'id'          => $plan->id,
+            'name'        => $plan->name,
+            'trainer'     => $plan->trainer ? $plan->trainer->name : null,      // Il frontend gestisce per null il fallback coerente.
+            'start_date'  => Carbon::parse($plan->created_at)->format('d/m/Y'),
+            'total_weeks' => $plan->num_weeks,
+            'weeks'       => $structuredPlan,
         ];
     }
 }

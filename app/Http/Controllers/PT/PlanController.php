@@ -7,8 +7,7 @@ use App\Models\User;
 use App\Models\Exercise;
 use App\Models\Plan;
 use Illuminate\Http\Request;
-use App\Http\Requests\StorePlanRequest;
-use App\Http\Requests\UpdatePlanRequest;
+use App\Http\Requests\PlanRequest;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -40,7 +39,7 @@ class PlanController extends Controller
         ]);
     }
 
-    public function store(StorePlanRequest $request)
+    public function store(PlanRequest $request)
     {
         $data = $request->validated();
 
@@ -73,6 +72,7 @@ class PlanController extends Controller
                     'reps'        => $item['reps'],
                     'day_of_week' => $item['day_of_week'],
                     'rest_time'   => $item['rest_time'] ?? null,
+                    'weight_kg'   => $item['weight_kg'] ?? null,
                 ]);
             }
         });
@@ -87,7 +87,7 @@ class PlanController extends Controller
         
         $plan->load(['exercises', 'client']);
 
-        return Inertia::render('pt/plans/edit', [
+        return Inertia::render('pt/plans/create', [
             'plan' => $plan,
             'client' => $plan->client,
             // si pescano solo id e nome per alleggerire il payload JSON a React.
@@ -95,7 +95,7 @@ class PlanController extends Controller
         ]);
     }
 
-    public function update(UpdatePlanRequest $request, Plan $plan)
+    public function update(PlanRequest $request, Plan $plan)
     {
         Gate::authorize('update', $plan);
 
@@ -120,6 +120,7 @@ class PlanController extends Controller
                     'sets'        => $item['sets'],
                     'reps'        => $item['reps'],
                     'rest_time'   => $item['rest_time'] ?? null,
+                    'weight_kg'   => $item['weight_kg'] ?? null,
                 ]);
             }
         });

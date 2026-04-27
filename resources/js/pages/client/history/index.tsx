@@ -12,7 +12,7 @@ interface Plan {
     name: string;
     num_weeks: number;
     created_at: string;
-    trainer?: { name: string };
+    trainer?: { name: string } | null;
 }
 
 // Interfaccia per i dati paginati (se presenti)
@@ -116,7 +116,7 @@ export default function HistoryIndex({ pastPlans }: Props) {
                                                         <div className="flex gap-4 text-sm text-foreground/80 leading-relaxed bg-background/50 rounded-2xl p-5 border border-sidebar-border shadow-inner">
                                                             <Calendar size={18} className="shrink-0 mt-0.5 text-primary" />
                                                             <p className="font-bold uppercase italic text-[11px] tracking-tight">
-                                                                Assegnata il {new Date(plan.created_at).toLocaleDateString('it-IT')} dal Trainer {plan.trainer?.name || "Staff"}.
+                                                                Assegnata il {new Date(plan.created_at).toLocaleDateString('it-IT')} dal Trainer {plan.trainer?.name || "Staff Tecnico"}.
                                                             </p>
                                                         </div>
                                                     </div>
