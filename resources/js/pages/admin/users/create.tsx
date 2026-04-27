@@ -24,9 +24,7 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }, { title: 'Nuovo Utente', href: '#' }]}>
-            <Head title="Crea Nuovo Account" />
-            <div className="w-full p-6 md:p-10 italic uppercase">
+            <div className="w-full p-6 md:p-10">
                 <HeaderNew 
                     title="Crea nuovo account" 
                     subtitle="Registra un nuovo profilo nel sistema gestionale." 
@@ -36,7 +34,7 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
                     buttonIcon={<ArrowLeft size={16} />} 
                 />
                 
-                <form onSubmit={handleSubmit} className="max-w-4xl space-y-8 mt-10">
+                <form onSubmit={handleSubmit} className="w-full space-y-8 mt-10">
                     <FormCard>
                         {/* Il componente InputGroup gestisce automaticamente l'estrazione del value per i campi testo */}
                         <InputGroup label="Nome" value={data.first_name} onChange={(val: string) => setData('first_name', val)} error={errors.first_name} />
@@ -68,6 +66,5 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
                     <FormButton processing={processing} label="Salva Utente" />
                 </form>
             </div>
-        </AppLayout>
     );
 }

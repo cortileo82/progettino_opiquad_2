@@ -45,9 +45,7 @@ export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
     const breadcrumbTitle = isEdit ? "Modifica" : "Nuovo";
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gruppi Muscolari', href: '/admin/muscle-groups' }, { title: breadcrumbTitle, href: '#' }]}>
-            <Head title={pageTitle} />
-            <div className="w-full p-6 md:p-10 max-w-4xl mx-auto italic uppercase">
+            <div className="w-full p-6 md:p-10">
                 
                 <HeaderNew 
                     title={pageTitle} 
@@ -80,6 +78,5 @@ export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
                     </div>
                 </form>
             </div>
-        </AppLayout>
     );
 }

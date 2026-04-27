@@ -41,10 +41,7 @@ export default function Dashboard({ stats, exercises }: Props) {
     const { auth } = usePage().props as any;
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Admin Dashboard', href: '/admin/dashboard' }]}>
-            <Head title="Admin Dashboard" />
-
-            <div className="flex flex-col gap-8 p-6 max-w-[1600px] mx-auto w-full">
+            <div className="w-full p-6 md:p-10">
                 
                 {/* Intestazione con componente */}
                 <HeaderNew 
@@ -104,6 +101,5 @@ export default function Dashboard({ stats, exercises }: Props) {
                 </div>
 
             </div>
-        </AppLayout>
     );
 }

@@ -58,10 +58,7 @@ export default function CreatePlan({ client, exercises_list }: Props) {
         setData('exercises', updated);
     };
 
-    return (
-        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, { title: 'Nuova Scheda', href: '#' }]}>
-            <Head title="Crea Scheda - TEMPRA" />
-            
+    return (            
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
                 {/* HEADER SEZIONE */}
@@ -260,6 +257,5 @@ export default function CreatePlan({ client, exercises_list }: Props) {
                     TEMPRA Performance Lab - Sistema di Programmazione
                 </p>
             </div>
-        </AppLayout>
     );
 }

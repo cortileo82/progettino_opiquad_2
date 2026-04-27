@@ -64,10 +64,7 @@ export default function MuscleGroupIndex({ muscleGroups }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gruppi Muscolari', href: '/admin/muscle-groups' }]}>
-            <Head title="Gestione Gruppi Muscolari" />
-
-            <div className="w-full p-6 md:p-10 max-w-5xl mx-auto">   
+            <div className="w-full p-6 md:p-10">   
                 
                 {/* Header con componente */}
                 <HeaderNew 
@@ -107,7 +104,6 @@ export default function MuscleGroupIndex({ muscleGroups }: Props) {
                         />
                     )}
                 </div>
-            </div>
 
             {/* Modale per eliminare gruppo */}
             <ConfirmationModal 
@@ -119,6 +115,6 @@ export default function MuscleGroupIndex({ muscleGroups }: Props) {
                 description={`Stai per eliminare "${groupToDelete?.name.toUpperCase()}". Il gruppo verrà eliminato solo se non ci sono esercizi associati ad esso.`} 
                 confirmText="Sì, Elimina" 
             />
-        </AppLayout>
+        </div>
     );
 }

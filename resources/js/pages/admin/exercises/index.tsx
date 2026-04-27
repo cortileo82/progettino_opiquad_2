@@ -70,10 +70,7 @@ export default function ExerciseIndex({ exercises }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Esercizi', href: '/admin/exercises' }]}>
-            <Head title="Gestione Esercizi" />
-
-            <div className="w-full p-6 md:p-10 max-w-5xl mx-auto">   
+            <div className="w-full p-6 md:p-10">   
                 
                 <HeaderNew 
                     title="Gestione Esercizi"
@@ -109,7 +106,7 @@ export default function ExerciseIndex({ exercises }: Props) {
                         />
                     )}
                 </div>
-            </div>
+            
 
             {/* Modale di conferma eliminazione */}
             <ConfirmationModal 
@@ -120,7 +117,6 @@ export default function ExerciseIndex({ exercises }: Props) {
                 title="Elimina Esercizio" 
                 description={`Stai per rimuovere definitivamente "${exerciseToDelete?.name.toUpperCase()}". Questa azione non può essere annullata.`} 
                 confirmText="Sì, Rimuovi Esercizio" 
-            />
-        </AppLayout>
+            /></div>
     );
 }

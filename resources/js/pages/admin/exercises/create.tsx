@@ -61,9 +61,7 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
     const breadcrumbTitle = isEdit ? "Modifica" : "Nuovo";
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Esercizi', href: '/admin/exercises' }, { title: breadcrumbTitle, href: '#' }]}>
-            <Head title={pageTitle} />
-            <div className="w-full p-6 md:p-10 italic uppercase">
+            <div className="w-full p-6 md:p-10">
                 
                 <HeaderNew 
                     title={pageTitle} 
@@ -74,7 +72,7 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
                     buttonIcon={<ArrowLeft size={16} />} 
                 />
                 
-                <form onSubmit={handleSubmit} className="max-w-4xl space-y-8 mt-10">
+                <form onSubmit={handleSubmit} className="w-full space-y-8 mt-10">
                     <FormCard>
                         <InputGroup 
                             label="Nome Esercizio" 
@@ -119,6 +117,5 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
                     </div>
                 </form>
             </div>
-        </AppLayout>
     );
 }

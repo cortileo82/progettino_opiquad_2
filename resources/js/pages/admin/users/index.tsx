@@ -4,7 +4,7 @@ import { Head, router } from '@inertiajs/react';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { ResourceList } from '@/components/custom/resource-list';
 import { HeaderNew } from '@/components/custom/header-new';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Plus } from 'lucide-react';
 
 interface User { id: number; name: string; email: string; roles: { name: string }[]; trainer_id: number | null; trainer?: { id: number; name: string } }
 interface Props { users: User[]; auth: { user: User }; }
@@ -29,8 +29,6 @@ export default function Index({ users = [], auth }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Gestione Utenti', href: '/admin/users' }]}>
-            <Head title="Gestione Account" />
             <div className="w-full p-6 md:p-10">
                 <HeaderNew 
                     title="Gestione Utenti" 
@@ -38,6 +36,7 @@ export default function Index({ users = [], auth }: Props) {
                     icon={UserPlus} 
                     buttonText="Nuovo utente" 
                     buttonHref="/admin/users/create"
+                    buttonIcon={<Plus size={18} />}
                 />
                 
                 <ResourceList 
@@ -47,7 +46,6 @@ export default function Index({ users = [], auth }: Props) {
                     editBaseUrl="/admin/users"
                     authUserId={auth.user.id} 
                 />
-            </div>
             
             <ConfirmationModal 
                 isOpen={isDeleteOpen} 
@@ -58,6 +56,6 @@ export default function Index({ users = [], auth }: Props) {
                 description="Sei sicuro? Questa azione cancellerà l'utente e tutti i dati associati. L'operazione è irreversibile." 
                 confirmText="Sì, Elimina Definitivamente" 
             />
-        </AppLayout>
+        </div>
     );
 }

@@ -42,12 +42,6 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[
-            { title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, 
-            { title: `Schede di ${client.name}`, href: '#' }
-        ]}>
-            <Head title={`Schede - ${client.name}`} />
-
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
                 {/* Header con componente */}
@@ -107,7 +101,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                         </div>
                     )}
                 </div>
-            </div>
+            
 
             {/* MODAL DI CONFERMA */}
             <ConfirmationModal
@@ -119,6 +113,6 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                 description={`Stai per eliminare definitivamente la scheda "${planToDelete?.name.toUpperCase()}". L'atleta non potrà più visualizzarla. Questa azione è irreversibile.`}
                 confirmText="Sì, elimina scheda"
             />
-        </AppLayout>
+            </div>
     );
 }
