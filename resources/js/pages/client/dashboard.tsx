@@ -34,6 +34,9 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
     const breadcrumbs = [{ title: 'Dashboard', href: '/client/dashboard' }];
 
     return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Dashboard" />
+
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-10">
                 
                 {/* Header con componente */}
@@ -135,5 +138,6 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
                     />
                 )}
             </div>
+            </AppLayout>
     );
 }

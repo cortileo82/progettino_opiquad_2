@@ -1,4 +1,5 @@
 import React from 'react';
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { ChevronLeft, Plus, Edit3 } from 'lucide-react';
@@ -71,6 +72,7 @@ export default function PlanForm({ client, exercises_list, plan }: Props) {
                     onSubmit={handleSubmit} 
                 />
             </div>
+        </AppLayout>
         </AppLayout>
     );
 }

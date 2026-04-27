@@ -70,8 +70,12 @@ export default function ShowPlan({ client, plan }: Props) {
                                             <span className="text-xl font-black italic">{ex.pivot.week_number}</span>
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black uppercase italic text-primary tracking-widest mb-1 leading-none">{ex.pivot.day_of_week}</p>
-                                            <h4 className="text-xl font-black uppercase italic tracking-tighter leading-none">{ex.name}</h4>
+                                            <p className="text-[10px] font-black uppercase italic text-primary tracking-widest mb-1 leading-none">
+                                                {ex.pivot.day_of_week}
+                                            </p>
+                                            <h4 className="text-xl font-black uppercase italic tracking-tighter leading-none">
+                                                {ex.name}
+                                            </h4>
                                         </div>
                                     </div>
                                     

@@ -18,6 +18,8 @@ interface Props {
 
 export default function Dashboard({ auth, totalClients, totalWorkoutPlans }: Props) {
     return (
+        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }]}>
+            <Head title="I Miei Atleti" />
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 {/* Header della Dashboard */}
                 <HeaderNew 
@@ -42,5 +44,6 @@ export default function Dashboard({ auth, totalClients, totalWorkoutPlans }: Pro
                     />
                 </div>
             </div>
+            </AppLayout>
     );
 }

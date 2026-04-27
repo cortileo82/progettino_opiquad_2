@@ -18,6 +18,10 @@ interface Props {
     exercises: Exercise[];
 }
 
+const breadcrumbs = [
+        { title: 'Catalogo Esercizi', href: '/pt/exercises/catalog' }
+    ];
+
 export default function ExerciseCatalog({ exercises = [] }: Props) {
     const [search, setSearch] = useState('');
 
@@ -38,6 +42,9 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
     });
 
     return (
+         <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Catalogo Tecnico Esercizi" />
+
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
                 {/* Header con componente */}
@@ -74,5 +81,6 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                     )}
                 </div>
             </div>
+            </AppLayout>
     );
 }

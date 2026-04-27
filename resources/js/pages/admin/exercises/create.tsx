@@ -61,6 +61,14 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
     const breadcrumbTitle = isEdit ? "Modifica" : "Nuovo";
 
     return (
+         <AppLayout 
+            breadcrumbs={[
+                { title: 'Esercizi', href: '/admin/exercises' }, 
+                { title: 'Nuovo', href: '#' }
+            ]}
+        >
+            <Head title="Aggiungi Nuovo Esercizio" />
+
             <div className="w-full p-6 md:p-10">
                 
                 <HeaderNew 
@@ -117,5 +125,6 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
                     </div>
                 </form>
             </div>
+            </AppLayout>
     );
 }
