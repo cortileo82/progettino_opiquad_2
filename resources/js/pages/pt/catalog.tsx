@@ -65,7 +65,7 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                     }
                 />
 
-                {/* Lista Esercizi */}
+                {/* Lista esercizi con componente*/}
                 <div className="w-full">
                     {filteredExercises.length > 0 ? (
                         <ResourceList 

@@ -45,7 +45,7 @@ export default function Dashboard({ stats, exercises }: Props) {
             <Head title="Admin Dashboard" />
             <div className="w-full p-6 md:p-10">
                 
-                {/* Intestazione con componente */}
+                {/* Header con componente */}
                 <HeaderNew 
                     title="Benvenuto" 
                     subtitle="Panoramica attuale del sistema." 
