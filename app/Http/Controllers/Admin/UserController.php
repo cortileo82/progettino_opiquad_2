@@ -63,7 +63,7 @@ class UserController extends Controller
         ]);
 
         // 2. Assegnazione ruolo nel DB di Spatie
-        $user->assignRole($request->role);
+        $user->assignRole($validated['role']);
 
         return Inertia::render('admin/users/success');
     }

@@ -13,7 +13,6 @@ class ClientAssignmentController extends Controller
 {
     public function index(Request $request)
     {
-        // Anche se non c'è le Policy per questo, il Gate basato sul permesso funziona
         Gate::authorize('users:take-free-client');
 
         $availableClients = User::role(User::ROLE_CLIENT)
@@ -49,7 +48,7 @@ class ClientAssignmentController extends Controller
             'trainer_id' => $request->user()->id
         ]);
 
-        return redirect()->route('pt.dashboard')
+        return redirect()->route('pt.clients.manage-clients')
             ->with('success', "Hai preso in carico l'atleta {$client->name} con successo!");
     }
 }

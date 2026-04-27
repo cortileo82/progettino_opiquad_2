@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('num_weeks')->default(4);
+            $table->boolean('is_active')->default(false);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('pt_id')->nullable()->constraind('users')->nullOnDelete();
             $table->timestamps();

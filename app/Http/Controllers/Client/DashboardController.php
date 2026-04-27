@@ -6,57 +6,71 @@ use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $user = auth()->user()->load('trainer');
+        // 1. Estrazione sicura: carichiamo il trainer ma solo ID e Nome per risparmiare memoria
+        $user = $request->user()->load('trainer:id,name');
 
-        // 1. Recuperiamo l'ultimo piano (attivo o no) con gli esercizi
-        $myPlans = Plan::with(['trainer', 'exercises'])
-                       ->where('user_id', $user->id)
-                       ->latest()
-                       ->get();
+        // 2. Query SEPARATA per la Scheda Attiva (Veloce, estrae solo 1 record)
+        $activePlan = Plan::with(['trainer:id,name', 'exercises'])
+            ->where('user_id', $user->id)
+            ->where('is_active', true)
+            ->latest()
+            ->first();
 
-        // 2. Trasformiamo i dati
-        $formattedPlans = $myPlans->map(function ($plan) {
-            // Calcolo settimana corrente rispetto alla data di creazione
-            $startDate = $plan->created_at;
-            $now = Carbon::now();
-            $daysPassed = $startDate->diffInDays($now);
-            $currentWeek = floor($daysPassed / 7) + 1;
-
-            // Cap (limite) al numero massimo di settimane del piano
-            if ($currentWeek > $plan->num_weeks) {
-                $currentWeek = $plan->num_weeks;
-            }
-
-            return [
-                'id'           => $plan->id,
-                'name'         => $plan->name,
-                'is_active'    => $plan->is_active,
-                'start_date'   => $plan->created_at->format('d/m/Y'),
-                'end_date'     => $plan->end_date,
-                'current_week' => $currentWeek,
-                'total_weeks'  => $plan->num_weeks,
-                // Raggruppiamo gli esercizi per giorno, ma FILTRATI per la settimana corrente
-                'weekly_days'  => $plan->exercises
-                                    ->where('pivot.week_number', $currentWeek)
-                                    ->groupBy('pivot.day_of_week')
-                                    ->toArray(),
-                // Tutti i giorni (senza filtro settimana) per la pagina "La mia Scheda"
-                'all_days'     => $plan->exercises
-                                    ->groupBy('pivot.day_of_week')
-                                    ->toArray(),
-            ];
-        });
+        // 3. Query SEPARATA per lo Storico: NON carichiamo gli "exercises" per le schede vecchie!
+        $pastPlans = Plan::with('trainer:id,name')
+            ->where('user_id', $user->id)
+            ->where('is_active', false)
+            ->latest()
+            ->get();
 
         return Inertia::render('client/dashboard', [
             'assignedTrainer' => $user->trainer ? $user->trainer->name : 'Nessun Trainer',
-            'activePlan'      => $formattedPlans->firstWhere('is_active', true),
-            'pastPlans'        => $formattedPlans->where('is_active', false)->values()->all(),
+            
+            // Smistiamo la formattazione a metodi specializzati
+            'activePlan' => $activePlan ? $this->formatActivePlan($activePlan) : null,
+            'pastPlans'  => $pastPlans->map(fn($plan) => $this->formatPastPlan($plan)),
         ]);
+    }
+
+    /**
+     * Formatta la scheda attiva, includendo il calcolo complesso e gli esercizi
+     */
+    private function formatActivePlan(Plan $plan): array
+    {
+        // Ottimizzazione del calcolo con min() al posto dell'if()
+        $daysPassed = $plan->created_at->diffInDays(now());
+        $currentWeek = min((int) floor($daysPassed / 7) + 1, $plan->num_weeks);
+
+        return [
+            'id'           => $plan->id,
+            'name'         => $plan->name,
+            'is_active'    => $plan->is_active,
+            'start_date'   => $plan->created_at->format('d/m/Y'),
+            'end_date'     => $plan->end_date,
+            'current_week' => $currentWeek,
+            'total_weeks'  => $plan->num_weeks,
+            'weekly_days'  => $plan->exercises->where('pivot.week_number', $currentWeek)->groupBy('pivot.day_of_week')->toArray(),
+            'all_days'     => $plan->exercises->groupBy('pivot.day_of_week')->toArray(),
+        ];
+    }
+
+    /**
+     * DTO leggero per lo storico: omette i calcoli pesanti e le liste di esercizi
+     */
+    private function formatPastPlan(Plan $plan): array
+    {
+        return [
+            'id'           => $plan->id,
+            'name'         => $plan->name,
+            'is_active'    => $plan->is_active,
+            'start_date'   => $plan->created_at->format('d/m/Y'),
+            'end_date'     => $plan->end_date,
+            'total_weeks'  => $plan->num_weeks,
+        ];
     }
 }
