@@ -50,9 +50,6 @@ export default function MyPlan({ plan }: Props) {
     const hasExercises = currentWeekData && Object.keys(currentWeekData).length > 0;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Programma Completo" />
-
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8 min-h-screen">
                 
                 {/* Header Scheda */}
@@ -148,6 +145,5 @@ export default function MyPlan({ plan }: Props) {
                     )}
                 </div>
             </div>
-        </AppLayout>
     );
 }

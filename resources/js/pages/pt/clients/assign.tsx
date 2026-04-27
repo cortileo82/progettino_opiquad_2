@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
-import { UserPlus, ArrowLeft, Users } from 'lucide-react';
+import { UserPlus, ArrowLeft, Users, Plus } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { HeaderNew } from '@/components/custom/header-new';
 import { EmptyState } from '@/components/custom/empty-state';
@@ -32,9 +32,6 @@ export default function Assign({ availableClients = [] }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Associa Clienti', href: '/pt/clients/assign' }]}>
-            <Head title="Associa Nuovi Clienti" />
-
             <div className="flex h-full flex-1 flex-col gap-6 p-6 max-w-5xl mx-auto w-full">
                 
                 {/* Header con componente custom */}
@@ -42,9 +39,9 @@ export default function Assign({ availableClients = [] }: Props) {
                     title="Bacheca Nuovi Atleti" 
                     subtitle="Seleziona e associa i nuovi atleti al tuo profilo professionale." 
                     icon={UserPlus} 
-                    buttonText="I Miei Atleti" 
-                    buttonHref="/pt/clients/manage-clients" 
-                    buttonIcon={<ArrowLeft size={16} />} 
+                    buttonText="TORNA INDIETRO"
+                    buttonHref="/pt/clients"
+                    buttonIcon={<ArrowLeft size={18} />}
                 />
 
                 <div className="grid gap-4 mt-4">
@@ -79,6 +76,5 @@ export default function Assign({ availableClients = [] }: Props) {
                     )}
                 </div>
             </div>
-        </AppLayout>
     );
 }

@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/plans/{plan}/edit', [PTPlanController::class, 'edit'])->name('plans.edit');
         Route::put('/plans/{plan}', [PTPlanController::class, 'update'])->name('plans.update');
         Route::delete('/plans/{plan}', [PTPlanController::class, 'delete'])->name('plans.delete');
+        Route::get('/clients', ManageClientsController::class)->name('clients.index');
     });
 
     // ==========================================

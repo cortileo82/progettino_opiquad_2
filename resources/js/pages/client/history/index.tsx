@@ -39,10 +39,7 @@ export default function HistoryIndex({ pastPlans }: Props) {
         setExpandedId(expandedId === id ? null : id);
     };
 
-    return (
-        <AppLayout breadcrumbs={[{ title: 'Storico Schede', href: '/client/history' }]}>
-            <Head title="Storico Schede" />
-            
+    return (            
             <div className="w-full p-6 md:p-10 max-w-5xl mx-auto">
                 
                 {/* Header con componente */}
@@ -150,6 +147,5 @@ export default function HistoryIndex({ pastPlans }: Props) {
                     )}
                 </div>
             </div>
-        </AppLayout>
-    );
+        );
 }

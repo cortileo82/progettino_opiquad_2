@@ -30,9 +30,7 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Account', href: '/admin/users' }, { title: 'Modifica', href: '#' }]}>
-            <Head title={`Modifica ${user.name}`} />
-            <div className="w-full p-6 md:p-10 italic uppercase">
+            <div className="w-full p-6 md:p-10">
                 <HeaderNew 
                     title="Modifica Profilo" 
                     subtitle={`Stai modificando l'account di: ${user.name}`} 
@@ -42,7 +40,7 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
                     buttonIcon={<ArrowLeft size={16} />} 
                 />
                 
-                <form onSubmit={handleSubmit} className="max-w-4xl space-y-8 mt-10">
+                <form onSubmit={handleSubmit} className="w-full space-y-8 mt-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 rounded-[2.5rem] border-2 border-sidebar-border bg-sidebar shadow-sm">
                         <InputGroup label="Nome Completo" icon={User} value={data.name} onChange={(val: string) => setData('name', val)} error={errors.name} required />
                         <InputGroup label="Email" icon={Mail} type="email" value={data.email} onChange={(val: string) => setData('email', val)} error={errors.email} required />
@@ -70,6 +68,5 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
                     <FormButton processing={processing} label="Salva Modifiche" icon={Save} />
                 </form>
             </div>
-        </AppLayout>
     );
 }

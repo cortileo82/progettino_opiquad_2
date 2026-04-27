@@ -1,42 +1,41 @@
-import { Link, usePage } from '@inertiajs/react';
+import React from 'react';
+import { ShieldCheck, Plus, Lock } from 'lucide-react';
+import { HeaderNew } from '@/components/custom/header-new'; 
+import { ResourceList } from '@/components/custom/resource-list'; 
 
-export default function RoleIndex({ roles }: { roles: any[] }) {
+interface RoleIndexProps {
+    roles: any[];
+}
+
+export default function RoleIndex({ roles }: RoleIndexProps) {
     const protectedRoles = ['admin', 'pt', 'client'];
+    const formattedRoles = roles.map(role => ({
+        ...role,
+        description: role.permissions.length > 0 
+            ? role.permissions.map((p: any) => p.name).join(', ') 
+            : 'Nessun permesso assegnato a questo ruolo.',
+        isProtected: protectedRoles.includes(role.name.toLowerCase())
+    }));
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Gestione Ruoli</h1>
-            <Link href="/admin/roles/create" className="bg-blue-500 text-white px-4 py-2 rounded">
-                Crea Nuovo Ruolo
-            </Link>
+        <div className="w-full p-6 md:p-10">
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                {roles.map((role) => (
-                    <div key={role.id} className="border p-4 rounded shadow">
-                        <h2 className="text-xl font-bold uppercase">{role.name}</h2>
-                        
-                        {/* Sezione Espandibile dei Permessi */}
-                        <details className="mt-2 text-sm text-gray-600">
-                            <summary className="cursor-pointer font-semibold text-blue-600">
-                                Vedi Permessi ({role.permissions.length})
-                            </summary>
-                            <ul className="mt-2 list-disc pl-5">
-                                {role.permissions.map((perm: any) => (
-                                    <li key={perm.id}>{perm.name}</li>
-                                ))}
-                            </ul>
-                        </details>
+            {/* Header con componente */}
+            <HeaderNew 
+                title="GESTIONE RUOLI" 
+                subtitle="Configurazione permessi e livelli di accesso"
+                icon={ShieldCheck}
+                buttonText="NUOVO RUOLO"
+                buttonHref="/admin/roles/create"
+                buttonIcon={<Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />}
+            />
 
-                        {/* Bottoni Nascosti per i ruoli di sistema */}
-                        {!protectedRoles.includes(role.name) && (
-                            <div className="mt-4 flex gap-2">
-                                <Link href={`/admin/roles/${role.id}/edit`} className="text-green-600">Modifica</Link>
-                                <Link href={`/admin/roles/${role.id}`} method="delete" as="button" className="text-red-600">Elimina</Link>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
+            {/* Lista utilizzando componente */}
+            <ResourceList 
+                items={roles} 
+                type="roles" 
+                readOnly={true} 
+            />
         </div>
     );
 }
