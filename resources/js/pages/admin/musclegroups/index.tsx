@@ -64,6 +64,8 @@ export default function MuscleGroupIndex({ muscleGroups }: Props) {
     };
 
     return (
+            <AppLayout breadcrumbs={[{ title: 'Gruppi Muscolari', href: '/admin/muscle-groups' }]}>
+            <Head title="Gestione Gruppi Muscolari" />
             <div className="w-full p-6 md:p-10">   
                 
                 {/* Header con componente */}
@@ -116,5 +118,6 @@ export default function MuscleGroupIndex({ muscleGroups }: Props) {
                 confirmText="Sì, Elimina" 
             />
         </div>
+        </AppLayout>
     );
 }

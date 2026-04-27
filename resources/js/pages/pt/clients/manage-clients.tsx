@@ -17,6 +17,8 @@ interface Props {
 
 export default function MyClients({ clients = [] }: Props) {
     return (
+        <AppLayout breadcrumbs={[{ title: 'Gestione Clienti', href: '/pt/clients/manage-clients' }]}>
+            <Head title="Associa Nuovi Clienti" />
             <div className="p-6 md:p-10 flex flex-col gap-10 w-full"> 
                 <HeaderNew 
                     title="I Miei Atleti" 
@@ -38,5 +40,6 @@ export default function MyClients({ clients = [] }: Props) {
                     />
                 </div>
             </div>
+            </AppLayout>
     );
 }

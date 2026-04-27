@@ -10,6 +10,8 @@ interface Props {
 
 export default function ShowPlan({ client, plan }: Props) {
     return (
+        <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }, { title: 'Dettaglio Scheda', href: '#' }]}>
+            <Head title={`Scheda: ${plan.name}`} />
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
                 {/* HEADER SEZIONE */}
@@ -137,5 +139,6 @@ export default function ShowPlan({ client, plan }: Props) {
                     </p>
                 </div>
             </div>
+            </AppLayout>
     );
 }

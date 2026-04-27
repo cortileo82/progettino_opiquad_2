@@ -30,6 +30,8 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
     };
 
     return (
+         <AppLayout breadcrumbs={[{ title: 'Account', href: '/admin/users' }, { title: 'Modifica', href: '#' }]}>
+            <Head title={`Modifica ${user.name}`} />
             <div className="w-full p-6 md:p-10">
                 <HeaderNew 
                     title="Modifica Profilo" 
@@ -68,5 +70,6 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
                     <FormButton processing={processing} label="Salva Modifiche" icon={Save} />
                 </form>
             </div>
+            </AppLayout>
     );
 }

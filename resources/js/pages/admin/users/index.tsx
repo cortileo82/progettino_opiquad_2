@@ -29,6 +29,9 @@ export default function Index({ users = [], auth }: Props) {
     };
 
     return (
+        <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }]}>
+            <Head title="Gestione Account" />
+
             <div className="w-full p-6 md:p-10">
                 <HeaderNew 
                     title="Gestione Utenti" 
@@ -57,5 +60,6 @@ export default function Index({ users = [], auth }: Props) {
                 confirmText="Sì, Elimina Definitivamente" 
             />
         </div>
+        </AppLayout>
     );
 }

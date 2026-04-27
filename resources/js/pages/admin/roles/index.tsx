@@ -2,6 +2,8 @@ import React from 'react';
 import { ShieldCheck, Plus, Lock } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new'; 
 import { ResourceList } from '@/components/custom/resource-list'; 
+import AppLayout from '@/layouts/app-layout';
+import { Head, router } from '@inertiajs/react';
 
 interface RoleIndexProps {
     roles: any[];
@@ -18,6 +20,8 @@ export default function RoleIndex({ roles }: RoleIndexProps) {
     }));
 
     return (
+        <AppLayout breadcrumbs={[{ title: 'Ruoli', href: '/admin/rules' }]}>
+            <Head title="Gestione Ruoli" />
         <div className="w-full p-6 md:p-10">
 
             {/* Header con componente */}
@@ -37,5 +41,6 @@ export default function RoleIndex({ roles }: RoleIndexProps) {
                 readOnly={true} 
             />
         </div>
+        </AppLayout>
     );
 }

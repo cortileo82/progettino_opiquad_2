@@ -45,6 +45,13 @@ export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
     const breadcrumbTitle = isEdit ? "Modifica" : "Nuovo";
 
     return (
+        <AppLayout 
+            breadcrumbs={[
+                { title: 'Gruppi Muscolari', href: '/admin/musclegroups' }, 
+                { title: 'Nuovo', href: '#' }
+            ]}
+        >
+            <Head title="Nuovo Gruppo Muscolare" />
             <div className="w-full p-6 md:p-10">
                 
                 <HeaderNew 
@@ -78,5 +85,6 @@ export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
                     </div>
                 </form>
             </div>
+        </AppLayout>
     );
 }

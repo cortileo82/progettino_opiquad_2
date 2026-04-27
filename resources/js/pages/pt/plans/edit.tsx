@@ -71,7 +71,9 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
         setData('exercises', updated);
     };
 
-    return (            
+    return (         
+         <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/dashboard' }, { title: 'Modifica Scheda', href: '#' }]}>
+            <Head title={`Modifica: ${plan.name}`} />   
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 
                 {/* HEADER SEZIONE */}
@@ -245,5 +247,6 @@ export default function EditPlan({ client, exercises_list, plan }: Props) {
                     TEMPRA Performance Lab - Sistema di Revisione
                 </p>
             </div>
+            </AppLayout>
     );
 }

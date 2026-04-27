@@ -5,7 +5,9 @@ import { ShieldCheck, ArrowLeft, ListChecks, Type, CheckCircle2 } from 'lucide-r
 import { InputGroup } from '@/components/custom/input-group';
 import { FormCard } from '@/components/custom/form-card';
 import { FormButton } from '@/components/custom/form-button';
+import AppLayout from '@/layouts/app-layout';
 
+import { Head, router } from '@inertiajs/react';
 export default function RoleForm({ role, permissions }: { role?: any, permissions: any[] }) {
     const isEdit = !!role;
 
@@ -35,6 +37,9 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
     };
 
     return (
+         <AppLayout breadcrumbs={[{ title: 'Ruoli', href: '/admin/roles' }]}>
+        <Head title="Gestione Ruoli" />
+
         <div className="w-full p-6 md:p-10">
            <HeaderNew 
                 title={isEdit ? 'MODIFICA RUOLO' : 'NUOVO RUOLO'} 
@@ -116,5 +121,6 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                 </div>
             </form>
         </div>
+        </AppLayout>
     );
 }

@@ -48,6 +48,12 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
     };
 
     return (
+        <AppLayout breadcrumbs={[
+            { title: 'I Miei Atleti', href: '/pt/dashboard' }, 
+            { title: `Schede di ${client.name}`, href: '#' }
+        ]}>
+            <Head title={`Schede - ${client.name}`} />
+
             
             <div className="p-6 md:p-10 flex flex-col gap-10 w-full">
                 
@@ -133,5 +139,6 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                 confirmText="SÌ, ELIMINA DEFINITIVAMENTE"
             />
             </div>
+            </AppLayout>
     );
 }
