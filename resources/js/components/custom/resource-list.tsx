@@ -9,7 +9,7 @@ import {
 interface ResourceListProps {
     items: any[];
     // Aggiunto 'clients' ai tipi supportati
-    type: 'users' | 'exercises' | 'muscle-groups' | 'roles' | 'clients'; 
+    type: 'users' | 'exercises' | 'muscle-groups' | 'roles' | 'clients' | 'plans'; 
     onDelete?: (id: number) => void;
     editBaseUrl?: string;
     authUserId?: number;
