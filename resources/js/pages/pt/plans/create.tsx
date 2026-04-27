@@ -1,7 +1,7 @@
-import React from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react';
+// ARCHITETTURA FIX: Rimuoviamo useForm e usiamo router puro
+import { Head, router } from '@inertiajs/react'; 
 import { ChevronLeft, Plus, Edit3 } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 import { CreateEditSchede } from '@/components/custom/createdit-schede';
@@ -13,11 +13,11 @@ interface Props {
 }
 
 export default function PlanForm({ client, exercises_list, plan }: Props) {
-    // L'intelligenza architetturale: capiamo in che stato siamo
     const isEditing = !!plan;
-    const { post, put, processing } = useForm();
+    
+    // Gestiamo il caricamento manualmente dato che abbiamo rimosso useForm
+    const [processing, setProcessing] = useState(false);
 
-    // Mappatura dati iniziale (incluso weight_kg)
     const initialValues = {
         name: isEditing ? plan.name : '',
         num_weeks: isEditing ? plan.num_weeks : 4,
@@ -28,16 +28,28 @@ export default function PlanForm({ client, exercises_list, plan }: Props) {
             sets: ex.pivot?.sets || '',
             reps: ex.pivot?.reps || '',
             rest_time: ex.pivot?.rest_time || '',
-            weight_kg: ex.pivot?.weight_kg || '' // <-- Ripristinato il tuo campo
+            weight_kg: ex.pivot?.weight_kg || '' 
         })) : []
     };
 
-    // Routing intelligente
     const handleSubmit = (values: any) => {
+        // Assembliamo il payload corretto per Laravel
+        const payload = { ...values, user_id: client.id };
+
+        // Parametri di navigazione Inertia
+        const visitOptions = {
+            preserveScroll: true,
+            onStart: () => setProcessing(true),
+            onFinish: () => setProcessing(false),
+            // Se Laravel rifiuta ancora i dati, li vedremo stampati in console!
+            onError: (errors: any) => console.error("Errori di Validazione Laravel:", errors) 
+        };
+
+        // ARCHITETTURA FIX: router invia esattamente il payload che gli passiamo
         if (isEditing) {
-            put(`/pt/plans/${plan.id}`, { ...values, preserveScroll: true });
+            router.put(`/pt/plans/${plan.id}`, payload, visitOptions);
         } else {
-            post('/pt/plans/store', { ...values, user_id: client.id });
+            router.post('/pt/plans/store', payload, visitOptions);
         }
     };
 
@@ -72,7 +84,6 @@ export default function PlanForm({ client, exercises_list, plan }: Props) {
                     onSubmit={handleSubmit} 
                 />
             </div>
-        </AppLayout>
         </AppLayout>
     );
 }
