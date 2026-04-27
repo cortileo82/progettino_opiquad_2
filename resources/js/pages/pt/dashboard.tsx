@@ -21,8 +21,8 @@ export default function Dashboard({ auth, totalClients, totalWorkoutPlans }: Pro
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 {/* Header della Dashboard */}
                 <HeaderNew 
-                    title="DASHBOARD" 
-                    subtitle={`Benvenuto, ${auth.user.name.toUpperCase()}. Ecco il riepilogo della tua attività.`} 
+                    title={`BENVENUTO, ${auth.user.name.toUpperCase()}`} 
+                    subtitle="Ecco il riepilogo della tua attività e dei tuoi clienti."
                     icon={LayoutDashboard}
                 />
 

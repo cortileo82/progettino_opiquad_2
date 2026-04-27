@@ -25,7 +25,7 @@ class DashboardController extends Controller
         // 2. Conta il numero totale di schede create da questo PT
         // Nota: Assumo che la tabella dei piani abbia una colonna 'user_id' o 'trainer_id' 
         // che indica chi ha creato la scheda.
-        $numWorkoutPlans = Plan::where('user_id', $ptId)->count();
+        $numWorkoutPlans = Plan::where('pt_id', $ptId)->count();
 
         return Inertia::render('pt/dashboard', [
             'totalClients'      => $numClients,

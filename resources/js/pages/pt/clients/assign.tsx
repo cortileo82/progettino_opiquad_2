@@ -39,6 +39,9 @@ export default function Assign({ availableClients = [] }: Props) {
                     title="Bacheca Nuovi Atleti" 
                     subtitle="Seleziona e associa i nuovi atleti al tuo profilo professionale." 
                     icon={UserPlus} 
+                    buttonText="TORNA INDIETRO"
+                    buttonHref="/pt/clients"
+                    buttonIcon={<ArrowLeft size={18} />}
                 />
 
                 <div className="grid gap-4 mt-4">
