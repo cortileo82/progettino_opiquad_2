@@ -44,4 +44,3 @@ Assicurati di avere installato sul tuo ambiente locale:
 * Composer
 * Node.js >= 18.x e npm
 * Un server database (MySQL >= 8.0 o PostgreSQL)
-* 
