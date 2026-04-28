@@ -15,19 +15,14 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Reset della cache di Spatie per evitare bug sui permessi
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 2. Suddivisione delle responsabilità (Single Responsibility)
         $this->seedPermissionsAndRoles();
         $this->seedUsers();
         $this->seedCatalog();
         $this->seedPlans();
     }
 
-    /**
-     * Creazione e assegnazione di Permessi e Ruoli
-     */
     private function seedPermissionsAndRoles(): void
     {
         $globalEntities = ['roles', 'muscle-groups', 'exercises'];
@@ -53,7 +48,6 @@ class DatabaseSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'users:change-trainer']);
         Permission::firstOrCreate(['name' => 'users:take-free-client']);
 
-        // Ruoli (Usa sempre le costanti del Model User se disponibili)
         $adminRole = Role::firstOrCreate(['name' => User::ROLE_ADMIN ?? 'admin']);
         $adminRole->syncPermissions(Permission::all());
 
@@ -70,9 +64,6 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 
-    /**
-     * Creazione degli utenti base del sistema
-     */
     private function seedUsers(): void
     {
         $defaultPassword = Hash::make('pwd');
@@ -108,9 +99,6 @@ class DatabaseSeeder extends Seeder
         $client2->assignRole(User::ROLE_CLIENT ?? 'client');
     }
 
-    /**
-     * Creazione del catalogo usando gli array esatti da te forniti
-     */
     private function seedCatalog(): void
     {
         $muscleGroupsList = [
@@ -142,19 +130,20 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    /**
-     * Creazione delle schede assegnate e popolamento pivot
-     */
     private function seedPlans(): void
     {
         $client1 = User::where('email', 'luca@tempra.com')->first();
         $client2 = User::where('email', 'sara@tempra.com')->first();
         
-        $panca = Exercise::where('name', 'Panca Piana')->first();
-        $squat = Exercise::where('name', 'Squat')->first();
+        // Estraiamo dal database una selezione di esercizi per creare le routine
+        $panca    = Exercise::where('name', 'Panca Piana')->first();
+        $french   = Exercise::where('name', 'French Press')->first();
+        $squat    = Exercise::where('name', 'Squat')->first();
+        $legCurl  = Exercise::where('name', 'Leg Curl')->first();
+        $trazioni = Exercise::where('name', 'Trazioni')->first();
+        $curl     = Exercise::where('name', 'Curl Bicipiti')->first();
 
-        // Utilizzo di firstOrCreate per evitare duplicati in caso di re-seeding
-        // IMPORTANTE: is_active => true è stato aggiunto per rendere la scheda visibile al client!
+        // Entrambe le schede ora sono di 4 settimane
         $plan1 = Plan::firstOrCreate(
             ['name' => 'Scheda Massa A', 'user_id' => $client1->id],
             ['pt_id' => $client1->trainer_id, 'num_weeks' => 4, 'is_active' => true]
@@ -162,29 +151,60 @@ class DatabaseSeeder extends Seeder
 
         $plan2 = Plan::firstOrCreate(
             ['name' => 'Definizione Invernale', 'user_id' => $client2->id],
-            ['pt_id' => $client2->trainer_id, 'num_weeks' => 8, 'is_active' => true]
+            ['pt_id' => $client2->trainer_id, 'num_weeks' => 4, 'is_active' => true]
         );
 
-        // Popolamento della tabella pivot tramite la relazione Eloquent (addio PlanExercise::create)
-        // Usiamo syncWithoutDetaching per non sdoppiare l'esercizio se lanciamo il seeder due volte
-        $plan1->exercises()->syncWithoutDetaching([
-            $panca->id => [
-                'week_number' => 1,
-                'day_of_week' => 'Lunedì',
-                'sets' => 4,
-                'reps' => 8,
-                'rest_time' => "90''"
-            ]
-        ]);
+        // ARCHITETTURA: Puliamo la pivot prima di inserire. 
+        // Questo rende il seeder "Idempotente" aggirando il limite del sync() con ID duplicati.
+        $plan1->exercises()->detach();
+        $plan2->exercises()->detach();
 
-        $plan2->exercises()->syncWithoutDetaching([
-            $squat->id => [
-                'week_number' => 1,
-                'day_of_week' => 'Mercoledì',
-                'sets' => 5,
-                'reps' => 5,
-                'rest_time' => "120''"
+        $days = ['Lunedì', 'Mercoledì', 'Venerdì'];
+
+        // Strutturiamo la routine (2 esercizi al giorno)
+        $routine = [
+            'Lunedì' => [
+                ['ex' => $panca, 'sets' => 4, 'reps' => 8, 'rest' => "90''", 'weight' => 60.5],
+                ['ex' => $french, 'sets' => 3, 'reps' => 10, 'rest' => "60''", 'weight' => 22.5],
+            ],
+            'Mercoledì' => [
+                ['ex' => $squat, 'sets' => 5, 'reps' => 5, 'rest' => "120''", 'weight' => 80],
+                ['ex' => $legCurl, 'sets' => 3, 'reps' => 12, 'rest' => "60''", 'weight' => 35],
+            ],
+            'Venerdì' => [
+                ['ex' => $trazioni, 'sets' => 4, 'reps' => 8, 'rest' => "90''", 'weight' => 0], // A corpo libero
+                ['ex' => $curl, 'sets' => 3, 'reps' => 12, 'rest' => "60''", 'weight' => 14],
             ]
-        ]);
+        ];
+
+        // Popolamento massivo: 4 settimane x 3 giorni x 2 esercizi = 24 righe per scheda
+        for ($week = 1; $week <= 4; $week++) {
+            foreach ($days as $day) {
+                foreach ($routine[$day] as $workout) {
+                    
+                    // Inserimento Scheda 1 (Massa)
+                    $plan1->exercises()->attach($workout['ex']->id, [
+                        'week_number' => $week,
+                        'day_of_week' => $day,
+                        'sets'        => $workout['sets'],
+                        'reps'        => $workout['reps'],
+                        'rest_time'   => $workout['rest'],
+                        'weight_kg'   => $workout['weight']
+                    ]);
+
+                    // Inserimento Scheda 2 (Definizione)
+                    // Variamo dinamicamente i dati per non avere schede identiche:
+                    // Abbassiamo i recuperi, togliamo 10kg e aumentiamo le reps
+                    $plan2->exercises()->attach($workout['ex']->id, [
+                        'week_number' => $week,
+                        'day_of_week' => $day,
+                        'sets'        => $workout['sets'],
+                        'reps'        => $workout['reps'] + 4,
+                        'rest_time'   => "45''",
+                        'weight_kg'   => max(0, $workout['weight'] - 10) 
+                    ]);
+                }
+            }
+        }
     }
 }

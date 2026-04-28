@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers\Client;
 
@@ -11,17 +11,17 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // 1. Estrazione sicura: carichiamo il trainer ma solo ID e Nome per risparmiare memoria
+        // 1. Estrazione sicura: si caricano il trainer ma solo ID e Nome per risparmiare memoria
         $user = $request->user()->load('trainer:id,name');
 
-        // 2. Query SEPARATA per la Scheda Attiva (Veloce, estrae solo 1 record)
+        // 2. Query separate per la Scheda Attiva (Veloce, estrae solo 1 record)
         $activePlan = Plan::with(['trainer:id,name', 'exercises'])
             ->where('user_id', $user->id)
             ->where('is_active', true)
             ->latest()
             ->first();
 
-        // 3. Query SEPARATA per lo Storico: NON carichiamo gli "exercises" per le schede vecchie!
+        // 3. Query separata per lo Storico: non si caricano gli "exercises" per le schede vecchie
         $pastPlans = Plan::with('trainer:id,name')
             ->where('user_id', $user->id)
             ->where('is_active', false)
@@ -29,11 +29,11 @@ class DashboardController extends Controller
             ->get();
 
         return Inertia::render('client/dashboard', [
-            'assignedTrainer' => $user->trainer ? $user->trainer->name : 'Nessun Trainer',
-            
-            // Smistiamo la formattazione a metodi specializzati
-            'activePlan' => $activePlan ? $this->formatActivePlan($activePlan) : null,
-            'pastPlans'  => $pastPlans->map(fn($plan) => $this->formatPastPlan($plan)),
+            // ARCHITETTURA FIX: Passiamo null se non c'è il trainer. 
+            // React farà: assignedTrainer || 'Nessun Trainer'
+            'assignedTrainer' => $user->trainer ? $user->trainer->name : null,
+            'activePlan'      => $activePlan ? $this->formatActivePlan($activePlan) : null,
+            'pastPlans'       => $pastPlans->map(fn($plan) => $this->formatPastPlan($plan)),
         ]);
     }
 
@@ -42,7 +42,6 @@ class DashboardController extends Controller
      */
     private function formatActivePlan(Plan $plan): array
     {
-        // Ottimizzazione del calcolo con min() al posto dell'if()
         $daysPassed = $plan->created_at->diffInDays(now());
         $currentWeek = min((int) floor($daysPassed / 7) + 1, $plan->num_weeks);
 
@@ -65,12 +64,12 @@ class DashboardController extends Controller
     private function formatPastPlan(Plan $plan): array
     {
         return [
-            'id'           => $plan->id,
-            'name'         => $plan->name,
-            'is_active'    => $plan->is_active,
-            'start_date'   => $plan->created_at->format('d/m/Y'),
-            'end_date'     => $plan->end_date,
-            'total_weeks'  => $plan->num_weeks,
+            'id'          => $plan->id,
+            'name'        => $plan->name,
+            'is_active'   => $plan->is_active,
+            'start_date'  => $plan->created_at->format('d/m/Y'),
+            'end_date'    => $plan->end_date,
+            'total_weeks' => $plan->num_weeks,
         ];
     }
 }
