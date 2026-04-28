@@ -70,10 +70,7 @@ export default function MyPlan({ plan }: Props) {
                                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                                 Inizio: <span className="text-foreground">{plan.start_date}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                Formato: <span className="text-foreground">(Serie x Ripetizioni)</span>
-                            </div>
+                            
                         </div>
                     </div>
                     
