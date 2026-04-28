@@ -40,7 +40,7 @@ Questa applicazione è stata sviluppata seguendo pattern architetturali solidi p
 ## Prerequisiti
 
 Assicurati di avere installato sul tuo ambiente locale:
-* PHP >= 8.2
+* PHP >= 8.3
 * Composer
 * Node.js >= 18.x e npm
 * Un server database (MySQL >= 8.0 o PostgreSQL)
