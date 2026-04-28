@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers\Client;
 
@@ -15,16 +15,19 @@ class PlanController extends Controller
     {
         $user = $request->user();
 
-        // Si filtra in SQL usando where('is_active', true)
-        // Questo è immensamente più veloce e scalabile del filter() in RAM.
         $plan = Plan::with(['trainer:id,name', 'exercises'])
             ->where('user_id', $user->id)
             ->where('is_active', true)
             ->latest()
             ->first();
 
+        $data = null;
+        if ($plan) {
+            $data = $this->formatPlanData($plan);
+        }
+
         return Inertia::render('client/plan/show', [
-            'plan' => $plan ? $this->formatPlanData($plan) : null
+            'plan' => $data
         ]);
     }
 
@@ -32,13 +35,17 @@ class PlanController extends Controller
     {
         $user = $request->user();
 
-        // Si filtra lo storico via SQL. 
-        // Estraiamo solo i campi necessari del trainer.
-        $pastPlans = Plan::with('trainer:id,name')
+        // Recuperiamo i piani paginati
+        $pastPlans = Plan::with(['trainer:id,name', 'exercises'])
             ->where('user_id', $user->id)
             ->where('is_active', false)
             ->latest()
-            ->get();
+            ->paginate(10);
+
+        // Trasformiamo i dati uno per uno per strutturare weeks
+        $pastPlans->getCollection()->transform(function ($plan) {
+            return $this->formatPlanData($plan);
+        });
 
         return Inertia::render('client/history/index', [
             'pastPlans' => $pastPlans
@@ -49,7 +56,6 @@ class PlanController extends Controller
     {
         Gate::authorize('view', $plan);
 
-        // Ottimizziamo il load estraendo solo id e name del trainer
         $plan->load(['trainer:id,name', 'exercises']);
 
         return Inertia::render('client/plan/show', [
@@ -60,17 +66,22 @@ class PlanController extends Controller
 
     private function formatPlanData(Plan $plan): array
     {
-        $structuredPlan = $plan->exercises->groupBy('pivot.week_number')->map(function ($weekExercises) {
-            return $weekExercises->groupBy('pivot.day_of_week');
+        // Trasformiamo la lista piatta di esercizi in Settimana -> Giorno -> Esercizi
+        $structuredWeeks = $plan->exercises->groupBy('pivot.week_number')->map(function ($week) {
+            return $week->groupBy('pivot.day_of_week');
         });
 
         return [
             'id'          => $plan->id,
             'name'        => $plan->name,
-            'trainer'     => $plan->trainer ? $plan->trainer->name : null,      
+            'trainer'     => [
+                'name' => $plan->trainer ? $plan->trainer->name : 'Staff Tecnico'
+            ],
+            'created_at'  => $plan->created_at,
             'start_date'  => Carbon::parse($plan->created_at)->format('d/m/Y'),
             'total_weeks' => $plan->num_weeks,
-            'weeks'       => $structuredPlan,
+            'num_weeks'   => $plan->num_weeks,
+            'weeks'       => $structuredWeeks,
         ];
     }
 }
