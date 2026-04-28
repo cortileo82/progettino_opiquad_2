@@ -138,6 +138,6 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
                     />
                 )}
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

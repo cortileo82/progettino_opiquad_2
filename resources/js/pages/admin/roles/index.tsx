@@ -22,25 +22,25 @@ export default function RoleIndex({ roles }: RoleIndexProps) {
     return (
         <AppLayout breadcrumbs={[{ title: 'Ruoli', href: '/admin/rules' }]}>
             <Head title="Gestione Ruoli" />
-        <div className="w-full p-6 md:p-10">
+            <div className="w-full p-6 md:p-10">
 
-            {/* Header con componente */}
-            <HeaderNew 
-                title="GESTIONE RUOLI" 
-                subtitle="Configurazione permessi e livelli di accesso"
-                icon={ShieldCheck}
-                buttonText="NUOVO RUOLO"
-                buttonHref="/admin/roles/create"
-                buttonIcon={<Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />}
-            />
+                {/* Header con componente */}
+                <HeaderNew 
+                    title="GESTIONE RUOLI" 
+                    subtitle="Configurazione permessi e livelli di accesso"
+                    icon={ShieldCheck}
+                    buttonText="NUOVO RUOLO"
+                    buttonHref="/admin/roles/create"
+                    buttonIcon={<Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />}
+                />
 
-            {/* Lista utilizzando componente */}
-            <ResourceList 
-                items={roles} 
-                type="roles" 
-                readOnly={true} 
-            />
-        </div>
+                {/* Lista utilizzando componente */}
+                <ResourceList 
+                    items={roles} 
+                    type="roles" 
+                    readOnly={true} 
+                />
+            </div>
         </AppLayout>
     );
 }

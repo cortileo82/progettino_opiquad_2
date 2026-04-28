@@ -103,6 +103,6 @@ export default function Dashboard({ stats, exercises }: Props) {
                 </div>
 
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

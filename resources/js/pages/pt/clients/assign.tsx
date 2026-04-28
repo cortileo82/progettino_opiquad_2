@@ -70,7 +70,7 @@ export default function Assign({ availableClients = [] }: Props) {
                             </div>
                         ))
                     ) : (
-                        /* Utilizzo del componente EmptyState per lista vuota */
+                        /* Componente EmptyState per lista vuota */
                         <EmptyState 
                             message="Nessun nuovo atleta disponibile nella bacheca" 
                             icon={Users} 
@@ -78,6 +78,6 @@ export default function Assign({ availableClients = [] }: Props) {
                     )}
                 </div>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

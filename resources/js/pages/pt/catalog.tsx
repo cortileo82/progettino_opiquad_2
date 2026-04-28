@@ -81,6 +81,6 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                     )}
                 </div>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

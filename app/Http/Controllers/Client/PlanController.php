@@ -67,7 +67,7 @@ class PlanController extends Controller
         return [
             'id'          => $plan->id,
             'name'        => $plan->name,
-            'trainer'     => $plan->trainer ? $plan->trainer->name : null,      // Il frontend gestisce per null il fallback coerente.
+            'trainer'     => $plan->trainer ? $plan->trainer->name : null,      
             'start_date'  => Carbon::parse($plan->created_at)->format('d/m/Y'),
             'total_weeks' => $plan->num_weeks,
             'weeks'       => $structuredPlan,

@@ -11,11 +11,11 @@ interface Props {
 
 export default function ShowPlan({ client, plan }: Props) {
     return (
-        // FIX SINTASSI: Rimossi i ";" alla fine delle prop
         <AppLayout breadcrumbs={[{ title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, { title: 'Dettaglio Scheda', href: '#' }]}>
             <Head title={`Scheda: ${plan.name}`} />
             
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
+               
                 <HeaderNew 
                     title={plan.name.toUpperCase()} 
                     subtitle={`Visualizzazione dettagli della scheda assegnata a: ${client.name.toUpperCase()}`} 
