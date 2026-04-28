@@ -11,6 +11,9 @@ use Carbon\Carbon;
 
 class PlanController extends Controller
 {
+    /**
+     * Visualizza la scheda attuale (is_active = true)
+     */
     public function current(Request $request)
     {
         $user = $request->user();
@@ -21,29 +24,26 @@ class PlanController extends Controller
             ->latest()
             ->first();
 
-        $data = null;
-        if ($plan) {
-            $data = $this->formatPlanData($plan);
-        }
-
         return Inertia::render('client/plan/show', [
-            'plan' => $data
+            'plan' => $plan ? $this->formatPlanData($plan) : null
         ]);
     }
 
+    /**
+     * Visualizza lo storico (is_active = false) con paginazione
+     */
     public function history(Request $request)
     {
         $user = $request->user();
 
-        // Recuperiamo i piani paginati
         $pastPlans = Plan::with(['trainer:id,name', 'exercises'])
             ->where('user_id', $user->id)
             ->where('is_active', false)
             ->latest()
             ->paginate(10);
 
-        // Trasformiamo i dati uno per uno per strutturare weeks
-        $pastPlans->getCollection()->transform(function ($plan) {
+        // Trasformiamo i dati all'interno della paginazione
+        $pastPlans->through(function ($plan) {
             return $this->formatPlanData($plan);
         });
 
@@ -52,6 +52,9 @@ class PlanController extends Controller
         ]);
     }
 
+    /**
+     * Visualizza una singola scheda specifica (usato dallo storico)
+     */
     public function show(Plan $plan)
     {
         Gate::authorize('view', $plan);
@@ -64,9 +67,12 @@ class PlanController extends Controller
         ]);
     }
 
+    /**
+     * Formatta i dati per il frontend in modo coerente
+     */
     private function formatPlanData(Plan $plan): array
     {
-        // Trasformiamo la lista piatta di esercizi in Settimana -> Giorno -> Esercizi
+        // Raggruppamento Esercizi: Settimana -> Giorno
         $structuredWeeks = $plan->exercises->groupBy('pivot.week_number')->map(function ($week) {
             return $week->groupBy('pivot.day_of_week');
         });
@@ -74,9 +80,8 @@ class PlanController extends Controller
         return [
             'id'          => $plan->id,
             'name'        => $plan->name,
-            'trainer'     => [
-                'name' => $plan->trainer ? $plan->trainer->name : 'Staff Tecnico'
-            ],
+            // Ritorno il nome come STRINGA semplice per evitare crash con .toUpperCase() nel frontend
+            'trainer'     => $plan->trainer ? $plan->trainer->name : 'Staff Tecnico',
             'created_at'  => $plan->created_at,
             'start_date'  => Carbon::parse($plan->created_at)->format('d/m/Y'),
             'total_weeks' => $plan->num_weeks,
