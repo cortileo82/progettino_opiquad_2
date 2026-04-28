@@ -33,6 +33,8 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
          <AppLayout breadcrumbs={[{ title: 'Account', href: '/admin/users' }, { title: 'Modifica', href: '#' }]}>
             <Head title={`Modifica ${user.name}`} />
             <div className="w-full p-6 md:p-10">
+
+                {/*Header con componente*/}
                 <HeaderNew 
                     title="Modifica Profilo" 
                     subtitle={`Stai modificando l'account di: ${user.name}`} 
@@ -70,6 +72,6 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
                     <FormButton processing={processing} label="Salva Modifiche" icon={Save} />
                 </form>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

@@ -44,6 +44,6 @@ export default function Dashboard({ auth, totalClients, totalWorkoutPlans }: Pro
                     />
                 </div>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

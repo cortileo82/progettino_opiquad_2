@@ -50,16 +50,16 @@ export default function Index({ users = [], auth }: Props) {
                     authUserId={auth.user.id} 
                 />
             
-            <ConfirmationModal 
-                isOpen={isDeleteOpen} 
-                onClose={() => setIsDeleteOpen(false)} 
-                onConfirm={handleConfirmDelete} 
-                loading={processing} 
-                title="Elimina Account" 
-                description="Sei sicuro? Questa azione cancellerà l'utente e tutti i dati associati. L'operazione è irreversibile." 
-                confirmText="Sì, Elimina Definitivamente" 
-            />
-        </div>
+                <ConfirmationModal 
+                    isOpen={isDeleteOpen} 
+                    onClose={() => setIsDeleteOpen(false)} 
+                    onConfirm={handleConfirmDelete} 
+                    loading={processing} 
+                    title="Elimina Account" 
+                    description="Sei sicuro? Questa azione cancellerà l'utente e tutti i dati associati. L'operazione è irreversibile." 
+                    confirmText="Sì, Elimina Definitivamente" 
+                />
+            </div>
         </AppLayout>
     );
 }

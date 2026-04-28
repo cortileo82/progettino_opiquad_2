@@ -141,7 +141,7 @@ export default function HistoryIndex({ pastPlans }: Props) {
                             )}
                         </div>
                     ) : (
-                        /* Utilizzo del nuovo componente EmptyState */
+                        /* Ccomponente EmptyState per storico schede vuoto*/
                         <EmptyState 
                             message="Nessuna scheda presente nello storico" 
                             icon={History} 
@@ -149,6 +149,6 @@ export default function HistoryIndex({ pastPlans }: Props) {
                     )}
                 </div>
             </div>
-            </AppLayout>
+        </AppLayout>
         );
 }

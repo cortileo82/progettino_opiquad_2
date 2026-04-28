@@ -27,6 +27,8 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
         <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }, { title: 'Nuovo Utente', href: '#' }]}>
             <Head title="Crea Nuovo Account" />
             <div className="w-full p-6 md:p-10">
+
+                {/*Header con componente*/}
                 <HeaderNew 
                     title="Crea nuovo account" 
                     subtitle="Registra un nuovo profilo nel sistema gestionale." 
@@ -68,6 +70,6 @@ export default function Create({ personalTrainers, availableRoles, clientRoleSlu
                     <FormButton processing={processing} label="Salva Utente" />
                 </form>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

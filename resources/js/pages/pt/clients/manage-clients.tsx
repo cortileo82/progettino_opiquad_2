@@ -20,6 +20,8 @@ export default function MyClients({ clients = [] }: Props) {
         <AppLayout breadcrumbs={[{ title: 'Gestione Clienti', href: '/pt/clients/manage-clients' }]}>
             <Head title="Associa Nuovi Clienti" />
             <div className="p-6 md:p-10 flex flex-col gap-10 w-full"> 
+                
+                {/* Header con componente */}
                 <HeaderNew 
                     title="I Miei Atleti" 
                     subtitle="Gestione della lista atleti associati e monitoraggio performance." 
@@ -30,16 +32,12 @@ export default function MyClients({ clients = [] }: Props) {
                 />
 
                 <div className="w-full">
-                    {/* Passiamo il tipo "clients". 
-                        Il componente ResourceList si occuperà di renderizzare le card 
-                        con i tasti "Nuova Scheda" e "Visualizza Schede".
-                    */}
                     <ResourceList 
                         items={clients} 
                         type="clients" 
                     />
                 </div>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }
