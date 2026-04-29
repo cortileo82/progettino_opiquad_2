@@ -18,7 +18,7 @@ class UserController extends Controller
     {
         Gate::authorize('viewAny', User::class);
         
-        $users = User::with(['trainer', 'roles'])->latest()->get(); 
+        $users = User::with(['trainer', 'roles'])->latest()->paginate(10); 
         $personalTrainers = User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']);
         
         return Inertia::render('admin/users/index', [

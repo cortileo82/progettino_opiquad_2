@@ -1,53 +1,57 @@
-import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Head, router } from '@inertiajs/react';
 import { Dumbbell, Search } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Input } from '@/components/ui/input';
 import { ResourceList } from '@/components/custom/resource-list';
 import { HeaderNew } from '@/components/custom/header-new';
-
-interface Exercise {
-    id: number;
-    name: string;
-    // muscle_group può essere una stringa o un oggetto con una proprietà name
-    muscle_group?: any; 
-    description?: string;
-}
+import AntdPagination from '@/components/custom/pagination';
+import { EmptyState } from '@/components/custom/empty-state';
 
 interface Props {
-    exercises: Exercise[];
+    exercises: {
+        data: any[];
+        current_page: number;
+        total: number;
+        per_page: number;
+    };
+    filters: { search?: string };
 }
 
-const breadcrumbs = [
-        { title: 'Catalogo Esercizi', href: '/pt/exercises/catalog' }
-    ];
+export default function ExerciseCatalog({ exercises, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
 
-export default function ExerciseCatalog({ exercises = [] }: Props) {
-    const [search, setSearch] = useState('');
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            // Controlliamo che la ricerca sia effettivamente cambiata rispetto ai filtri attuali
+            if (search !== (filters.search || '')) {
+                router.get(
+                    window.location.pathname,
+                    { search: search }, 
+                    { 
+                        preserveState: true, 
+                        replace: true, 
+                        preserveScroll: true 
+                    }
+                );
+            }
+        }, 300);
 
-    // --- LOGICA DI FILTRAGGIO CORRETTA ---
-    const filteredExercises = exercises.filter(ex => {
-        const searchLower = search.toLowerCase();
-        
-        // Estraiamo il nome del muscolo in modo sicuro
-        // Se è un oggetto prendiamo .name, altrimenti lo trattiamo come stringa, altrimenti stringa vuota
-        const muscleName = typeof ex.muscle_group === 'object' 
-            ? ex.muscle_group?.name 
-            : (ex.muscle_group || '');
+        return () => clearTimeout(delayDebounceFn);
+    }, [search]);
 
-        return (
-            ex.name.toLowerCase().includes(searchLower) || 
-            muscleName.toLowerCase().includes(searchLower)
-        );
-    });
+    // Calcolo dei metadati per la paginazione
+    const paginationMeta = {
+        current_page: exercises?.current_page || 1,
+        total: exercises?.total || 0,
+        per_page: exercises?.per_page || 12
+    };
 
     return (
-         <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={[{ title: 'Catalogo Esercizi', href: '#' }]}>
             <Head title="Catalogo Tecnico Esercizi" />
 
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
-                
-                {/* Header con componente */}
                 <HeaderNew 
                     title="CATALOGO ESERCIZI"
                     subtitle="Database tecnico degli esercizi disponibili"
@@ -56,8 +60,8 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                             <Input 
-                                placeholder="FILTRA PER NOME O MUSCOLO..." 
-                                className="pl-12 bg-sidebar border-sidebar-border rounded-2xl h-14 uppercase italic font-black text-[10px] tracking-widest focus:ring-foreground/20 w-full md:w-[300px]"
+                                placeholder="Cerca esercizio" 
+                                className="pl-12 bg-sidebar border-sidebar-border rounded-2xl h-14 uppercase italic font-black text-[10px] tracking-widest w-full md:w-[300px]"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -65,19 +69,16 @@ export default function ExerciseCatalog({ exercises = [] }: Props) {
                     }
                 />
 
-                {/* Lista esercizi con componente*/}
                 <div className="w-full">
-                    {filteredExercises.length > 0 ? (
-                        <ResourceList 
-                            items={filteredExercises} 
-                            type="exercises" 
-                            readOnly={true} 
-                        />
+                    {exercises?.data?.length > 0 ? (
+                        <>
+                            <ResourceList items={exercises.data} type="exercises" readOnly={true} />
+
+                            <AntdPagination meta={paginationMeta} queryParams={{ search }} />
+                        </>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-sidebar-border rounded-[2.5rem] opacity-50 mt-6">
-                            <Dumbbell size={40} className="mb-4 text-muted-foreground" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em]">Nessun esercizio trovato</p>
-                        </div>
+                        /* Componente EmptyState per db vuoto */
+                        <EmptyState message="Nessun esercizio trovato" icon={Dumbbell} />
                     )}
                 </div>
             </div>

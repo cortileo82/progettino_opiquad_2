@@ -16,11 +16,9 @@ class ManageClientsController extends Controller
 
         $myClients = User::role(User::ROLE_CLIENT)
             ->where('trainer_id', $request->user()->id)
-            // Si selezionano solo i campi necessari alla Dashboard React (nome, email, id)
-            // per evitare di spedire password hashate o timestamp inutili al frontend
             ->select('id', 'name', 'email')
             ->orderBy('name') 
-            ->get(); 
+            ->paginate(10); // Al posto di get uso paginate per ritornare 10 risultati per volta 
 
         $numClients = $myClients->count(); 
 

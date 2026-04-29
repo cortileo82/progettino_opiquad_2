@@ -71,10 +71,7 @@ export default function Assign({ availableClients = [] }: Props) {
                         ))
                     ) : (
                         /* Componente EmptyState per lista vuota */
-                        <EmptyState 
-                            message="Nessun nuovo atleta disponibile nella bacheca" 
-                            icon={Users} 
-                        />
+                        <EmptyState message="Nessun nuovo atleta disponibile nella bacheca" icon={Users} />
                     )}
                 </div>
             </div>
