@@ -43,7 +43,6 @@ export default function RoleIndex({ roles }: RoleIndexProps) {
                 />
 
                 <div className="w-full space-y-6">
-                    {/* Usiamo formattedRoles che deriva da roles.data */}
                     <ResourceList 
                         items={formattedRoles} 
                         type="roles" 

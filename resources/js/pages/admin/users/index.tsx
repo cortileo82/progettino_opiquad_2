@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Aggiunto useEffect
+import React, { useState, useEffect } from 'react'; 
 import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
@@ -6,8 +6,8 @@ import { ResourceList } from '@/components/custom/resource-list';
 import { HeaderNew } from '@/components/custom/header-new';
 import { EmptyState } from '@/components/custom/empty-state'; 
 import AntdPagination from '@/components/custom/pagination'; 
-import { UserPlus, Plus, UserX, Search } from 'lucide-react'; // Aggiunto Search
-import { Input } from '@/components/ui/input'; // Assicurati che l'import sia corretto
+import { UserPlus, Plus, UserX, Search } from 'lucide-react'; 
+import { Input } from '@/components/ui/input'; 
 
 interface User { 
     id: number; 
@@ -26,7 +26,7 @@ interface Props {
         per_page: number;
     }; 
     auth: { user: User }; 
-    filters: { search?: string }; // Aggiunto per ricevere il filtro dal controller
+    filters: { search?: string }; 
 }
 
 export default function Index({ users, auth, filters }: Props) {
@@ -34,10 +34,10 @@ export default function Index({ users, auth, filters }: Props) {
     const [userToDelete, setUserToDelete] = useState<number | null>(null);
     const [processing, setProcessing] = useState(false);
 
-    // 1. Stato per la ricerca
+    // Stato per la ricerca
     const [search, setSearch] = useState(filters.search || '');
 
-    // 2. Logic di Debounce per la ricerca
+    //  Logica per la ricerca
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (search !== (filters.search || '')) {
@@ -78,7 +78,7 @@ export default function Index({ users, auth, filters }: Props) {
                     title="Gestione Utenti" 
                     subtitle="Gestione completa degli utenti del sistema." 
                     icon={UserPlus} 
-                    // 3. Barra di ricerca inserita nelle azioni
+                    // Barra di ricerca inserita nelle azioni
                     actions={
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
@@ -112,15 +112,12 @@ export default function Index({ users, auth, filters }: Props) {
                                     total: users.total,
                                     per_page: users.per_page
                                 }} 
-                                // 4. Manteniamo la ricerca durante il cambio pagina
+                                // Manteniamo la ricerca durante il cambio pagina
                                 queryParams={{ search }}
                             />
                         </>
                     ) : (
-                        <EmptyState 
-                            message={search ? "Nessun utente corrisponde ai criteri di ricerca" : "Nessun utente trovato nel sistema"} 
-                            icon={UserX} 
-                        />
+                        <EmptyState message={search ? "Nessun utente corrisponde ai criteri di ricerca" : "Nessun utente trovato nel sistema"} icon={UserX} />
                     )}
                 </div>
             
