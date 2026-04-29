@@ -40,7 +40,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
 
                     <div className="text-center mb-10">
                         <h1 className="text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
-                            TEMPRA FITNESS
+                            TEMPRA
                         </h1>
                         <div className="flex items-center justify-center gap-3 mt-3 opacity-30">
                             <div className="h-px w-8 bg-foreground" />
