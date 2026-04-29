@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Aggiunto useEffect
 import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
@@ -6,7 +6,8 @@ import { ResourceList } from '@/components/custom/resource-list';
 import { HeaderNew } from '@/components/custom/header-new';
 import { EmptyState } from '@/components/custom/empty-state'; 
 import AntdPagination from '@/components/custom/pagination'; 
-import { UserPlus, Plus, UserX } from 'lucide-react';
+import { UserPlus, Plus, UserX, Search } from 'lucide-react'; // Aggiunto Search
+import { Input } from '@/components/ui/input'; // Assicurati che l'import sia corretto
 
 interface User { 
     id: number; 
@@ -18,7 +19,6 @@ interface User {
 }
 
 interface Props { 
-    // Aggiornato per riflettere la paginazione di Laravel
     users: {
         data: User[];
         current_page: number;
@@ -26,12 +26,31 @@ interface Props {
         per_page: number;
     }; 
     auth: { user: User }; 
+    filters: { search?: string }; // Aggiunto per ricevere il filtro dal controller
 }
 
-export default function Index({ users, auth }: Props) {
+export default function Index({ users, auth, filters }: Props) {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<number | null>(null);
     const [processing, setProcessing] = useState(false);
+
+    // 1. Stato per la ricerca
+    const [search, setSearch] = useState(filters.search || '');
+
+    // 2. Logic di Debounce per la ricerca
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (search !== (filters.search || '')) {
+                router.get(
+                    window.location.pathname,
+                    { search: search },
+                    { preserveState: true, replace: true, preserveScroll: true }
+                );
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [search]);
 
     const openDeleteModal = (id: number) => {
         setUserToDelete(id);
@@ -54,11 +73,23 @@ export default function Index({ users, auth }: Props) {
         <AppLayout breadcrumbs={[{ title: 'Gestione Account', href: '/admin/users' }]}>
             <Head title="Gestione Account" />
 
-            <div className="w-full p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto">
+            <div className="w-full p-6 md:p-10"> 
                 <HeaderNew 
                     title="Gestione Utenti" 
                     subtitle="Gestione completa degli utenti del sistema." 
                     icon={UserPlus} 
+                    // 3. Barra di ricerca inserita nelle azioni
+                    actions={
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                            <Input 
+                                placeholder="CERCA UTENTE" 
+                                className="pl-12 bg-sidebar border-sidebar-border rounded-2xl h-14 uppercase italic font-black text-[10px] tracking-widest w-full md:w-[300px]"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                    }
                     buttonText="Nuovo utente" 
                     buttonHref="/admin/users/create"
                     buttonIcon={<Plus size={18} />}
@@ -68,24 +99,28 @@ export default function Index({ users, auth }: Props) {
                     {users.data.length > 0 ? (
                         <>
                             <ResourceList 
-                                items={users.data} // Usiamo .data
+                                items={users.data} 
                                 type="users" 
                                 onDelete={openDeleteModal} 
                                 editBaseUrl="/admin/users"
                                 authUserId={auth.user.id} 
                             />
 
-                            {/* Componente Paginazione */}
                             <AntdPagination 
                                 meta={{
                                     current_page: users.current_page,
                                     total: users.total,
                                     per_page: users.per_page
                                 }} 
+                                // 4. Manteniamo la ricerca durante il cambio pagina
+                                queryParams={{ search }}
                             />
                         </>
                     ) : (
-                        <EmptyState message="Nessun utente trovato nel sistema" icon={UserX} />
+                        <EmptyState 
+                            message={search ? "Nessun utente corrisponde ai criteri di ricerca" : "Nessun utente trovato nel sistema"} 
+                            icon={UserX} 
+                        />
                     )}
                 </div>
             

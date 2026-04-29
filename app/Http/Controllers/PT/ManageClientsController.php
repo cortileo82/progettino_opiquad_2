@@ -16,16 +16,25 @@ class ManageClientsController extends Controller
 
         $myClients = User::role(User::ROLE_CLIENT)
             ->where('trainer_id', $request->user()->id)
+            // 1. Logica di ricerca (Nome o Email)
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->select('id', 'name', 'email')
             ->orderBy('name') 
-            ->paginate(10); // Al posto di get uso paginate per ritornare 10 risultati per volta 
-
-        $numClients = $myClients->count(); 
+            ->paginate(10)
+            ->withQueryString(); // Fondamentale per mantenere il filtro tra le pagine
 
         return Inertia::render('pt/clients/manage-clients', [ 
             'clients' => $myClients, 
+            // 2. Passiamo i filtri (risolve l'errore undefined search)
+            'filters' => $request->only(['search']),
             'stats' => [ 
-                'my_clients_count' => $numClients, 
+                // Usiamo total() per contare tutti gli atleti, non solo quelli in pagina
+                'my_clients_count' => $myClients->total(), 
             ] 
         ]); 
     } 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; // Importante
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Hash;
@@ -14,15 +14,27 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request) // Aggiunta Request
     {
         Gate::authorize('viewAny', User::class);
         
-        $users = User::with(['trainer', 'roles'])->latest()->paginate(10); 
+        $users = User::with(['trainer', 'roles'])
+            // Logica di ricerca per Nome o Email
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString(); // Mantiene i filtri tra le pagine
+
         $personalTrainers = User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']);
         
         return Inertia::render('admin/users/index', [
             'users' => $users,
+            'filters' => $request->only(['search']), // Passa i filtri al frontend
             'personalTrainers' => $personalTrainers,
             'availableRoles' => Role::orderBy('name')->get(['name']),
             'clientRoleSlug' => User::ROLE_CLIENT,
@@ -47,7 +59,6 @@ class UserController extends Controller
         
         $validated = $request->validated();
 
-        // 1. Creazione record DB 
         $user = User::create([
             'name' => $validated['first_name'] . ' ' . $validated['last_name'],
             'email' => $validated['email'],
@@ -55,10 +66,8 @@ class UserController extends Controller
             'trainer_id' => $validated['trainer_id'] ?? null,
         ]);
 
-        // 2. Assegnazione ruolo nel DB di Spatie
         $user->assignRole($validated['role']);
 
-        // --- MODIFICA QUI: Reindirizzamento corretto ---
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente creato con successo!');
     }

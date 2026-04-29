@@ -35,11 +35,14 @@ interface Exercise {
 interface Props {
     stats: Stats;
     exercises: Exercise[];
+    auth: {
+        user: {
+            name: string;
+        };
+    };
 }
 
-export default function Dashboard({ stats, exercises }: Props) {
-    const { auth } = usePage().props as any;
-
+export default function Dashboard({ auth, stats, exercises }: Props) {
     return (
         <AppLayout breadcrumbs={[{ title: 'Admin Dashboard', href: '/admin/dashboard' }]}>
             <Head title="Admin Dashboard" />
@@ -47,7 +50,7 @@ export default function Dashboard({ stats, exercises }: Props) {
                 
                 {/* Header con componente */}
                 <HeaderNew 
-                    title="Benvenuto" 
+                    title={`BENVENUTO, ${auth.user.name.toUpperCase()}`}  
                     subtitle="Panoramica attuale del sistema." 
                     icon={LayoutDashboard}
                 />
@@ -92,11 +95,9 @@ export default function Dashboard({ stats, exercises }: Props) {
                                     </div>
                                 ))
                             ) : (
+
                                 /* Componente per pagina vuota */
-                                <EmptyState 
-                                    message="Nessun esercizio presente nel database" 
-                                    icon={Dumbbell} 
-                                />
+                                <EmptyState message="Nessun esercizio presente nel database" icon={Dumbbell} />
                             )}
                         </div>
                     </div>
