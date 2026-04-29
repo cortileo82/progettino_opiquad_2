@@ -32,14 +32,14 @@ class PlanRequest extends FormRequest
             'num_weeks'   => 'required|integer|min:1',
             
             // Validazione Array Esercizi 
-            'exercises'   => 'required|array|min:1', 
-            'exercises.*.exercise_id' => 'required|exists:exercises,id',
-            'exercises.*.sets'        => 'required|integer|min:1',
-            'exercises.*.reps'        => 'required|integer|min:1',
-            'exercises.*.day_of_week' => 'required|string',
-            'exercises.*.week_number' => 'required|integer|min:1',
-            'exercises.*.rest_time'   => 'nullable|string|min:0',
-            'exercises.*.weight_kg' => 'nullable|numeric|min:0',
+            'exercises'                 => 'required|array|min:1', 
+            'exercises.*.exercise_id'   => 'required|exists:exercises,id',
+            'exercises.*.sets'          => 'required|integer|min:1',
+            'exercises.*.reps'          => 'required|integer|min:1',
+            'exercises.*.day_of_week'   => 'required|string',
+            'exercises.*.week_number'   => 'required|integer|min:1',
+            'exercises.*.weight_kg'     => 'nullable|numeric|min:0',
+            'exercises.*.rest_time'     => 'nullable|integer|min:0',
         ];
     }
 }

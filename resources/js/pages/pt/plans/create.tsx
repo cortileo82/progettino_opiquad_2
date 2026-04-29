@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, router } from '@inertiajs/react';
+// ARCHITETTURA FIX: Rimuoviamo useForm e usiamo router puro
+import { Head, router } from '@inertiajs/react'; 
 import { ChevronLeft, Plus, Edit3 } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 import { CreateEditSchede } from '@/components/custom/createdit-schede';
@@ -13,6 +14,8 @@ interface Props {
 
 export default function PlanForm({ client, exercises_list, plan }: Props) {
     const isEditing = !!plan;
+    
+    // Gestiamo il caricamento manualmente dato che abbiamo rimosso useForm
     const [processing, setProcessing] = useState(false);
 
     const initialValues = {
@@ -25,19 +28,24 @@ export default function PlanForm({ client, exercises_list, plan }: Props) {
             sets: ex.pivot?.sets || '',
             reps: ex.pivot?.reps || '',
             rest_time: ex.pivot?.rest_time || '',
-            weight_kg: ex.pivot?.weight_kg || ''
+            weight_kg: ex.pivot?.weight_kg || '' 
         })) : []
     };
 
     const handleSubmit = (values: any) => {
+        // Assembliamo il payload corretto per Laravel
         const payload = { ...values, user_id: client.id };
+
+        // Parametri di navigazione Inertia
         const visitOptions = {
             preserveScroll: true,
             onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
-            onError: (errors: any) => console.error("Errori di Validazione Laravel:", errors)
+            // Se Laravel rifiuta ancora i dati, li vedremo stampati in console!
+            onError: (errors: any) => console.error("Errori di Validazione Laravel:", errors) 
         };
 
+        // ARCHITETTURA FIX: router invia esattamente il payload che gli passiamo
         if (isEditing) {
             router.put(`/pt/plans/${plan.id}`, payload, visitOptions);
         } else {
@@ -57,6 +65,7 @@ export default function PlanForm({ client, exercises_list, plan }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? `Modifica: ${plan.name}` : `Nuova Scheda: ${client.name}`} />
+            
             <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
                 <HeaderNew 
                     title={isEditing ? 'Modifica Scheda' : 'Crea Nuova Scheda'} 
@@ -66,6 +75,7 @@ export default function PlanForm({ client, exercises_list, plan }: Props) {
                     buttonHref={isEditing ? `/pt/clients/${plan.user_id}/plans` : `/pt/clients/${client.id}/plans`} 
                     buttonIcon={<ChevronLeft size={18} />} 
                 />
+                
                 <CreateEditSchede 
                     initialValues={initialValues} 
                     exercises_list={exercises_list} 

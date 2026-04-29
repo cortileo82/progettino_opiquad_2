@@ -164,16 +164,16 @@ class DatabaseSeeder extends Seeder
         // Strutturiamo la routine (2 esercizi al giorno)
         $routine = [
             'Lunedì' => [
-                ['ex' => $panca, 'sets' => 4, 'reps' => 8, 'rest' => "90''", 'weight' => 60.5],
-                ['ex' => $french, 'sets' => 3, 'reps' => 10, 'rest' => "60''", 'weight' => 22.5],
+                ['ex' => $panca, 'sets' => 4, 'reps' => 8, 'rest' => 90, 'weight' => 60.5],
+                ['ex' => $french, 'sets' => 3, 'reps' => 10, 'rest' => 60, 'weight' => 22.5],
             ],
             'Mercoledì' => [
-                ['ex' => $squat, 'sets' => 5, 'reps' => 5, 'rest' => "120''", 'weight' => 80],
-                ['ex' => $legCurl, 'sets' => 3, 'reps' => 12, 'rest' => "60''", 'weight' => 35],
+                ['ex' => $squat, 'sets' => 5, 'reps' => 5, 'rest' => 120, 'weight' => 80],
+                ['ex' => $legCurl, 'sets' => 3, 'reps' => 12, 'rest' => 60, 'weight' => 35],
             ],
             'Venerdì' => [
-                ['ex' => $trazioni, 'sets' => 4, 'reps' => 8, 'rest' => "90''", 'weight' => 0], // A corpo libero
-                ['ex' => $curl, 'sets' => 3, 'reps' => 12, 'rest' => "60''", 'weight' => 14],
+                ['ex' => $trazioni, 'sets' => 4, 'reps' => 8, 'rest' => 90, 'weight' => 0], // A corpo libero
+                ['ex' => $curl, 'sets' => 3, 'reps' => 12, 'rest' => 60, 'weight' => 14],
             ]
         ];
 
@@ -200,7 +200,7 @@ class DatabaseSeeder extends Seeder
                         'day_of_week' => $day,
                         'sets'        => $workout['sets'],
                         'reps'        => $workout['reps'] + 4,
-                        'rest_time'   => "45''",
+                        'rest_time'   => 45,
                         'weight_kg'   => max(0, $workout['weight'] - 10) 
                     ]);
                 }

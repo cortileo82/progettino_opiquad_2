@@ -119,8 +119,8 @@ class PlanController extends Controller
                     'day_of_week' => $item['day_of_week'],
                     'sets'        => $item['sets'],
                     'reps'        => $item['reps'],
-                    'rest_time'   => $item['rest_time'] ?? null,
                     'weight_kg'   => $item['weight_kg'] ?? null,
+                    'rest_time'   => $item['rest_time'] ?? null,
                 ]);
             }
         });
