@@ -46,7 +46,9 @@ export function ExerciseRow({
                         rules={[{ required: true, message: 'Richiesto' }]} 
                         className="mb-0"
                     >
-                        <ExercisePicker exercisesList={exercisesList} />
+                        <InputGroup label="Esercizio" type="custom">
+                            <ExercisePicker exercisesList={exercisesList} />
+                        </InputGroup>
                     </Form.Item>
                 </div>
 
