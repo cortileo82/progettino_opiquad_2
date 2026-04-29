@@ -38,7 +38,7 @@ class PlanRequest extends FormRequest
             'exercises.*.reps'        => 'required|integer|min:1',
             'exercises.*.day_of_week' => 'required|string',
             'exercises.*.week_number' => 'required|integer|min:1',
-            'exercises.*.rest_time'   => 'nullable|string',
+            'exercises.*.rest_time'   => 'nullable|string|min:0',
             'exercises.*.weight_kg' => 'nullable|numeric|min:0',
         ];
     }

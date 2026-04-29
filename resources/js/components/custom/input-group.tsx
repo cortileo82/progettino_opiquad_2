@@ -7,7 +7,7 @@ interface InputGroupProps {
     label: string;
     icon?: LucideIcon; // Aggiunta l'icona opzionale
     error?: string;
-    type?: 'text' | 'email' | 'password' | 'textarea' | 'select';
+    type?: 'text' | 'email' | 'password' | 'textarea' | 'select' | 'number';
     rows?: number;
     children?: React.ReactNode;
     className?: string;
