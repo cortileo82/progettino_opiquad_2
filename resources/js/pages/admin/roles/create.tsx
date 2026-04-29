@@ -57,8 +57,6 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                         {/* Campo Nome Ruolo usando InputGroup */}
                         <InputGroup
                             label="Nome del Ruolo"
-                            icon={Type}
-                            placeholder="ES: AMMINISTRATORE, PERSONAL TRAINER..."
                             value={data.name}
                             onChange={(val) => setData('name', val)}
                             error={errors.name}
@@ -67,8 +65,7 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                         {/* Sezione Selezione Permessi */}
                         <div className="space-y-6">
                             <label className="text-[10px] font-black tracking-[0.2em] text-muted-foreground block ml-1 uppercase flex items-center gap-2 italic">
-                                <ListChecks size={12} className="text-muted-foreground/70" />
-                                Selezione Autorizzazioni ({data.permissions.length} selezionate)
+                                Autorizzazioni ({data.permissions.length} selezionate)
                             </label>
 
                             {/* Griglia interattiva dei permessi */}
