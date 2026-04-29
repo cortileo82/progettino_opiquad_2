@@ -141,5 +141,3 @@ export default function Login({ status, canResetPassword, canRegister }: Props) 
         </>
     );
 }
-
-//Login.layout = { title: 'Login - TEMPRA', description: 'Accedi al tuo pannello di controllo.' };
