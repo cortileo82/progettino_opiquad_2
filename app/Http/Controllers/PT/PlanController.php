@@ -14,17 +14,26 @@ use Illuminate\Support\Facades\Gate;
 
 class PlanController extends Controller
 {
-    public function show(Plan $plan)
+   public function show(Plan $plan)
     {
         Gate::authorize('view', $plan);
 
-        // Si evitiamo query extra. 
-        // Si caricano sia gli esercizi che il cliente associato alla scheda in un solo colpo tramite l'Eager Loading.
+        // Carichiamo esercizi e cliente
         $plan->load(['exercises', 'client']);
+        // Raggruppa gli esercizi in base al giorno della settimana
+        $structuredWeeks = $plan->exercises->groupBy('pivot.week_number')->map(function ($week) {
+            return $week->groupBy('pivot.day_of_week');
+        });
 
         return Inertia::render('pt/plans/show', [
-            'plan' => $plan,
             'client' => $plan->client,
+            'plan' => [
+                'id'          => $plan->id,
+                'name'        => $plan->name,
+                'num_weeks'   => $plan->num_weeks,
+                'total_weeks' => $plan->num_weeks,
+                'weeks'       => $structuredWeeks, // I dati strutturati
+            ],
         ]);
     }
 

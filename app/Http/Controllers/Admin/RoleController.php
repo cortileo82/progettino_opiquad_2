@@ -20,7 +20,7 @@ class RoleController extends Controller
         // (il DB fa 2 query in totale, a prescindere che vi siano 3 o 300 ruoli). 
         // Se non lo si mettesse, React farebbe una query al DB per ogni ruolo 
         // nel tentativo di leggerne i permessi associati, uccidendo il server.
-        $roles = Role::with('permissions')->get();
+        $roles = Role::with('permissions')->paginate(10);
 
         return Inertia::render('admin/roles/index', [
             'roles' => $roles,

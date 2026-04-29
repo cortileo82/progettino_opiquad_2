@@ -6,22 +6,32 @@ use App\Http\Controllers\Controller;
 use App\Models\Exercise;
 use App\Models\MuscleGroup;
 use App\Http\Requests\ExerciseRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ExerciseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', Exercise::class);
 
         $exercises = Exercise::with('muscle_group')
+            // Aggiungiamo la logica di filtro per la ricerca
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhereHas('muscle_group', function ($q) use ($search) {
+                          $q->where('name', 'like', "%{$search}%");
+                      });
+            })
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('admin/exercises/index', [
-            'exercises' => $exercises
+            'exercises' => $exercises,
+            // Importante: passiamo i filtri attuali al frontend
+            'filters' => $request->only(['search'])
         ]);
     }
 

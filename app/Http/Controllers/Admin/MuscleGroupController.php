@@ -11,13 +11,23 @@ use Inertia\Inertia;
 
 class MuscleGroupController extends Controller
 {
-    public function index()
+    public function index(Request $request) // 1. Aggiungi il parametro Request
     {
         Gate::authorize('viewAny', MuscleGroup::class);
 
-        $muscleGroups = MuscleGroup::orderBy('name')->paginate(10);
+        $muscleGroups = MuscleGroup::query()
+            // 2. Aggiungi il filtro per la ricerca
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString(); // Mantiene il parametro search nei link della paginazione
 
-        return Inertia::render('admin/musclegroups/index', ['muscleGroups' => $muscleGroups,]);
+        return Inertia::render('admin/musclegroups/index', [
+            'muscleGroups' => $muscleGroups,
+            'filters' => $request->only(['search']), // 3. Passa i filtri al frontend
+        ]);
     }
 
     public function create()

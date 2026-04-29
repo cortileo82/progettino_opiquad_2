@@ -57,7 +57,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
             
             <div className="p-6 md:p-10 flex flex-col gap-10 w-full">
                 
-                {/* 1. Header con componente custom */}
+                {/* Header con componente custom */}
                 <HeaderNew 
                     title={`SCHEDE: ${client.name.toUpperCase()}`}
                     subtitle="Gestione e archivio dei programmi di allenamento assegnati."
@@ -67,15 +67,13 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                     buttonIcon={<PlusCircle size={18} />}
                 />
 
-                {/* 2. AREA CONTENUTO */}
                 <div className="w-full">
                     {clientPlans && clientPlans.length > 0 ? (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {clientPlans.map((plan) => (
                                 <div 
                                     key={plan.id} 
-                                    className="bg-sidebar border border-sidebar-border rounded-[2.5rem] p-8 hover:border-foreground/20 transition-all duration-300 group flex flex-col justify-between min-h-[260px] relative overflow-hidden"
-                                >
+                                    className="bg-sidebar border border-sidebar-border rounded-[2.5rem] p-8 hover:border-foreground/20 transition-all duration-300 group flex flex-col justify-between min-h-[260px] relative overflow-hidden">
                                     <div>
                                         <div className="flex justify-between items-start mb-6">
                                             <div className="p-4 bg-background rounded-2xl text-primary border border-sidebar-border shadow-inner group-hover:scale-110 transition-transform duration-500">
@@ -120,7 +118,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                             ))}
                         </div>
                     ) : (
-                        /* 3. EMPTY STATE (Utilizzo componente custom) */
+                        /* Empty State con componente custom) */
                         <EmptyState 
                             message={`Nessuna scheda di allenamento trovata per ${client.name.toUpperCase()}`} 
                             icon={ClipboardList} 
@@ -128,7 +126,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                     )}
                 </div>
     
-            {/* 4. MODAL DI CONFERMA (Utilizzo componente custom) */}
+            {/* MODAL DI CONFERMA (Utilizzo componente custom) */}
             <ConfirmationModal
                 isOpen={isDeleteOpen}
                 onClose={() => setIsDeleteOpen(false)}
