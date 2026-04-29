@@ -9,11 +9,11 @@ interface WeekBlockProps {
     add: (defaultValue: any) => void;
     weekOptions: any[];
     dayOptions: any[];
-    exerciseOptions: any[];
+    exercisesList: any[];
     transformNumber: (v: any) => number | undefined;
 }
 
-export function WeekBlock({ weekNum, weekFields, remove, add, ...options }: WeekBlockProps) {
+export function WeekBlock({ weekNum, weekFields, remove, add, weekOptions, dayOptions, exercisesList, transformNumber }: WeekBlockProps) {
     return (
         <div className="bg-card border-2 border-sidebar-border rounded-3xl p-6 shadow-sm overflow-hidden">
             <div className="flex items-center gap-4 mb-6 pb-4 border-b border-sidebar-border/50">
@@ -37,7 +37,15 @@ export function WeekBlock({ weekNum, weekFields, remove, add, ...options }: Week
                     </div>
                 ) : (
                     weekFields.map(field => (
-                        <ExerciseRow key={field.key} field={field} remove={remove} {...options} />
+                        <ExerciseRow 
+                            key={field.key} 
+                            field={field} 
+                            remove={remove} 
+                            weekOptions={weekOptions} 
+                            dayOptions={dayOptions} 
+                            exercisesList={exercisesList} 
+                            transformNumber={transformNumber} 
+                        />
                     ))
                 )}
 

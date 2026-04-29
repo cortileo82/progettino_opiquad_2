@@ -1,14 +1,15 @@
 import React from 'react';
 import { Form } from 'antd';
 import { Trash2 } from 'lucide-react';
-import { InputGroup } from '@/components/custom/input-group'; 
+import { InputGroup } from '@/components/custom/input-group';
+import { ExercisePicker } from '@/components/custom/exercise-picker'; 
 
 interface ExerciseRowProps {
     field: any; // Ant Design injecta key e name qui
     remove: (name: number) => void;
     weekOptions: { label: string; value: number }[];
     dayOptions: { label: string; value: string }[];
-    exerciseOptions: { label: string; value: string }[];
+    exercisesList: any[];
     transformNumber: (v: any) => number | undefined;
 }
 
@@ -17,7 +18,7 @@ export function ExerciseRow({
     remove, 
     weekOptions, 
     dayOptions, 
-    exerciseOptions, 
+    exercisesList, 
     transformNumber 
 }: ExerciseRowProps) {
     const { key, name, ...restField } = field;
@@ -37,11 +38,18 @@ export function ExerciseRow({
                         <InputGroup label="Giorno" type="select" options={dayOptions} />
                     </Form.Item>
                 </div>
+                
                 <div className="md:col-span-3">
-                    <Form.Item {...restField} name={[name, 'exercise_id']} rules={[{ required: true, message: 'Richiesto' }]} className="mb-0">
-                        <InputGroup label="Esercizio" type="select" placeholder="SCEGLI..." options={exerciseOptions} showSearch optionFilterProp="label" />
+                    <Form.Item 
+                        {...restField} 
+                        name={[name, 'exercise_id']} 
+                        rules={[{ required: true, message: 'Richiesto' }]} 
+                        className="mb-0"
+                    >
+                        <ExercisePicker exercisesList={exercisesList} />
                     </Form.Item>
                 </div>
+
                 <div className="md:col-span-1">
                     <Form.Item {...restField} name={[name, 'sets']} validateFirst rules={[{ required: true, message: 'Req' }, { type: 'number', transform: transformNumber, min: 1, message: 'Minimo 1' }]} className="mb-0">
                         <InputGroup label="Sets" type="number" min={1} placeholder="0" />

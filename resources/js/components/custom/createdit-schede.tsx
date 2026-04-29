@@ -85,7 +85,7 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
                                             remove={remove}
                                             weekOptions={weekOptions}
                                             dayOptions={dayOptions}
-                                            exerciseOptions={exerciseOptions}
+                                            exercisesList={exercises_list} 
                                             transformNumber={transformNumber}
                                         />
                                     );
