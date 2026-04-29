@@ -41,7 +41,6 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
     return (
         <ConfigProvider 
             theme={{ 
-                // ARCHITETTURA FIX: Ant Design farà tutta la magia nativamente!
                 algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
                 token: { 
                     borderRadius: 12,
