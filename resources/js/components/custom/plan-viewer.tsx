@@ -33,7 +33,7 @@ export function PlanViewer({ weeks = {}, totalWeeks = 0 }: PlanViewerProps) {
         }
     }, [weeks]);
 
-    // PROTEZIONE 1: Se non ci sono settimane o l'oggetto è nullo
+    // Se non ci sono settimane o l'oggetto è nullo
     if (!weeks || totalWeeks === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-10 bg-sidebar/20 rounded-[2rem] border border-dashed border-sidebar-border">
@@ -107,12 +107,13 @@ export function PlanViewer({ weeks = {}, totalWeeks = 0 }: PlanViewerProps) {
                                                 {ex.pivot.sets}x{ex.pivot.reps}
                                             </div>
                                             
-                                            {ex.pivot.weight_kg && parseFloat(ex.pivot.weight_kg) > 0 && (
-                                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
-                                                    <Weight size={12} className="text-primary" />
-                                                    {ex.pivot.weight_kg} kg
-                                                </div>
-                                            )}
+                                           <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
+                                                <Weight size={12} className="text-primary" />
+                                                {ex.pivot.weight_kg && parseFloat(ex.pivot.weight_kg) > 0 
+                                                    ? `${ex.pivot.weight_kg} kg` 
+                                                    : "-"
+                                                }
+                                            </div>
 
                                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground italic uppercase">
                                                 <Timer size={12} className="text-primary" />
