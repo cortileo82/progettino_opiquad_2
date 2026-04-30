@@ -14,25 +14,15 @@ class ExerciseCatalogController extends Controller
     {
         Gate::authorize('viewCatalog', Exercise::class);
 
-        // Creiamo la query base
-        $query = Exercise::with('muscleGroup')->orderBy('name');
-
-        // Codice per la ricerca nel catalogo
-        if ($request->filled('search')) { // Se l'utente scrive nella barra entra nel if altrimenti salta 
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%") //Ricerca parziale (anche se contiene quella parola)
-            ->orWhereHas('muscleGroup', function($sub) use ($search) { // cerca anche nella dabella Gruppo muscolare
-                $sub->where('name', 'like', "%{$search}%");
-            });
-        });
-        }
-
-        $exercises = $query->paginate(10)->withQueryString();
+        $exercises = Exercise::with('muscleGroup')      // Eager Loading
+            ->searchWithMuscleGroup($request->search)   // Applicazione filtri se l'utente sta cercando
+            ->orderBy('name')                           // Ordinamento
+            ->paginate()                                // Paginazione definita nel Model (varabile "$perPage")
+            ->withQueryString();                        // e aggiunta link per le pagine successive
 
         return Inertia::render('pt/catalog', [
             'exercises' => $exercises,
-            'filters'   => $request->only(['search']) // Rimandiamo il filtro al frontend
+            'filters' => $request->only(['search'])
         ]);
     }
 }

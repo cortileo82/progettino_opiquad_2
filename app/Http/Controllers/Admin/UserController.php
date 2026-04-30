@@ -14,29 +14,25 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index(Request $request) // Aggiunta Request
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', User::class);
         
         $users = User::with(['trainer', 'roles'])
-            // Logica di ricerca per Nome o Email
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString(); // Mantiene i filtri tra le pagine
+            ->search($request->search)  // Applicazioni filtri se l'utente sta cercando
+            ->latest()                  // Ordinamento per "created_at DESC", cioè dal più recente            
+            ->paginate()                // Paginazione definita nel Model (varabile "$perPage")
+            ->withQueryString();        // e aggiunta link per le pagine successive
 
+        // Preparazione "dizionari" per i menù a tendina
         $personalTrainers = User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']);
-        
+        $availableRoles = Role::orderBy('name')->get(['name']);
+
         return Inertia::render('admin/users/index', [
             'users' => $users,
-            'filters' => $request->only(['search']), // Passa i filtri al frontend
+            'filters' => $request->only(['search']),
             'personalTrainers' => $personalTrainers,
-            'availableRoles' => Role::orderBy('name')->get(['name']),
+            'availableRoles' => $availableRoles,
             'clientRoleSlug' => User::ROLE_CLIENT,
             'adminRoleSlug' => User::ROLE_ADMIN,
         ]);

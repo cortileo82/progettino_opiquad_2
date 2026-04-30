@@ -10,32 +10,22 @@ use Inertia\Inertia;
 
 class ManageClientsController extends Controller 
 { 
-    public function __invoke(Request $request) 
-    { 
+    public function __invoke(Request $request)
+    {
         Gate::authorize('viewAny', User::class);
+        
+        $myClients = User::isClient()
+            ->assignedTo($request->user()->id)  // Metodo del Model per ottenere i clienti di tale PT
+            ->search($request->search)          // Applicazione filtri se l'utente sta cercando
+            ->select('id', 'name', 'email')     // Ottimizzazione memoria: si evita di caricare colonne come la password, token o ID
+            ->orderBy('name')                   // Ordinamento
+            ->paginate()                        // Paginazione definita nel Model (varabile "$perPage")
+            ->withQueryString();                // e aggiunta link per le pagine successive
 
-        $myClients = User::role(User::ROLE_CLIENT)
-            ->where('trainer_id', $request->user()->id)
-            // 1. Logica di ricerca (Nome o Email)
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->select('id', 'name', 'email')
-            ->orderBy('name') 
-            ->paginate(10)
-            ->withQueryString(); // Fondamentale per mantenere il filtro tra le pagine
-
-        return Inertia::render('pt/clients/manage-clients', [ 
-            'clients' => $myClients, 
-            // 2. Passiamo i filtri (risolve l'errore undefined search)
+        return Inertia::render('pt/clients/manage-clients', [
+            'clients' => $myClients,
             'filters' => $request->only(['search']),
-            'stats' => [ 
-                // Usiamo total() per contare tutti gli atleti, non solo quelli in pagina
-                'my_clients_count' => $myClients->total(), 
-            ] 
-        ]); 
-    } 
+            'stats' => ['my_clients_count' => $myClients->total()]
+        ]);
+    }
 }

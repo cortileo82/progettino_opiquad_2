@@ -20,10 +20,6 @@ class User extends Authenticatable
     public const ROLE_PT = 'pt';
     public const ROLE_CLIENT = 'client';
 
-    /**
-     * I campi che possono essere assegnati massivamente.
-     * Ho aggiunto tutti i campi necessari per il form di modifica.
-     */
     protected $fillable = [
         'name',
         'email',
@@ -42,6 +38,9 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
+    
+    // Per la paginazione nei controller
+    protected $perPage = 10;
 
     
 
@@ -87,5 +86,29 @@ class User extends Authenticatable
     public function assignedPlans(): HasMany
     {
         return $this->hasMany(Plan::class, 'user_id');
+    }
+
+    // Scope di Dominio
+    public function scopeIsClient($query)
+    {
+        return $query->role(self::ROLE_CLIENT);
+    }
+
+    public function scopeFree($query)
+    {
+        return $query->whereNull('trainer_id');
+    }
+
+    public function scopeAssignedTo($query, $trainerId)
+    {
+        return $query->where('trainer_id', $trainerId);
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
     }
 }
