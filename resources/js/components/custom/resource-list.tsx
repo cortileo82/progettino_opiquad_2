@@ -57,7 +57,7 @@ export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId, r
                         {/* Contenitore Flex per Badge "Tutti i permessi" */}
                         <div className="flex items-center">
                             {type === 'roles' && item.has_all_permissions && (
-                                <div className="px-2.5 py-0.5 bg-blue-600 text-white rounded-md text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                <div className="ml-5 mr-5 px-2.5 py-0.5 bg-blue-600 text-white rounded-md text-[9px] font-black uppercase tracking-widest shadow-sm">
                                     Tutti i permessi
                                 </div>
                             )}
