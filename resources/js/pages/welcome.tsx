@@ -29,12 +29,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                     
                     <div className="w-full mb-8 flex justify-center">
                         <div className="relative p-2 bg-card border border-sidebar-border rounded-[2.5rem] shadow-xl transition-colors duration-300">
-                            <img 
-                                src="/images/hero.jpeg" 
-                                alt="Tempra Hero" 
-                                className="w-full max-w-2xl h-auto rounded-[2rem] object-cover block" 
-                                onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop" }} 
-                            />
+                            <img src="/images/hero.jpeg" alt="Tempra Hero" className="w-full max-w-2xl h-auto rounded-[2rem] object-cover block" />
                         </div>
                     </div>
 
@@ -54,8 +49,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             
                             <Link 
                                 href={login()} 
-                                className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-foreground text-background rounded-2xl hover:bg-foreground/80 transition-all duration-300 shadow-lg group"
-                            >
+                                className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-foreground text-background rounded-2xl hover:bg-foreground/80 transition-all duration-300 shadow-lg group">
                                 <LogIn size={18} />
                                 <span className="font-black uppercase italic text-lg tracking-tight">Login</span>
                             </Link>
@@ -63,18 +57,13 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             {canRegister && (
                                 <Link 
                                     href={register()} 
-                                    className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-background text-foreground border-2 border-foreground rounded-2xl hover:bg-foreground/10 transition-all duration-300 group"
-                                >
+                                    className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-background text-foreground border-2 border-foreground rounded-2xl hover:bg-foreground/10 transition-all duration-300 group">
                                     <UserPlus size={18} />
                                     <span className="font-black uppercase italic text-lg tracking-tight">Register</span>
                                 </Link>
                             )}
                         </div>
                     )}
-
-                    <p className="mt-10 text-[11px] font-black uppercase italic opacity-30 tracking-[0.3em]">
-                        Push your limits.
-                    </p>
                 </div>
             </div>
         </>
