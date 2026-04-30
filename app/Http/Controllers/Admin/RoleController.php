@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\RoleRequest;
@@ -16,14 +17,29 @@ class RoleController extends Controller
     public function index() {
         Gate::authorize('viewAny', Role::class);
 
+        // Si contano i permessi per permettere a frontend di segnalare quali ruoli hanno tutti i permessi
+        $totalPermissionsCount = Permission::count();
+
         // Si usa "with('permissions')" per fare Eager Loading 
         // (il DB fa 2 query in totale, a prescindere che vi siano 3 o 300 ruoli). 
         // Se non lo si mettesse, React farebbe una query al DB per ogni ruolo 
         // nel tentativo di leggerne i permessi associati, uccidendo il server.
         $roles = Role::with('permissions')->paginate(10);
 
+        $roles->getCollection()->transform(function ($role) use ($totalPermissionsCount) {
+            // Se il numero di permessi del ruolo è uguale al totale assoluto, è true
+            $role->has_all_permissions = $role->permissions->count() === $totalPermissionsCount;
+            return $role;
+        });
+
         return Inertia::render('admin/roles/index', [
             'roles' => $roles,
+            // Si passano al frontend i ruoli non modificabili leggendoli dal Model
+            'protectedRoles' => [
+                User::ROLE_ADMIN,
+                User::ROLE_PT,
+                User::ROLE_CLIENT,
+            ]
         ]);
     }
 
