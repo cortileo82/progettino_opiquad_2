@@ -10,11 +10,11 @@ use Inertia\Inertia;
 
 class ShowClientPlansController extends Controller
 {
-    public function __invoke(User $client)
+    public function __invoke(User $client) 
     {
         Gate::authorize('view', $client);
 
-        $clientPlans = Plan::where('user_id', $client->id)
+        $clientPlans = $client->assignedPlans()
             ->select('id', 'name', 'num_weeks', 'is_active', 'created_at')
             ->latest()
             ->get();

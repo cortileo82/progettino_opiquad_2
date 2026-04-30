@@ -11,31 +11,21 @@ use Illuminate\Validation\Rule;
 
 class ClientAssignmentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request) 
     {
         Gate::authorize('users:take-free-client');
         
-        $availableClients = User::role(User::ROLE_CLIENT) 
-            // 1. Usiamo una funzione per gestire i vari stati di "vuoto" di trainer_id
-            ->where(function ($query) {
-                $query->whereNull('trainer_id')
-                      ->orWhere('trainer_id', ''); // Protezione se non è un vero NULL
-            })
-            ->select('id', 'name', 'email')
-            // 2. Usiamo trim() per evitare che spazi vuoti nella ricerca nascondano tutto
-            ->when(trim($request->search), function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name')
+        $availableClients = User::isClient()    // Usa lo scope definito nel Model
+            ->free()                            // Metodo del Model che restituisce gli utenti senza PT assegnati
+            ->search($request->search)          // Applicazione filtri se l'utente sta cercando
+            ->select('id', 'name', 'email')     // Ottimizzazione memoria: si evita di caricare colonne come la password, token o ID
+            ->orderBy('name')                   // Ordinamento
             ->get();
 
         return Inertia::render('pt/clients/assign', [
             'availableClients' => $availableClients,
             'filters' => [
-                'search' => $request->search ?? '' // Assicura che search sia almeno stringa vuota
+                'search' => $request->search ?? ''
             ]
         ]);
     }

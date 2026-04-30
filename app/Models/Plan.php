@@ -38,6 +38,11 @@ class Plan extends Model
         return $this->belongsTo(User::class, 'pt_id');
     }
 
+    public function scopeByTrainer($query, $trainerId)
+    {
+        return $query->where('pt_id', $trainerId);
+    }
+
     public function exercises(): BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'plan_exercises')

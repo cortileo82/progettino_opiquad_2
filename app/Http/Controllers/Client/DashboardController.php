@@ -29,7 +29,7 @@ class DashboardController extends Controller
             ->get();
 
         return Inertia::render('client/dashboard', [
-            // ARCHITETTURA FIX: Passiamo null se non c'è il trainer. 
+            // Si passa null se non c'è il trainer. 
             // React farà: assignedTrainer || 'Nessun Trainer'
             'assignedTrainer' => $user->trainer ? $user->trainer->name : null,
             'activePlan'      => $activePlan ? $this->formatActivePlan($activePlan) : null,
