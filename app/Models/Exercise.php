@@ -11,47 +11,32 @@ class Exercise extends Model
 {
     use HasFactory;
 
-    /**
-     * I campi che possono essere assegnati massivamente.
-     */
-    protected $fillable = [
-        'name',
-        'description',
-        'muscle_group_id',
-    ];
+    protected $fillable = ['name', 'description', 'muscle_group_id'];
+    
+    // Per la paginazione nei controller
+    protected $perPage = 10;
 
-    /**
-     * Relazione PRINCIPALE (Snake Case)
-     * Usata dai nuovi controller e dal frontend React.
-     */
-    public function muscle_group(): BelongsTo
+    public function muscleGroup(): BelongsTo
     {
         return $this->belongsTo(MuscleGroup::class, 'muscle_group_id');
     }
 
-    /**
-     * ALIAS DI COMPATIBILITÀ (Camel Case)
-     * Questo metodo serve a risolvere l'errore "RelationNotFoundException [muscleGroup]".
-     * Qualsiasi parte del sistema che cerca ancora il vecchio nome verrà reindirizzata qui.
-     */
-    public function muscleGroup(): BelongsTo
-    {
-        return $this->muscle_group();
-    }
-
-    /**
-     * Relazione Molti-a-Molti con la tabella Plans.
-     */
     public function plans(): BelongsToMany
     {
         return $this->belongsToMany(Plan::class, 'plan_exercises')
-            ->withPivot([
-                'day_of_week', 
-                'week_number', 
-                'sets', 
-                'reps', 
-                'rest_time'   
-            ])
+            ->withPivot(['day_of_week', 'week_number', 'sets', 'reps', 'weight_kg', 'rest_time', 'order'])
+            ->orderByPivot('order', 'asc') 
             ->withTimestamps();
+    }
+
+    // Scope di Ricerca Centralizzato
+    public function scopeSearchWithMuscleGroup($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhereHas('muscleGroup', function ($sub) use ($search) {
+                  $sub->where('name', 'like', "%{$search}%");
+              });
+        });
     }
 }

@@ -14,12 +14,12 @@ class ClientAssignmentController extends Controller
     public function index(Request $request)
     {
         Gate::authorize('users:take-free-client');
-
-        $availableClients = User::role(User::ROLE_CLIENT)
-            ->whereNull('trainer_id')
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get();
+        
+        $availableClients = User::isClient()
+            ->free()                            // Metodo del Model che restituisce gli utenti senza PT assegnati
+            ->select('id', 'name', 'email')     // Ottimizzazione memoria: si evita di caricare colonne come la password, token o ID
+            ->orderBy('name')                   // Ordinamento
+            ->get();                            // Ottenimenti di tutti i risultati
 
         return Inertia::render('pt/clients/assign', [
             'availableClients' => $availableClients

@@ -10,6 +10,7 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 use App\Policies\RolePolicy;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,8 +28,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        
         // Si collega il modello "Role" esterno di Spatie alla "RolePolicy" interna
         Gate::policy(Role::class, RolePolicy::class);
+
+        // Si evita il wrapping globale di Laravel per le JsonResource.
+        // In tale modo si evita l'utilizza della chiave "data" nei controller (pratica consigliata da Inertia.js)
+        JsonResource::withoutWrapping();
     }
 
     /**

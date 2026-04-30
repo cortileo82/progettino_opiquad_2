@@ -14,6 +14,8 @@ class MuscleGroup extends Model
         'name',
     ];
 
+    protected $perPage = 10;
+
     public function exercises(): HasMany
     {
         return $this->hasMany(Exercise::class);
@@ -22,5 +24,12 @@ class MuscleGroup extends Model
     public static function getForDropDown()
     {
         return self::orderBy('name')->get(['id', 'name']);
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+        });
     }
 }
