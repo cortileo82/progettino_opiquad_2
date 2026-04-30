@@ -38,7 +38,7 @@ export function HeaderNew({
                         <h1 className="text-5xl font-black tracking-tighter text-foreground leading-[0.9] uppercase italic">
                             {title}
                         </h1>
-                        <p className="text-muted-foreground text-[10px] font-black mt-3 uppercase tracking-[0.3em] opacity-70">
+                        <p className="text-muted-foreground text-[12px] font-black mt-3 uppercase tracking-[0.3em] opacity-70">
                             {subtitle}
                         </p>
                     </div>

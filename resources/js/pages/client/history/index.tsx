@@ -20,7 +20,7 @@ export default function Index({ pastPlans }: any) {
                 
                 <HeaderNew 
                     title="Storico Schede"
-                    subtitle="Archivio delle tue programmazioni passate."
+                    subtitle="Archivio delle tue schede passate."
                     icon={Archive}
                 />
 
