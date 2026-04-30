@@ -8,26 +8,16 @@ import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 import { User, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { IndexHeader } from '@/components/custom/index-header';
+
 
 export default function Register() {
     return (
         <>
             <Head title="Register - TEMPRA" />
 
-            {/* --- HEADER TEMPRA --- */}
-            <div className="text-center mb-8 mt-2 animate-in fade-in zoom-in-95 duration-500">
-                <div className="flex justify-center mb-5">
-                    <div className="p-1.5 bg-sidebar border border-sidebar-border rounded-2xl shadow-sm">
-                        <img src="/images/hero.jpeg" alt="Tempra" className="w-16 h-16 rounded-xl object-cover grayscale-[0.5]" />
-                    </div>
-                </div>
-                <h1 className="text-4xl font-black uppercase italic tracking-tighter leading-none text-foreground">
-                    TEMPRA
-                </h1>
-                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground mt-2">
-                    Crea il tuo profilo atleta
-                </p>
-            </div>
+            <IndexHeader subtitle="Crea il tuo profilo utente" />
+
 
             {/* --- FORM REGISTRAZIONE --- */}
             <Form {...store.form()} resetOnSuccess={['password', 'password_confirmation']} className="flex flex-col gap-6">
@@ -70,7 +60,7 @@ export default function Register() {
                                         required 
                                         tabIndex={2} 
                                         autoComplete="email" 
-                                        placeholder="mario@esempio.it" 
+                                        placeholder="nome@esempio.it" 
                                         className="h-12 pl-10 bg-background border-sidebar-border rounded-xl focus:ring-2 focus:ring-primary transition-all font-medium" 
                                     />
                                 </div>
@@ -148,5 +138,3 @@ export default function Register() {
         </>
     );
 }
-
-//Register.layout = { title: 'TEMPRA | Register', description: 'Crea il tuo profilo atleta per iniziare il tuo percorso.' };

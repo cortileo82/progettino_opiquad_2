@@ -11,6 +11,7 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { IndexHeader } from '@/components/custom/index-header';
 
 type Props = {
     status?: string;
@@ -22,20 +23,9 @@ export default function Login({ status, canResetPassword, canRegister }: Props) 
     return (
         <>
             <Head title="Login - TEMPRA" />
-
-            <div className="text-center mb-8 mt-2 animate-in fade-in zoom-in-95 duration-500">
-                <div className="flex justify-center mb-5">
-                    <div className="p-1.5 bg-sidebar border border-sidebar-border rounded-2xl shadow-sm">
-                        <img src="/images/hero.jpeg" alt="Tempra" className="w-16 h-16 rounded-xl object-cover grayscale-[0.5]" />
-                    </div>
-                </div>
-                <h1 className="text-4xl font-black uppercase italic tracking-tighter leading-none text-foreground">
-                    TEMPRA
-                </h1>
-                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground mt-2">
-                    Accedi alla tua area riservata
-                </p>
-            </div>
+            
+            <IndexHeader subtitle="Accedi alla tua area riservata"/>
+            
 
             {status && (
                 <div className="mb-6 p-4 bg-green-500/10 rounded-xl text-green-500 text-xs font-bold uppercase italic text-center border border-green-500/20">
