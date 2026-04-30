@@ -53,7 +53,7 @@ export function ExercisePicker({ value, onChange, exercisesList }: ExercisePicke
                                     </div>
                                     <div className="flex flex-col flex-1 truncate">
                                         <span className="font-bold text-sm truncate">{ex.name}</span>
-                                        <span className="text-[11px] text-foreground/50 font-medium"> {ex.muscle_group || 'Full body'}</span>
+                                        <span className="text-[11px] text-foreground/50 font-medium"> {ex.muscle_group?.name || ''}</span>
                                     </div>
                                 </button>
                             ))}

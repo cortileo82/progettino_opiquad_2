@@ -39,24 +39,24 @@ class PlanPolicy
 
     public function update(User $user, Plan $plan): bool
     {
-        // 1. Si fa passare l'Admin
+        // 1. L'Admin (o chi ha permessi universali) può sempre modificare tutto
         if ($user->can('plans:update:any')) {
             return true;
         }
 
-        // 2. Si fa passare chi il permesso di leggere le schede che gli riguardano
-        if ($user->can('plans:update:own')) {
+        // 2. Controllo specifico per i PT
+        // Verifichiamo che l'utente sia un PT e che abbia il permesso di gestire schede
+        if ($user->hasRole(User::ROLE_PT) && $user->can('plans:update:own')) {
             
-            // Può vederla se: è il cliente (proprietario) || ( è il PT che l'ha creata && è l'attuale PT assegnato al cliente ).
-            return $user->id === $plan->user_id                                         // Cliente proprietario della scheda
-                || ( $user->id === $plan->pt_id                                         // PT creatore della scheda
-                    && ($plan->client && $user->id === $plan->client->trainer_id) );    // PT attuale del cliente
-                                                // Nessun User::find(), perché si usa la relazione definita nel Model.
-                                                // Si controlla che il client esista (->client) prima di chiamarne la proprietà (->trainer_id)
-                
+            // Recuperiamo il trainer attuale del cliente associato alla scheda
+            $currentTrainerId = $plan->client?->trainer_id;
+
+            // Autorizziamo la modifica SOLO se il PT loggato è l'attuale trainer dell'atleta
+            // Nota: non controlliamo più $plan->pt_id (il creatore), che viene ignorato.
+            return $currentTrainerId !== null && $user->id === $currentTrainerId;
         }
 
-        // 3. Fallback di sicurezza
+        // 3. I clienti o altri ruoli non autorizzati finiscono qui
         return false;
     }
 
