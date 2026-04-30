@@ -23,7 +23,6 @@ export default function Login({ status, canResetPassword, canRegister }: Props) 
         <>
             <Head title="Login - TEMPRA" />
 
-            {/* --- HEADER DI MATTEO (Inserito direttamente nel flusso standard) --- */}
             <div className="text-center mb-8 mt-2 animate-in fade-in zoom-in-95 duration-500">
                 <div className="flex justify-center mb-5">
                     <div className="p-1.5 bg-sidebar border border-sidebar-border rounded-2xl shadow-sm">
@@ -38,14 +37,12 @@ export default function Login({ status, canResetPassword, canRegister }: Props) 
                 </p>
             </div>
 
-            {/* --- MESSAGGIO DI STATO --- */}
             {status && (
                 <div className="mb-6 p-4 bg-green-500/10 rounded-xl text-green-500 text-xs font-bold uppercase italic text-center border border-green-500/20">
                     {status}
                 </div>
             )}
 
-            {/* --- FORM ORIGINALE LARAVEL + STILE MATTEO --- */}
             <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
                 {({ processing, errors }) => (
                     <>
