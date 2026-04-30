@@ -43,6 +43,8 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
+    
+
     /**
      * I cast degli attributi.
      */

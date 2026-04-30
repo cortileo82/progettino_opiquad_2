@@ -18,8 +18,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                     <div className="absolute top-6 right-6 z-30">
                         <Link 
                             href={dashboard()} 
-                            className="flex items-center gap-2 px-4 py-2 bg-card border border-sidebar-border rounded-xl text-[10px] font-black uppercase italic hover:border-primary transition-all shadow-sm text-foreground"
-                        >
+                            className="flex items-center gap-2 px-4 py-2 bg-card border border-sidebar-border rounded-xl text-[10px] font-black uppercase italic hover:border-primary transition-all shadow-sm text-foreground">
                             Dashboard <ArrowRight size={14} />
                         </Link>
                     </div>
