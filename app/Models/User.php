@@ -88,7 +88,8 @@ class User extends Authenticatable
         return $this->hasMany(Plan::class, 'user_id');
     }
 
-    // Scope di Dominio
+    // ---- Scope di Dominio ----
+    
     public function scopeIsClient($query)
     {
         return $query->role(self::ROLE_CLIENT);
