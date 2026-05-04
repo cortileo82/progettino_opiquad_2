@@ -12,7 +12,7 @@ class ManageClientsController extends Controller
 { 
     public function __invoke(Request $request)
     {
-        Gate::authorize('viewAny', User::class);
+        Gate::authorize('viewOwnClients', User::class);
         
         $myClients = User::isClient()
             ->assignedTo($request->user()->id)  // Metodo del Model per ottenere i clienti di tale PT
