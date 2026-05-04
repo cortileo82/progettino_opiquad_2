@@ -22,34 +22,7 @@ export function InputGroup({ label, icon: Icon, error, type = 'text', children, 
         const baseClass = "w-full rounded-xl border border-sidebar-border bg-background px-4 focus:border-primary focus:ring-1 focus:ring-primary transition-all font-bold text-sm outline-none italic text-foreground placeholder:text-muted-foreground/50";
         const standardHeight = "h-[54px]";
 
-        // Gestione dei componenti custom (come ExercisePicker)
-        if (type === 'custom') {
-            if (React.isValidElement(children)) {
-                // Passa in automatico value e onChange al componente figlio
-                return React.cloneElement(children as React.ReactElement<any>, { value, onChange, ...props });
-            }
-            return <>{children}</>;
-        }
-
-        if (type === 'select') {
-            return (
-                <Select {...props} value={value} className={cn("w-full text-sm font-bold ant-custom-select", standardHeight)} onChange={(val) => onChange && onChange(val)}>
-                    {children}
-                </Select>
-            )
-        }
-        
-        if (type === 'textarea') {
-            return (
-                <textarea {...props} rows={props.rows || 4} value={value} onChange={(e) => onChange && onChange(e.target.value)} className={cn(baseClass, "py-4 resize-none min-h-[120px]", error && "border-red-500")} />
-            )
-        }
-        
-        const InputComponent = type === 'password' ? Input.Password : Input;
-        
-        return (
-            <InputComponent {...props} value={value} type={type} onChange={(e: any) => onChange && onChange(e.target.value)} className={cn(baseClass, standardHeight, type === 'email' && "lowercase", error && "border-red-500")} />
-        )
+        return <>{children}</>
     };
 
     return (

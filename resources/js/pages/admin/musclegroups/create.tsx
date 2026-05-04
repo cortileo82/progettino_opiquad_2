@@ -65,15 +65,9 @@ export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
                 
                 <form onSubmit={handleSubmit} className="space-y-8 mt-10">
                     <div className="p-8 rounded-[2.5rem] border-2 border-sidebar-border bg-sidebar shadow-sm">
-                        <InputGroup 
-                            label="Nome della Categoria" 
-                            icon={BicepsFlexed} 
-                            value={data.name} 
-                            onChange={(val: string) => setData('name', val)} 
-                            error={errors.name} 
-                            placeholder="ES. PETTORALI, DORSI, GAMBE..." 
-                            required 
-                        />
+                        <InputGroup label="Nome della Categoria" error={errors.name} >
+                            <input type='text' value={data.name} placeholder="ES. PETTORALI, DORSI, GAMBE..." onChange={(e) => setData('name', e.target.value)} className="h-8 w-full rounded-md border border-input bg-transparent px-3 font-bold italic shadow-sm focus:ring-1 focus:ring-primary outline-none text-sm"/>
+                        </InputGroup>
                     </div>
                     
                     <div className="flex justify-end">

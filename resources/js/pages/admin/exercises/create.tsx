@@ -1,13 +1,14 @@
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
 import { ArrowLeft, Dumbbell, Save } from 'lucide-react';
 import { FormCard } from '@/components/custom/form-card';
 import { InputGroup } from '@/components/custom/input-group';
 import { FormButton } from '@/components/custom/form-button';
-import { Select } from 'antd';
 import { HeaderNew } from '@/components/custom/header-new';
+
+// IMPORTA TUTTO DA ANTD PER EVITARE CONFLITTI
+import { Input, Select } from 'antd';
 
 interface MuscleGroup {
     id: number;
@@ -23,17 +24,19 @@ interface Exercise {
 
 interface Props {
     exercise?: Exercise;
-    // Accettiamo entrambe le nomenclature per evitare bug di idratazione da Laravel
     muscleGroups?: MuscleGroup[];
     muscle_groups?: MuscleGroup[]; 
 }
 
 export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: Props) {
-    // Capiamo se siamo in modalità modifica
     const isEdit = !!exercise?.id;
-    
-    // Normalizziamo i gruppi muscolari
     const availableMuscleGroups = muscleGroups || muscle_groups || [];
+
+    // Mappiamo i gruppi muscolari per la Select di Ant Design
+    const muscleOptions = availableMuscleGroups.map(group => ({
+        label: group.name.toUpperCase(),
+        value: group.id
+    }));
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: exercise?.name || '',
@@ -53,24 +56,21 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
         }
     };
 
-    // Variabili dinamiche per la UI
     const pageTitle = isEdit ? "Modifica Esercizio" : "Crea Nuovo Esercizio";
     const pageSubtitle = isEdit 
         ? `Stai aggiornando: ${exercise.name}` 
         : "Inserisci un nuovo esercizio nel database della piattaforma.";
-    const breadcrumbTitle = isEdit ? "Modifica" : "Nuovo";
 
     return (
-         <AppLayout 
+        <AppLayout 
             breadcrumbs={[
                 { title: 'Esercizi', href: '/admin/exercises' }, 
-                { title: 'Nuovo', href: '#' }
+                { title: isEdit ? 'Modifica' : 'Nuovo', href: '#' }
             ]}
         >
-            <Head title="Aggiungi Nuovo Esercizio" />
+            <Head title={pageTitle} />
 
             <div className="w-full p-6 md:p-10">
-                
                 <HeaderNew 
                     title={pageTitle} 
                     subtitle={pageSubtitle} 
@@ -80,43 +80,50 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
                     buttonIcon={<ArrowLeft size={16} />} 
                 />
                 
-                <form onSubmit={handleSubmit} className="w-full space-y-8 mt-10">
+               <form onSubmit={handleSubmit} className="w-full space-y-8 mt-10">
                     <FormCard>
-                        <InputGroup 
-                            label="Nome Esercizio" 
-                            value={data.name} 
-                            onChange={(val: string) => setData('name', val)} 
-                            error={errors.name} 
-                            required
-                        />
                         
-                        <InputGroup 
-                            label="Gruppo Muscolare" 
-                            type="select" 
-                            value={data.muscle_group_id} 
-                            onChange={(val: any) => setData('muscle_group_id', val)} 
-                            error={errors.muscle_group_id}
-                        >
-                            <Select.Option value="">SELEZIONA GRUPPO...</Select.Option>
-                            {availableMuscleGroups.map((group) => (
-                                <Select.Option key={group.id} value={group.id}>
-                                    {group.name?.toUpperCase() || 'SENZA NOME'}
-                                </Select.Option>
-                            ))}
+                        {/* NOME ESERCIZIO - Utilizza il tuo stile InputGroup */}
+                        <InputGroup label="Nome Esercizio" error={errors.name} icon={Dumbbell}>
+                            <Input 
+                                value={data.name} 
+                                onChange={(e) => setData('name', e.target.value)} 
+                                placeholder="Panca Piana"
+                                // Applichiamo qui lo stile specifico dell'input interno
+                                className="h-8 w-full rounded-md border border-input bg-transparent px-3 font-bold italic shadow-sm focus:ring-1 focus:ring-primary outline-none"
+                            />
                         </InputGroup>
                         
-                        <InputGroup 
-                            label="Descrizione (Opzionale)" 
-                            type="textarea" 
-                            className="md:col-span-2" 
-                            value={data.description} 
-                            onChange={(val: string) => setData('description', val)} 
-                            error={errors.description} 
-                            rows={5}
-                        />
+                        {/* GRUPPO MUSCOLARE */}
+                        <InputGroup label="Gruppo Muscolare" error={errors.muscle_group_id}>
+                            <Select 
+                                value={data.muscle_group_id} 
+                                onChange={(val) => setData('muscle_group_id', val)} 
+                                options={muscleOptions}
+                                placeholder="Seleziona..."
+                                className="w-full h-8 font-bold italic"
+                                // Ant Design richiede style per l'altezza precisa
+                                style={{ height: '32px' }}
+                            />
+                        </InputGroup>
+                        
+                        {/* DESCRIZIONE - Finalmente grande e con il tuo stile */}
+                        <div className="col-span-full">
+                            <InputGroup label="Descrizione" error={errors.description}>
+                                <Input.TextArea 
+                                    value={data.description} 
+                                    onChange={(e) => setData('description', e.target.value)} 
+                                    placeholder="Note..."
+                                    autoSize={{ minRows: 4, maxRows: 6 }}
+                                    // Usiamo le stesse classi dell'input ma senza altezza fissa
+                                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 font-bold italic shadow-sm focus:ring-1 focus:ring-primary outline-none"
+                                />
+                            </InputGroup>
+                        </div>
+
                     </FormCard>
                     
-                    <div className="flex justify-end">
+                    <div className="flex justify-end pt-4">
                         <FormButton 
                             processing={processing} 
                             label={isEdit ? "Salva Modifiche" : "Crea Esercizio"} 
@@ -125,6 +132,6 @@ export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: 
                     </div>
                 </form>
             </div>
-            </AppLayout>
+        </AppLayout>
     );
 }

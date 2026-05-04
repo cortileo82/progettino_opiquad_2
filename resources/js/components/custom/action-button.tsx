@@ -13,17 +13,6 @@ interface ActionButtonProps {
 
 export function ActionButton({ href, label, icon: Icon = Plus, className }: ActionButtonProps) {
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Button: {
-                        colorPrimary: '#09090b',      // Zinc 950
-                        colorPrimaryHover: '#18181b', // Zinc 900
-                        colorPrimaryActive: '#27272a', // Zinc 800
-                    },
-                },
-            }}
-        >
             <Link href={href}>
                 <Button 
                     type="primary"
@@ -39,6 +28,5 @@ export function ActionButton({ href, label, icon: Icon = Plus, className }: Acti
                     </span>
                 </Button>
             </Link>
-        </ConfigProvider>
     );
 }

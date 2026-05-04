@@ -1,17 +1,22 @@
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useMemo } from 'react';
+import React, { FormEventHandler, useMemo } from 'react';
+import { useForm, Head } from '@inertiajs/react';
 import { HeaderNew } from '@/components/custom/header-new';
-import { ShieldCheck, ArrowLeft, CheckCircle2, CheckSquare, Square } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, CheckCircle2, CheckSquare, Square, Save } from 'lucide-react';
 import { InputGroup } from '@/components/custom/input-group';
 import { FormCard } from '@/components/custom/form-card';
 import { FormButton } from '@/components/custom/form-button';
 import AppLayout from '@/layouts/app-layout';
-import { Head, router } from '@inertiajs/react';
+import { Input } from 'antd'; 
 
-// ARCHITETTURA FIX: Importiamo la nostra logica centralizzata
+// ARCHITETTURA: Importiamo la logica per raggruppare i permessi
 import { groupPermissionsByCategory } from '@/lib/permission-utils';
 
-export default function RoleForm({ role, permissions }: { role?: any, permissions: any[] }) {
+interface Props {
+    role?: any;
+    permissions: any[];
+}
+
+export default function RoleForm({ role, permissions }: Props) {
     const isEdit = !!role;
     const initialPermissions = role?.permissions?.map((p: any) => p.name) || [];
     
@@ -20,10 +25,10 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
         permissions: initialPermissions,
     });
 
-    // Si utilizza useMemo per calcolare i raggruppamenti dei permessi solo se i permessi cambiano, ottimizzando il rendering
+    // Ottimizzazione rendering permessi
     const groupedPermissions = useMemo(() => groupPermissionsByCategory(permissions), [permissions]);
 
-    // Stato derivato per capire se si è già selezionato tutto
+    // Stato per la selezione di massa
     const isAllSelected = data.permissions.length === permissions.length && permissions.length > 0;
 
     const handleCheckboxChange = (permName: string, isChecked: boolean) => {
@@ -34,12 +39,11 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
         }
     };
 
-    // Funzione per gestire la selezione di massa
     const toggleSelectAll = () => {
         if (isAllSelected) {
-            setData('permissions', []); // Svuota
+            setData('permissions', []);
         } else {
-            setData('permissions', permissions.map(p => p.name)); // Riempe con tutti
+            setData('permissions', permissions.map(p => p.name));
         }
     };
 
@@ -53,8 +57,8 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Ruoli', href: '/admin/roles' }]}>
-            <Head title="Gestione Ruoli" />
+        <AppLayout breadcrumbs={[{ title: 'Ruoli', href: '/admin/roles' }, { title: isEdit ? 'Modifica' : 'Nuovo', href: '#' }]}>
+            <Head title={isEdit ? "Modifica Ruolo" : "Nuovo Ruolo"} />
             <div className="w-full p-6 md:p-10">
                 <HeaderNew 
                     title={isEdit ? 'MODIFICA RUOLO' : 'NUOVO RUOLO'} 
@@ -67,12 +71,16 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                 
                 <form onSubmit={submit} className="mt-12 space-y-8">
                     <FormCard className="md:grid-cols-1 gap-12">
-                        <InputGroup 
-                            label="Nome del Ruolo" 
-                            value={data.name} 
-                            onChange={(val) => setData('name', val)} 
-                            error={errors.name} 
-                        />
+                        
+                        <InputGroup label="Nome del Ruolo" error={errors.name}>
+                            {/* FIX: Usiamo e.target.value per evitare [object Object] */}
+                            <Input 
+                                placeholder="ES. AMMINISTRATORE, TRAINER..." 
+                                value={data.name} 
+                                onChange={(e) => setData('name', e.target.value)}
+                                className="h-10 font-bold italic border-sidebar-border bg-background hover:border-primary focus:border-primary shadow-sm"
+                            />
+                        </InputGroup>    
                         
                         <div className="space-y-6">
                             <div className="flex items-center justify-between border-b border-sidebar-border/50 pb-4">
@@ -83,8 +91,8 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                                 <button 
                                     type="button" 
                                     onClick={toggleSelectAll}
-                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors hover:opacity-80
-                                        ${isAllSelected ? 'text-red-500' : 'text-primary'}"
+                                    className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors hover:opacity-80
+                                        ${isAllSelected ? 'text-red-500' : 'text-primary'}`}
                                 >
                                     {isAllSelected ? (
                                         <><Square size={14} /> Deseleziona Tutti</>
@@ -97,12 +105,10 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                             <div className="space-y-8 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
                                 {Object.entries(groupedPermissions).map(([category, perms]) => (
                                     <div key={category} className="space-y-4">
-                                        {/* Titolo Categoria */}
                                         <h4 className="text-[11px] font-black uppercase tracking-widest text-foreground bg-sidebar/50 p-3 rounded-xl border border-sidebar-border inline-block shadow-sm">
                                             {category.replace(/_/g, ' ')}
                                         </h4>
                                         
-                                        {/* Griglia Permessi della Categoria */}
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                             {perms.map((perm: any) => {
                                                 const isChecked = data.permissions.includes(perm.name);
@@ -143,7 +149,12 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                     </FormCard>
                     
                     <div className="flex justify-end">
-                        <FormButton processing={processing} label={isEdit ? "Aggiorna Ruolo" : "Crea Ruolo"} className="scale-110" />
+                        <FormButton 
+                            processing={processing} 
+                            label={isEdit ? "Aggiorna Ruolo" : "Crea Ruolo"} 
+                            icon={Save}
+                            className="scale-110" 
+                        />
                     </div>
                 </form>
             </div>

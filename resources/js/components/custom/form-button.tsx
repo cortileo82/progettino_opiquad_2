@@ -17,18 +17,7 @@ export function FormButton({
     className 
 }: FormButtonProps) {
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Button: {
-                        colorPrimary: '#09090b',      // Zinc 950 (Nero)
-                        colorPrimaryHover: '#18181b', // Zinc 900
-                        colorPrimaryActive: '#27272a', // Zinc 800
-                    },
-                },
-            }}
-        >
-            <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-2">
                 <Button 
                     type="primary"
                     htmlType="submit"            // Fondamentale per inviare il form
@@ -46,6 +35,5 @@ export function FormButton({
                     </span>
                 </Button>
             </div>
-        </ConfigProvider>
     );
 }

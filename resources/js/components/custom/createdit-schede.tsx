@@ -4,6 +4,7 @@ import { WeekBlock } from '@/components/custom/week-block';
 import { FormCard } from '@/components/custom/form-card';
 import { InputGroup } from '@/components/custom/input-group';
 import { FormButton } from '@/components/custom/form-button';
+import { Input } from 'antd';
 
 interface Props {
     initialValues: any;
@@ -46,7 +47,6 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
     return (
         <ConfigProvider
             theme={{
-                algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
                 token: {
                     borderRadius: 12,
                     colorPrimary: isDarkMode ? '#ffffff' : '#09090b',
@@ -58,10 +58,14 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
             <Form form={form} onFinish={onSubmit} layout="vertical" autoComplete="off" initialValues={initialValues}>
                 <FormCard className="mb-8">
                     <Form.Item name="name" rules={[{ required: true, message: 'Obbligatorio' }]} className="mb-0">
-                        <InputGroup label="Nome Programma" />
+                        <InputGroup label="Nome Programma">
+                            <Input type='text'/>
+                        </InputGroup>
                     </Form.Item>
                     <Form.Item name="num_weeks" validateFirst rules={[{ required: true, message: 'Obbligatorio' }, { type: 'number', transform: transformNumber, min: 1, message: 'Minimo 1' }]} className="mb-0">
-                        <InputGroup label="Settimane Totali" type="number" min={1} placeholder="ES. 4" />
+                        <InputGroup label="Settimane Totali" >
+                            <Input type='number' min={1} placeholder="ES. 4"/>
+                        </InputGroup>
                     </Form.Item>
                 </FormCard>
 

@@ -53,8 +53,7 @@ export function WeekBlock({ weekNum, weekFields, remove, add, weekOptions, dayOp
                     <button
                         type="button"
                         onClick={() => add({ week_number: weekNum, day_of_week: 'Lunedì', sets: '', reps: '', weight_kg: '', rest_time: '' })}
-                        className="flex items-center gap-3 p-2 pr-6 rounded-2xl border-2 border-dashed border-sidebar-border hover:border-primary/50 bg-sidebar/30 hover:bg-sidebar transition-all group w-fit"
-                    >
+                        className="flex items-center gap-3 p-2 pr-6 rounded-2xl border-2 border-dashed border-sidebar-border hover:border-primary/50 bg-sidebar/30 hover:bg-sidebar transition-all group w-fit">
                         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                             <Plus size={20} strokeWidth={3} />
                         </div>
