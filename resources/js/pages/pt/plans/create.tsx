@@ -62,7 +62,7 @@ export default function CreatePlan({ client, exercises_list, plan }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? `Modifica: ${plan.name}` : `Nuova Scheda: ${client.name}`} />
             
-            <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
+            <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 <HeaderNew 
                     title={isEditing ? 'Modifica Scheda' : 'Crea Nuova Scheda'} 
                     subtitle={isEditing 

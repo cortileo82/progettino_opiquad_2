@@ -18,11 +18,11 @@ interface RoleIndexProps {
 
 export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
     
-    const handleDelete = (id: number) => {
-        if (confirm('Sei sicuro di voler eliminare questo ruolo? L\'azione è irreversibile.')) {
-            router.delete(`/admin/roles/${id}`);
-        }
-    };
+    //const handleDelete = (id: number) => {
+        //if (confirm('Sei sicuro di voler eliminare questo ruolo? L\'azione è irreversibile.')) {
+          //  router.delete(`/admin/roles/${id}`);
+        //}
+    //};
 
     const formattedRoles = roles.data.map(role => ({
         ...role,
@@ -47,12 +47,7 @@ export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
                 />
                 
                 <div className="w-full space-y-6">
-                    <ResourceList 
-                        items={formattedRoles} 
-                        type="roles"
-                        editBaseUrl="/admin/roles"
-                        onDelete={handleDelete}
-                    />
+                    <ResourceList items={formattedRoles} type="roles" editBaseUrl="/admin/roles" /*onDelete={handleDelete}*/ />
                     
                     <AntdPagination 
                         meta={{
