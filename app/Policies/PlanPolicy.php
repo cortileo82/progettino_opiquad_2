@@ -52,7 +52,6 @@ class PlanPolicy
             $currentTrainerId = $plan->client?->trainer_id;
 
             // Autorizziamo la modifica SOLO se il PT loggato è l'attuale trainer dell'atleta
-            // Nota: non controlliamo più $plan->pt_id (il creatore), che viene ignorato.
             return $currentTrainerId !== null && $user->id === $currentTrainerId;
         }
 
