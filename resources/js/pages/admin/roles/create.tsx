@@ -81,8 +81,7 @@ export default function RoleForm({ role, permissions }: { role?: any, permission
                                 <button 
                                     type="button" 
                                     onClick={toggleSelectAll}
-                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors hover:opacity-80
-                                        ${isAllSelected ? 'text-red-500' : 'text-primary'}"
+                                    className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors hover:opacity-80 ${isAllSelected ? 'text-red-500' : 'text-primary'}`}
                                 >
                                     {isAllSelected ? (
                                         <><Square size={14} /> Deseleziona Tutti</>
