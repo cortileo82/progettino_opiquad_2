@@ -53,7 +53,6 @@ export default function MyPlan({ plan }: Props) {
                     icon={ClipboardList}
                 />
 
-                {/* Il componente PlanViewer gestisce ora tutto: selettore WK e griglia esercizi */}
                 <PlanViewer 
                     weeks={plan.weeks} 
                     totalWeeks={plan.total_weeks} 

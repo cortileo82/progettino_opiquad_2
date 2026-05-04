@@ -20,15 +20,15 @@ interface Props {
 }
 
 export default function ExerciseIndex({ exercises, filters }: Props) {
-    // 1. STATO RICERCA
+    // 1. Stato ricerca
     const [search, setSearch] = useState(filters.search || '');
 
-    // 2. STATI ELIMINAZIONE
+    // 2. Stati di eliminazione
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [exerciseToDelete, setExerciseToDelete] = useState<{ id: number, name: string } | null>(null);
     const [processing, setProcessing] = useState(false);
 
-    // 3. EFFECT PER RICERCA (DEBOUNCE)
+    // 3. Effect per la ricerca (Debounce)
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (search !== (filters.search || '')) {
@@ -42,7 +42,7 @@ export default function ExerciseIndex({ exercises, filters }: Props) {
         return () => clearTimeout(delayDebounceFn);
     }, [search]);
 
-    // 4. HANDLERS ELIMINAZIONE
+    // 4. Handlers per l'eliminazione
     const openDeleteModal = (id: number) => {
         const exercise = exercises.data.find(ex => ex.id === id);
         if (exercise) {
@@ -64,7 +64,7 @@ export default function ExerciseIndex({ exercises, filters }: Props) {
         });
     };
 
-    // 5. META PAGINAZIONE
+    // 5. Meta paginazione
     const paginationMeta = {
         current_page: exercises?.current_page || 1,
         total: exercises?.total || 0,

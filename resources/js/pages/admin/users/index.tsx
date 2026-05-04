@@ -78,7 +78,6 @@ export default function Index({ users, auth, filters }: Props) {
                     title="Gestione Utenti" 
                     subtitle="Gestione completa degli utenti del sistema." 
                     icon={UserPlus} 
-                    // Barra di ricerca inserita nelle azioni
                     actions={
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />

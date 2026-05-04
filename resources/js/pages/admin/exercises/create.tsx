@@ -23,16 +23,16 @@ interface Exercise {
 
 interface Props {
     exercise?: Exercise;
-    // Accettiamo entrambe le nomenclature per evitare bug di idratazione da Laravel
+    // Si accettano entrambe le nomenclature per evitare bug di idratazione da Laravel
     muscleGroups?: MuscleGroup[];
     muscle_groups?: MuscleGroup[]; 
 }
 
 export default function ExerciseForm({ exercise, muscleGroups, muscle_groups }: Props) {
-    // Capiamo se siamo in modalità modifica
+    // Si capisce se si è in modalità modifica
     const isEdit = !!exercise?.id;
     
-    // Normalizziamo i gruppi muscolari
+    // Si normalizzano i gruppi muscolari
     const availableMuscleGroups = muscleGroups || muscle_groups || [];
 
     const { data, setData, post, put, processing, errors, reset } = useForm({

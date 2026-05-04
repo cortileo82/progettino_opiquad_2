@@ -5,8 +5,6 @@ import { ResourceList } from '@/components/custom/resource-list';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import AntdPagination from '@/components/custom/pagination';
-
-// ARCHITETTURA FIX: Importiamo il modale di conferma per allinearci al Design System
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
 interface RoleIndexProps {
@@ -20,7 +18,6 @@ interface RoleIndexProps {
 }
 
 export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
-    // ARCHITETTURA FIX: Aggiungiamo lo stato per gestire l'apertura/chiusura del modale
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [roleToDelete, setRoleToDelete] = useState<{ id: number, name: string } | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -34,7 +31,6 @@ export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
         hideActions: protectedRoles.includes(role.name.toLowerCase())
     }));
 
-    // ARCHITETTURA FIX: Fase 1 - Preparazione. Troviamo il ruolo cliccato e apriamo il modale.
     const handleDeleteClick = (id: number) => {
         const role = roles.data.find(r => r.id === id);
         if (role) {
@@ -43,7 +39,6 @@ export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
         }
     };
 
-    // ARCHITETTURA FIX: Fase 2 - Esecuzione. Chiamata al server con gestione dei caricamenti.
     const handleConfirmDelete = () => {
         if (!roleToDelete) return;
         
@@ -72,7 +67,6 @@ export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
                 />
                 
                 <div className="w-full space-y-6">
-                    {/* Sostituiamo onDelete con la nuova funzione che apre il modale */}
                     <ResourceList 
                         items={formattedRoles} 
                         type="roles" 
@@ -90,7 +84,6 @@ export default function RoleIndex({ roles, protectedRoles }: RoleIndexProps) {
                 </div>
             </div>
 
-            {/* Il Modale per l'eliminazione. Resta invisibile finché isDeleteOpen non diventa true */}
             <ConfirmationModal 
                 isOpen={isDeleteOpen} 
                 onClose={() => setIsDeleteOpen(false)} 

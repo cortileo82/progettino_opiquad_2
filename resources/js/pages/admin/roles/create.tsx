@@ -7,8 +7,6 @@ import { FormCard } from '@/components/custom/form-card';
 import { FormButton } from '@/components/custom/form-button';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
-
-// ARCHITETTURA FIX: Importiamo la nostra logica centralizzata
 import { groupPermissionsByCategory } from '@/lib/permission-utils';
 
 export default function RoleForm({ role, permissions }: { role?: any, permissions: any[] }) {

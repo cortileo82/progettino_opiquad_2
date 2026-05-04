@@ -49,8 +49,6 @@ export default function Assign({ availableClients = [], filters = {} }: Props) {
             <Head title="Associa Nuovi Clienti" />
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
-                {/* Header con componente custom*/}
-
                 <HeaderNew 
                     title="Nuovi Atleti" 
                     subtitle="Seleziona e associa i nuovi atleti al tuo profilo professionale." 

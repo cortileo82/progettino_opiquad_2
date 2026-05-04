@@ -18,10 +18,10 @@ interface Props {
 }
 
 export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
-    // Normalizziamo i dati (prende quello che Laravel ci ha inviato)
+    // Si normalizzano i dati (si prende quello che Laravel ha inviato)
     const currentGroup = muscleGroup || muscle_group;
     
-    // Capiamo se siamo in creazione o in modifica
+    // Si capisce se si è in creazione o in modifica
     const isEdit = !!currentGroup?.id;
 
     const { data, setData, post, put, processing, errors } = useForm({

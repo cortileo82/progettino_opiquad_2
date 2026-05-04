@@ -34,7 +34,6 @@ export default function EditUser({ user, personalTrainers, availableRoles, clien
             <Head title={`Modifica ${user.name}`} />
             <div className="w-full p-6 md:p-10">
 
-                {/*Header con componente*/}
                 <HeaderNew 
                     title="Modifica Profilo" 
                     subtitle={`Stai modificando l'account di: ${user.name}`} 

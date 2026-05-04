@@ -40,7 +40,6 @@ export default function Dashboard({ auth, stats, exercises }: Props) {
             <Head title="Admin Dashboard" />
             <div className="w-full p-6 md:p-10">
                 
-                {/* Header con componente */}
                 <HeaderNew 
                     title={`BENVENUTO, ${auth.user.name.toUpperCase()}`}  
                     subtitle="Panoramica attuale del sistema." 

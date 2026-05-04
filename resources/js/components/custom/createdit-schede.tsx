@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Form } from 'antd'; // ARCHITETTURA FIX: Rimosso ConfigProvider e theme
+import { Form } from 'antd'; 
 import { WeekBlock } from '@/components/custom/week-block';
 import { FormCard } from '@/components/custom/form-card';
 import { InputGroup } from '@/components/custom/input-group';

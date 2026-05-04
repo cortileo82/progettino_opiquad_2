@@ -16,7 +16,6 @@ interface Props {
 export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) {
     const breadcrumbs = [{ title: 'Dashboard', href: '/client/dashboard' }];
 
-    // Sincronizziamo la logica con quella di ShowPlan
     const formattedWeeks = useMemo(() => {
         if (!activePlan || !activePlan.weekly_days) return {};
         const currentWeekNumber = activePlan.current_week || 1;

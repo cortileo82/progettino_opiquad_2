@@ -4,7 +4,7 @@ import { Head, router } from '@inertiajs/react';
 import { UserPlus, Users, UserX, Search } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 import { ResourceList } from '@/components/custom/resource-list';
-import { EmptyState } from '@/components/custom/empty-state'; // Importato correttamente
+import { EmptyState } from '@/components/custom/empty-state'; 
 import AntdPagination from '@/components/custom/pagination';
 import { Input } from '@/components/ui/input';
 
@@ -30,7 +30,7 @@ interface Props {
 export default function MyClients({ clients, stats, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
 
-    //Codice per la barra di ricerca, (aspetta 300ms dopo che l'utente ha finito di scrivere poi fa la ricerca) --> meno conusomo di risorse
+    // Logica di ricerca (si aspetta 300ms dopo che l'utente ha finito di scrivere poi fa la ricerca) --> meno conusomo di risorse
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (search !== (filters.search || '')) {
@@ -51,8 +51,6 @@ export default function MyClients({ clients, stats, filters }: Props) {
             
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
-                {/* Header con componente */}
-
                 <HeaderNew 
                     title="I Miei Atleti" 
                     subtitle={`Visualizzazione dei tuoi ${stats.my_clients_count} atleti associati.`} 

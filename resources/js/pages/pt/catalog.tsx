@@ -23,7 +23,6 @@ export default function ExerciseCatalog({ exercises, filters }: Props) {
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            // Controlliamo che la ricerca sia effettivamente cambiata rispetto ai filtri attuali
             if (search !== (filters.search || '')) {
                 router.get(
                     window.location.pathname,
