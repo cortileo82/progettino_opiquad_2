@@ -8,7 +8,7 @@ import { CreateEditSchede } from '@/components/custom/createdit-schede';
 interface Props {
     client: any;
     exercises_list: any[];
-    plan?: any; // Se presente, siamo in modalità Edit
+    plan?: any; // Se presente, si è in modalità Edit
 }
 
 export default function CreatePlan({ client, exercises_list, plan }: Props) {
@@ -44,10 +44,8 @@ export default function CreatePlan({ client, exercises_list, plan }: Props) {
         };
 
         if (isEditing) {
-            // Rotta PUT: /pt/plans/{plan}
             router.put(`/pt/plans/${plan.id}`, payload, visitOptions);
         } else {
-            // Rotta POST: /pt/plans/store (Corrisponde al tuo web.php)
             router.post('/pt/plans/store', payload, visitOptions);
         }
     };

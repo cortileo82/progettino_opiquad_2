@@ -24,7 +24,7 @@ interface PaginatedMuscleGroups {
 
 interface Props {
     muscleGroups: PaginatedMuscleGroups;
-    filters: { search?: string }; // Aggiunta prop filters
+    filters: { search?: string };
 }
 
 export default function MuscleGroupIndex({ muscleGroups, filters }: Props) {
@@ -51,6 +51,8 @@ export default function MuscleGroupIndex({ muscleGroups, filters }: Props) {
 
         return () => clearTimeout(delayDebounceFn);
     }, [search]);
+
+    // Handlers per l'eliminazione
 
     const handleDeleteClick = (id: number) => {
         const group = groupList.find(g => g.id === id);
@@ -115,7 +117,7 @@ export default function MuscleGroupIndex({ muscleGroups, filters }: Props) {
                                     total: muscleGroups.total,
                                     per_page: muscleGroups.per_page
                                 }} 
-                                // 4. Passiamo il parametro search alla paginazione
+                                // 4. Si passa il parametro search alla paginazione
                                 queryParams={{ search }}
                             />
                         </div>

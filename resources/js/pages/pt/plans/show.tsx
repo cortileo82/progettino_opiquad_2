@@ -37,7 +37,6 @@ export default function ShowPlan({ client, plan }: Props) {
             
             <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                
-                {/* Header con componente */}
                 <HeaderNew 
                     title={plan.name?.toUpperCase() || 'SCHEDA SENZA NOME'} 
                     subtitle={`Visualizzazione dettagli della scheda assegnata a: ${client?.name?.toUpperCase() || 'ATLETA'}`} 
@@ -59,7 +58,6 @@ export default function ShowPlan({ client, plan }: Props) {
                     } 
                 />
                 
-                {/* Info Cards con componente custom*/}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card 
                         label="Atleta"
@@ -74,7 +72,6 @@ export default function ShowPlan({ client, plan }: Props) {
                     />
                 </div>
 
-                {/* Visualizzazione con componente custom */}
                 <div className="space-y-6">
                     <div className="flex items-center gap-3 pl-4">
                         <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />

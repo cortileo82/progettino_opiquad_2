@@ -1,160 +1,178 @@
 import React, { useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { groupPermissionsByCategory } from '@/lib/permission-utils';
-import { Pencil, Trash2, ChevronDown, Mail, UserCircle, Dumbbell, AlignLeft, Target, ShieldCheck, FileText, PlusCircle, ArrowRight, Users } from 'lucide-react';
+import { Pencil, Trash2, ChevronDown, Mail, UserCircle, Dumbbell, AlignLeft, Target, ShieldCheck, FileText, PlusCircle, ArrowRight, Users, History, Eye } from 'lucide-react';
+import { PlanViewer } from '@/components/custom/plan-viewer';
 
 interface ResourceListProps {
     items: any[];
     type: 'users' | 'exercises' | 'muscle-groups' | 'roles' | 'clients' | 'plans';
     onDelete?: (id: number) => void;
     editBaseUrl?: string;
+    showBaseUrl?: string;
     authUserId?: number;
     readOnly?: boolean;
 }
 
-export function ResourceList({ items, type, onDelete, editBaseUrl, authUserId, readOnly = false }: ResourceListProps) {
+export function ResourceList({ items, type, onDelete, editBaseUrl, showBaseUrl, authUserId, readOnly = false }: ResourceListProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
     
-    const toggleExpand = (id: number) => {
+    const handleRowClick = (item: any) => {
         if (type === 'muscle-groups') return;
-        setExpandedId(expandedId === id ? null : id);
+
+        // Se è una scheda senza esercizi (PT Index) e si ha l'URL, si usa il click per navigare subito
+        if (type === 'plans' && !item.weeks && showBaseUrl) {
+            router.get(`${showBaseUrl}/${item.id}`);
+            return;
+        }
+
+        // Altrimenti, normale comportamento a tendina
+        setExpandedId(expandedId === item.id ? null : item.id);
     };
 
     return (
         <div className="space-y-4 mt-6">
-            {items.map((item) => (
-                <div key={item.id} className={`bg-sidebar border rounded-[2rem] transition-all duration-300 ${expandedId === item.id ? 'border-foreground ring-1 ring-foreground/10 shadow-2xl scale-[1.01]' : 'border-sidebar-border hover:border-foreground/20'} overflow-hidden`}>
-                    
-                    <div className={`flex items-center justify-between p-6 ${type !== 'muscle-groups' ? 'cursor-pointer' : ''}`} onClick={() => toggleExpand(item.id)}>
-                        <div className="flex items-center gap-6">
-                            <div className={`p-4 rounded-2xl transition-all duration-500 ${expandedId === item.id ? 'bg-foreground text-background' : 'bg-background text-muted-foreground'}`}>
-                                {type === 'users' && <UserCircle size={22} />}
-                                {type === 'clients' && <Users size={22} />}
-                                {type === 'exercises' && <Dumbbell size={22} />}
-                                {type === 'muscle-groups' && <Target size={22} />}
-                                {type === 'roles' && <ShieldCheck size={22} />}
-                            </div>
-                        
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center">
-                                    <span className="font-black uppercase italic text-lg tracking-tight text-foreground"> 
-                                        {item.name}
-                                    </span>
-                                </div>
+            {items.map((item) => {
+                const isExpandable = type !== 'muscle-groups' && !(type === 'plans' && !item.weeks);
 
-                                {type !== 'muscle-groups' && (
-                                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">
-                                        {type === 'users' && (item.roles?.[0]?.name || 'NESSUN RUOLO')}
-                                        {type === 'clients' && 'ATLETA ASSOCIATO'}
-                                        {type === 'exercises' && (item.muscle_group?.name || item.muscle_group || 'Senza Categoria')}
-                                        {type === 'roles' && `${item.permissions?.length || 0} AUTORIZZAZIONI`}
-                                    </span>
+                return (
+                    <div key={item.id} className={`bg-sidebar border rounded-[2rem] transition-all duration-300 ${expandedId === item.id ? 'border-foreground ring-1 ring-foreground/10 shadow-2xl scale-[1.01]' : 'border-sidebar-border hover:border-foreground/20'} overflow-hidden`}>
+                        
+                        {/* Assegniamo l'evento handleRowClick passando l'intero item */}
+                        <div className={`flex items-center justify-between p-6 ${isExpandable || (type === 'plans' && showBaseUrl) ? 'cursor-pointer' : ''}`} onClick={() => handleRowClick(item)}>
+                            <div className="flex items-center gap-6">
+                                <div className={`p-4 rounded-2xl transition-all duration-500 ${expandedId === item.id ? 'bg-foreground text-background' : 'bg-background text-muted-foreground'}`}>
+                                    {type === 'users' && <UserCircle size={22} />}
+                                    {type === 'clients' && <Users size={22} />}
+                                    {type === 'exercises' && <Dumbbell size={22} />}
+                                    {type === 'muscle-groups' && <Target size={22} />}
+                                    {type === 'roles' && <ShieldCheck size={22} />}
+                                    {type === 'plans' && <History size={22} />}
+                                </div>
+                                
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center">
+                                        <span className="font-black uppercase italic text-lg tracking-tight text-foreground"> {item.name}</span>
+                                    </div>
+                                    {type !== 'muscle-groups' && (
+                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">
+                                            {type === 'users' && (item.roles?.[0]?.name || 'NESSUN RUOLO')}
+                                            {type === 'clients' && 'ATLETA ASSOCIATO'}
+                                            {type === 'exercises' && (item.muscle_group?.name || item.muscle_group || 'Senza Categoria')}
+                                            {type === 'roles' && `${item.permissions?.length || 0} AUTORIZZAZIONI`}
+                                            {type === 'plans' && `SCHEDA DEL ${new Date(item.created_at).toLocaleDateString()} • ${item.num_weeks} SETTIMANE`}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center">
+                                {type === 'roles' && item.has_all_permissions && (
+                                    <div className="ml-5 mr-5 px-2.5 py-0.5 bg-blue-600 text-white rounded-md text-[9px] font-black uppercase tracking-widest shadow-sm"> Tutti i permessi </div>
+                                )}
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                                {!readOnly && type !== 'clients' && !item.hideActions && (
+                                    <div className="flex items-center gap-2 border-r border-sidebar-border pr-5">
+                                        {showBaseUrl && (
+                                            <Link href={`${showBaseUrl}/${item.id}`} onClick={(e) => e.stopPropagation()} className="p-2.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all">
+                                                <Eye size={18} />
+                                            </Link>
+                                        )}
+                                        {editBaseUrl && (
+                                            <Link href={`${editBaseUrl}/${item.id}/edit`} onClick={(e) => e.stopPropagation()} className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all">
+                                                <Pencil size={18} />
+                                            </Link>
+                                        )}
+                                        {item.id !== authUserId && onDelete && (
+                                            <button type="button" onClick={(e) => { e.stopPropagation(); onDelete(item.id) }} className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                                {/* ARCHITETTURA FIX: Mostriamo la freccia solo se la riga è effettivamente espandibile! */}
+                                {isExpandable && (
+                                    <ChevronDown size={20} className={`text-muted-foreground transition-transform duration-500 ${expandedId === item.id ? 'rotate-180 text-foreground' : ''}`} />
                                 )}
                             </div>
                         </div>
-
                         
-                        {/* Contenitore Flex per Badge "Tutti i permessi" */}
-                        <div className="flex items-center">
-                            {type === 'roles' && item.has_all_permissions && (
-                                <div className="ml-5 mr-5 px-2.5 py-0.5 bg-blue-600 text-white rounded-md text-[9px] font-black uppercase tracking-widest shadow-sm">
-                                    Tutti i permessi
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="flex items-center gap-4">
-                            {!readOnly && type !== 'clients' && !item.hideActions && (
-                                <div className="flex items-center gap-2 border-r border-sidebar-border pr-5">
-                                    {editBaseUrl && (
-                                        <Link href={`${editBaseUrl}/${item.id}/edit`} onClick={(e) => e.stopPropagation()} className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all">
-                                            <Pencil size={18} />
-                                        </Link>
-                                    )}
-                                    {item.id !== authUserId && onDelete && (
-                                        <button type="button" onClick={(e) => { e.stopPropagation(); onDelete(item.id) }} className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
-                                            <Trash2 size={18} />
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                            {type !== 'muscle-groups' && (
-                                <ChevronDown size={20} className={`text-muted-foreground transition-transform duration-500 ${expandedId === item.id ? 'rotate-180 text-foreground' : ''}`} />
-                            )}
-                        </div>
-                    </div>
-                    
-                    {expandedId === item.id && type !== 'muscle-groups' && (
-                        <div className="px-10 pb-10 pt-2 bg-background/30 border-t border-sidebar-border/50 animate-in fade-in slide-in-from-top-4 duration-500">
-                            <div className="mt-6">
-                                {type === 'roles' ? (
-                                    <div className="space-y-6">
-                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary block ml-1 mb-2"> Permessi Organizzati per Risorsa </span>
-                                        {item.permissions && item.permissions.length > 0 ? (
-                                            <div className="space-y-5">
-                                                {Object.entries(groupPermissionsByCategory(item.permissions)).map(([category, perms]) => (
-                                                    <div key={category} className="space-y-3">
-                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-sidebar-border/50 pb-2 ml-1">
-                                                            {category.replace(/_/g, ' ')}
-                                                        </h4>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {perms.map((perm: any) => (
-                                                                <div key={perm.id} className="px-4 py-2 bg-foreground text-background rounded-xl text-[11px] font-bold italic shadow-md tracking-wide">
-                                                                    {perm.formattedName}
-                                                                </div>
-                                                            ))}
+                        {/* L'area espansa si apre solo per le righe che lo supportano */}
+                        {expandedId === item.id && isExpandable && (
+                            <div className="px-10 pb-10 pt-2 bg-background/30 border-t border-sidebar-border/50 animate-in fade-in slide-in-from-top-4 duration-500">
+                                <div className="mt-6">
+                                    {type === 'plans' ? (
+                                        <div className="mt-2">
+                                            {/* Ora siamo sicuri che item.weeks esista se siamo arrivati qui */}
+                                            <PlanViewer weeks={item.weeks} totalWeeks={item.num_weeks} />
+                                        </div>
+                                    ) : type === 'roles' ? (
+                                        <div className="space-y-6">
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary block ml-1 mb-2"> Permessi Organizzati per Risorsa </span>
+                                            {item.permissions && item.permissions.length > 0 ? (
+                                                <div className="space-y-5">
+                                                    {Object.entries(groupPermissionsByCategory(item.permissions)).map(([category, perms]) => (
+                                                        <div key={category} className="space-y-3">
+                                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-sidebar-border/50 pb-2 ml-1"> {category.replace(/_/g, ' ')}</h4>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {perms.map((perm: any) => (
+                                                                    <div key={perm.id} className="px-4 py-2 bg-foreground text-background rounded-xl text-[11px] font-bold italic shadow-md tracking-wide"> {perm.formattedName}</div>
+                                                                ))}
+                                                            </div>
                                                         </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="p-4 bg-background border border-dashed border-sidebar-border rounded-2xl text-xs italic text-muted-foreground"> Nessun permesso trovato. </div>
+                                            )}
+                                        </div>
+                                    ) : type === 'clients' ? (
+                                        <div className="space-y-8">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <DetailBox label="Email Atleta" value={item.email} icon={Mail} />
+                                            </div>
+                                            <div className="flex flex-col md:flex-row gap-4 mt-4">
+                                                <Link href={`/pt/clients/${item.id}/plans`} className="flex-1 flex items-center justify-between p-6 bg-background border border-sidebar-border rounded-[1.5rem] hover:border-primary transition-all group/btn shadow-sm">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="p-3 bg-sidebar rounded-xl text-muted-foreground group-hover/btn:text-primary transition-colors"> <FileText size={20} /> </div>
+                                                        <span className="font-black uppercase italic text-xs tracking-widest">Visualizza Schede</span>
                                                     </div>
-                                                ))}
+                                                    <ArrowRight size={18} className="text-primary group-hover/btn:translate-x-2 transition-transform" />
+                                                </Link>
+                                                <Link href={`/pt/plans/create/${item.id}`} className="flex-1 flex items-center justify-between p-6 bg-foreground text-background rounded-[1.5rem] hover:opacity-90 transition-all group/btn shadow-xl">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="p-3 bg-background/10 rounded-xl"> <PlusCircle size={20} /> </div>
+                                                        <span className="font-black uppercase italic text-xs tracking-widest">Nuova Scheda</span>
+                                                    </div>
+                                                    <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform" />
+                                                </Link>
                                             </div>
-                                        ) : (
-                                            <div className="p-4 bg-background border border-dashed border-sidebar-border rounded-2xl text-xs italic text-muted-foreground"> Nessun permesso trovato. </div>
-                                        )}
-                                    </div>
-                                ) : type === 'clients' ? (
-                                    <div className="space-y-8">
+                                        </div>
+                                    ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <DetailBox label="Email Atleta" value={item.email} icon={Mail} />
-                                        </div>
-                                        <div className="flex flex-col md:flex-row gap-4 mt-4">
-                                            <Link href={`/pt/clients/${item.id}/plans`} className="flex-1 flex items-center justify-between p-6 bg-background border border-sidebar-border rounded-[1.5rem] hover:border-primary transition-all group/btn shadow-sm">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-sidebar rounded-xl text-muted-foreground group-hover/btn:text-primary transition-colors"> <FileText size={20} /> </div>
-                                                    <span className="font-black uppercase italic text-xs tracking-widest">Visualizza Schede</span>
+                                            {type === 'users' && (
+                                                <>
+                                                    <DetailBox label="Email utente" value={item.email} icon={Mail} />
+                                                    {(item.roles?.[0]?.name === 'client') && (
+                                                        <DetailBox label="Personal Trainer" value={item.trainer?.name || 'NON ASSEGNATO'} icon={UserCircle} />
+                                                    )}
+                                                </>
+                                            )}
+                                            {type === 'exercises' && (
+                                                <div className="md:col-span-2">
+                                                    <DetailBox label="Dettagli Tecnici Esercizio" value={item.description || 'Nessuna specifica tecnica inserita.'} icon={AlignLeft} isTextArea />
                                                 </div>
-                                                <ArrowRight size={18} className="text-primary group-hover/btn:translate-x-2 transition-transform" />
-                                            </Link>
-                                            <Link href={`/pt/plans/create/${item.id}`} className="flex-1 flex items-center justify-between p-6 bg-foreground text-background rounded-[1.5rem] hover:opacity-90 transition-all group/btn shadow-xl">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-background/10 rounded-xl"> <PlusCircle size={20} /> </div>
-                                                    <span className="font-black uppercase italic text-xs tracking-widest">Nuova Scheda</span>
-                                                </div>
-                                                <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform" />
-                                            </Link>
+                                            )}
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        {type === 'users' && (
-                                            <>
-                                                <DetailBox label="Email utente" value={item.email} icon={Mail} />
-                                                {(item.roles?.[0]?.name === 'client') && (
-                                                    <DetailBox label="Personal Trainer" value={item.trainer?.name || 'NON ASSEGNATO'} icon={UserCircle} />
-                                                )}
-                                            </>
-                                        )}
-                                        {type === 'exercises' && (
-                                            <div className="md:col-span-2">
-                                                <DetailBox label="Dettagli Tecnici Esercizio" value={item.description || 'Nessuna specifica tecnica inserita.'} icon={AlignLeft} isTextArea />
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            ))}
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 }

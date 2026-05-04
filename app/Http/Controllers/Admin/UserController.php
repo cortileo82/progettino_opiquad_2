@@ -9,6 +9,7 @@ use Illuminate\Http\Request; // Importante
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
@@ -28,6 +29,7 @@ class UserController extends Controller
         $personalTrainers = User::role(User::ROLE_PT)->orderBy('name')->get(['id', 'name']);
         $availableRoles = Role::orderBy('name')->get(['name']);
 
+        Log::debug($users);
         return Inertia::render('admin/users/index', [
             'users' => $users,
             'filters' => $request->only(['search']),

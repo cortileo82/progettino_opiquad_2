@@ -6,10 +6,15 @@ use App\Models\User;
 
 class UserPolicy
 {
-    // Permessso vista utenti (es.: clienti propri)
+    // Permesso vista utenti (es.: clienti propri)
     public function viewAny(User $user): bool
     {
-        return $user->can('users:read:any') || $user->can('users:read:own');
+        return $user->can('users:read:any');
+    }
+
+    public function viewOwnClients(User $user): bool
+    {
+        return $user->can('users:read:own');
     }
 
     // Permesso vista dettagli di un utente
