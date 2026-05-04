@@ -5,8 +5,6 @@ import AppLayout from '@/layouts/app-layout';
 import { HeaderNew } from '@/components/custom/header-new';
 import { EmptyState } from '@/components/custom/empty-state';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
-
-// ARCHITETTURA FIX: Importiamo il nostro Factory Component
 import { ResourceList } from '@/components/custom/resource-list';
 
 interface Plan {
@@ -14,7 +12,7 @@ interface Plan {
     name: string;
     num_weeks: number;
     created_at: string;
-    weeks?: any; // Aggiunto per il PlanViewer interno
+    weeks?: any;
 }
 
 interface Client {
@@ -32,7 +30,7 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
     const [planToDelete, setPlanToDelete] = useState<Plan | null>(null);
     const [processing, setProcessing] = useState(false);
 
-    // Adattiamo la funzione per ricevere l'ID dalla ResourceList
+    // Si adatta la funzione per ricevere l'ID dalla ResourceList
     const handleDeleteClick = (id: number) => {
         const plan = clientPlans.find(p => p.id === id);
         if (plan) {
@@ -73,14 +71,12 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
                 
                 <div className="w-full">
                     {clientPlans && clientPlans.length > 0 ? (
-                        /* ARCHITETTURA FIX: Passiamo la palla a ResourceList. 
-                           Passando editBaseUrl, la ResourceList mostrerà in automatico 
-                           il bottone "Matita" per modificare la scheda! */
+                        /* Si utilizza ResourceList.  */
                         <ResourceList 
                             items={clientPlans} 
                             type="plans" 
-                            showBaseUrl="/pt/plans"
-                            editBaseUrl="/pt/plans" 
+                            showBaseUrl="/pt/plans"         /* Utilizzato per stampare il bottone "occhio" per visualizzare i dettagli della scheda */
+                            editBaseUrl="/pt/plans"         /* Utilizzato per stampare il bottone "matita" per modificare la scheda */
                             onDelete={handleDeleteClick} 
                         />
                     ) : (
