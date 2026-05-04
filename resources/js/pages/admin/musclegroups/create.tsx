@@ -47,7 +47,7 @@ export default function MuscleGroupForm({ muscleGroup, muscle_group }: Props) {
     return (
         <AppLayout 
             breadcrumbs={[
-                { title: 'Gruppi Muscolari', href: '/admin/musclegroups' }, 
+                { title: 'Gruppi Muscolari', href: '/admin/muscle-groups' }, 
                 { title: 'Nuovo', href: '#' }
             ]}
         >

@@ -35,7 +35,7 @@ export default function ShowPlan({ client, plan }: Props) {
             ]}>
             <Head title={`Scheda: ${plan.name}`} />
             
-            <div className="p-6 md:p-10 flex flex-col gap-10 max-w-7xl mx-auto w-full">
+            <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                
                 {/* Header con componente */}
                 <HeaderNew 

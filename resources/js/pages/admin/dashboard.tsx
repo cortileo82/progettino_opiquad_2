@@ -4,15 +4,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { HeaderNew } from '@/components/custom/header-new';
 import { Card } from '@/components/custom/cards';
 import { EmptyState } from '@/components/custom/empty-state';
-import { 
-    Users, 
-    Dumbbell, 
-    UserCheck, 
-    History,
-    ArrowUpRight,
-    ClipboardList,
-    LayoutDashboard 
-} from 'lucide-react';
+import { Users, Dumbbell, UserCheck, History, ArrowUpRight, ClipboardList, LayoutDashboard } from 'lucide-react';
 
 interface Stats {
     total_clients: number;
@@ -72,8 +64,7 @@ export default function Dashboard({ auth, stats, exercises }: Props) {
                         </h2>
                         <Link 
                             href="/admin/exercises" 
-                            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                        >
+                            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
                             Vedi Tutti <ArrowUpRight size={12} />
                         </Link>
                     </div>

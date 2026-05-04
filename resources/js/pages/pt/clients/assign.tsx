@@ -47,7 +47,7 @@ export default function Assign({ availableClients = [], filters = {} }: Props) {
     return (
         <AppLayout breadcrumbs={[{ title: 'Associa Clienti', href: '/pt/clients/assign' }]}>
             <Head title="Associa Nuovi Clienti" />
-            <div className="p-6 md:p-10 flex flex-col gap-10 w-full max-w-7xl mx-auto"> 
+            <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
                 {/* Header con componente custom*/}
 

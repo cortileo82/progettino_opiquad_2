@@ -49,13 +49,13 @@ export default function ClientPlansIndex({ client, clientPlans }: Props) {
 
     return (
         <AppLayout breadcrumbs={[
-            { title: 'I Miei Atleti', href: '/pt/dashboard' }, 
+            { title: 'I Miei Atleti', href: '/pt/clients/manage-clients' }, 
             { title: `Schede di ${client.name}`, href: '#' }
         ]}>
             <Head title={`Schede - ${client.name}`} />
 
             
-            <div className="p-6 md:p-10 flex flex-col gap-10 w-full">
+            <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
                 {/* Header con componente custom */}
                 <HeaderNew 

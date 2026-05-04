@@ -30,6 +30,7 @@ interface Props {
 export default function MyClients({ clients, stats, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
 
+    //Codice per la barra di ricerca, (aspetta 300ms dopo che l'utente ha finito di scrivere poi fa la ricerca) --> meno conusomo di risorse
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (search !== (filters.search || '')) {
@@ -41,14 +42,14 @@ export default function MyClients({ clients, stats, filters }: Props) {
             }
         }, 300);
 
-        return () => clearTimeout(delayDebounceFn);
+        return () => clearTimeout(delayDebounceFn); //se sono passati meno di 300ms e l'utente scrive viene resettato il timer.
     }, [search]);
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Gestione Clienti', href: '#' }]}>
             <Head title="I Miei Atleti" />
             
-            <div className="p-6 md:p-10 flex flex-col gap-10 w-full max-w-7xl mx-auto"> 
+            <div className="flex h-full flex-col gap-8 p-6 md:p-10">
                 
                 {/* Header con componente */}
 
