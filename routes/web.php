@@ -89,6 +89,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/my-plan', [ClientPlanController::class, 'current'])->name('plan.current');
         Route::get('/history', [ClientPlanController::class, 'history'])->name('history');
         Route::get('/plans/{plan}', [ClientPlanController::class, 'show'])->name('plans.show');
+        
+        Route::get('/pricing', function () {
+        return Inertia::render('client/pricing');
+    })->name('subscription.index');
     });
 });
 
