@@ -18,6 +18,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
+            $table->string('stripe_id')->nullable()->unique()->after('id');     // nullable() perché quando un utente si registra non ha ancora pagato nulla
+            $table->boolean('is_premium')->default(false)->after('stripe_id');  // unique() perché due utenti non possono avere lo stesso account Stripe
+
             // Relazione ricorsava sulla tabella users per permettere di associare ai clienti un personal trainer
             // nullable per permettere il campo vuoto ad admin e personal trainer
             // constrained per obbligare la presenza in users dell'id inserito

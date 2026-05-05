@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->integer('num_weeks')->default(4);
             $table->boolean('is_active')->default(false);
+            $table->boolean('is_paid')->default(false)->after('is_active');
+            $table->string('stripe_payment_intent')->nullable()->after('is_paid');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('pt_id')->nullable()->constraind('users')->nullOnDelete();
             $table->timestamps();
