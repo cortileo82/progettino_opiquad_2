@@ -1,103 +1,95 @@
 import React from 'react';
-import { Form, Select, Input } from 'antd'; 
+import { Form, Select, InputNumber, Button } from 'antd';
 import { Trash2 } from 'lucide-react';
 
-interface ExerciseRowProps {
-    field: any; 
-    remove: (name: number) => void;
-    weekOptions: { label: string; value: number }[];
-    dayOptions: { label: string; value: string }[];
-    exercisesList: any[];
-    transformNumber: (v: any) => number | undefined;
-}
+const giorniSettimana = [
+    { label: 'Lun', value: 'Lunedì' },
+    { label: 'Mar', value: 'Martedì' },
+    { label: 'Mer', value: 'Mercoledì' },
+    { label: 'Gio', value: 'Giovedì' },
+    { label: 'Ven', value: 'Venerdì' },
+    { label: 'Sab', value: 'Sabato' },
+    { label: 'Dom', value: 'Domenica' },
+];
 
-export function ExerciseRow({ 
-    field, 
-    remove, 
-    weekOptions, 
-    dayOptions, 
-    exercisesList,
-    transformNumber 
-}: ExerciseRowProps) {
-    // Estraiamo name (l'indice) e restField (key e altri dati di AntD)
+export function ExerciseRow({ field, remove, exercisesList }: any) {
     const { name, ...restField } = field;
 
     return (
-        <div className="bg-sidebar border border-sidebar-border rounded-2xl p-4 shadow-sm mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+        <div className="bg-sidebar/30 border border-border/50 rounded-2xl p-4 mb-2 shadow-sm">
+            <div className="grid grid-cols-12 gap-4 items-end">
                 
-                {/* SETTIMANA */}
-                <div className="md:col-span-1">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Sett.</label>
-                    <Form.Item {...restField} name={[name, 'week_number']} className="mb-0">
-                        <Select options={weekOptions} className="h-10 font-bold italic" />
+                {/* GIORNO DELLA SETTIMANA */}
+                <div className="col-span-4 md:col-span-2">
+                    <Form.Item
+                        {...restField}
+                        label={<span className="text-[10px] font-black uppercase italic opacity-50">Giorno</span>}
+                        name={[name, 'day_of_week']}
+                        rules={[{ required: true, message: '!' }]}
+                        className="mb-0"
+                    >
+                        <Select options={giorniSettimana} placeholder="Giorno" className="h-10 w-full" />
                     </Form.Item>
                 </div>
 
-                {/* GIORNO */}
-                <div className="md:col-span-2">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Giorno</label>
-                    <Form.Item {...restField} name={[name, 'day_of_week']} className="mb-0">
-                        <Select options={dayOptions} className="h-10 font-bold italic" />
-                    </Form.Item>
-                </div>
-                
                 {/* ESERCIZIO */}
-                <div className="md:col-span-3">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Esercizio</label>
-                    <Form.Item {...restField} name={[name, 'exercise_id']} className="mb-0">
-                        <Select 
+                <div className="col-span-8 md:col-span-4">
+                    <Form.Item
+                        {...restField}
+                        label={<span className="text-[10px] font-black uppercase italic opacity-50">Esercizio</span>}
+                        name={[name, 'exercise_id']}
+                        rules={[{ required: true, message: '!' }]}
+                        className="mb-0"
+                    >
+                        <Select
                             showSearch
+                            placeholder="Seleziona esercizio"
                             optionFilterProp="label"
-                            options={exercisesList.map(ex => ({ label: ex.name.toUpperCase(), value: ex.id }))} 
-                            className="w-full h-10 font-bold italic" 
+                            className="h-10 w-full"
+                            options={exercisesList?.map((ex: any) => ({ label: ex.name.toUpperCase(), value: ex.id }))}
                         />
                     </Form.Item>
                 </div>
 
-                {/* SETS */}
-                <div className="md:col-span-1">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Sets</label>
-                    <Form.Item {...restField} name={[name, 'sets']} className="mb-0">
-                        <Input className="h-10 font-bold italic text-center" />
-                    </Form.Item>
+                {/* DATI TECNICI (Sets, Reps, Kg, Rest) */}
+                <div className="col-span-11 md:col-span-5 grid grid-cols-4 gap-2">
+                    <div>
+                        <Form.Item {...restField} name={[name, 'sets']} label={<span className="text-[10px] font-black italic opacity-50 uppercase block text-center">Sets</span>} className="mb-0">
+                            <InputNumber min={1} className="w-full h-10 font-bold text-center" />
+                        </Form.Item>
+                    </div>
+                    <div>
+                        <Form.Item {...restField} name={[name, 'reps']} label={<span className="text-[10px] font-black italic opacity-50 uppercase block text-center">Reps</span>} className="mb-0">
+                            <InputNumber min={1} className="w-full h-10 font-bold text-center" />
+                        </Form.Item>
+                    </div>
+                    <div>
+                        <Form.Item {...restField} name={[name, 'weight_kg']} label={<span className="text-[10px] font-black italic opacity-50 uppercase block text-center">Kg</span>} className="mb-0">
+                            <InputNumber min={0} step={0.5} className="w-full h-10 font-bold text-center" />
+                        </Form.Item>
+                    </div>
+                    <div>
+                        <Form.Item {...restField} name={[name, 'rest_time']} label={<span className="text-[10px] font-black italic opacity-50 uppercase block text-center">Rest</span>} className="mb-0">
+                            <InputNumber min={0} className="w-full h-10 font-bold text-center" />
+                        </Form.Item>
+                    </div>
                 </div>
 
-                {/* REPS */}
-                <div className="md:col-span-1">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Reps</label>
-                    <Form.Item {...restField} name={[name, 'reps']} className="mb-0">
-                        <Input className="h-10 font-bold italic text-center" />
-                    </Form.Item>
-                </div>
-
-                {/* KG */}
-                <div className="md:col-span-1">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Kg</label>
-                    <Form.Item {...restField} name={[name, 'weight_kg']} className="mb-0">
-                        <Input className="h-10 font-bold italic text-center" />
-                    </Form.Item>
-                </div>
-
-                {/* REST */}
-                <div className="md:col-span-2">
-                    <label className="text-[10px] font-bold uppercase opacity-50 ml-1">Rest</label>
-                    <Form.Item {...restField} name={[name, 'rest_time']} className="mb-0">
-                        <Input className="h-10 font-bold italic text-center" />
-                    </Form.Item>
-                </div>
-
-                {/* CESTINO */}
-                <div className="md:col-span-1">
-                    <button 
-                        type="button" 
+                {/* ELIMINA */}
+                <div className="col-span-1 md:col-span-1 flex justify-end">
+                    <Button 
+                        danger 
+                        type="text" 
+                        icon={<Trash2 size={18} />} 
                         onClick={() => remove(name)} 
-                        className="w-full h-10 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all border border-red-500/20"
-                    >
-                        <Trash2 size={16} />
-                    </button>
+                        className="hover:bg-red-500/10 h-10 w-10 flex items-center justify-center rounded-xl"
+                    />
                 </div>
             </div>
+            {/* Campo nascosto per mantenere il riferimento alla settimana nel payload */}
+            <Form.Item {...restField} name={[name, 'week_number']} noStyle>
+                <input type="hidden" />
+            </Form.Item>
         </div>
     );
 }

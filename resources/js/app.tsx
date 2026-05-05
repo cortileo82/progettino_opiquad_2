@@ -20,9 +20,7 @@ function AntdThemeProvider({ children }: { children: React.ReactNode }) {
     return (
         <ConfigProvider
             theme={{
-                // Si dice ad Antd di seguire il tema globale
-                algorithm: resolvedAppearance === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
-                token: {
+               token: {
                     // Si mantiene una coerenza visiva base con il design system
                     borderRadius: 12,
                     colorPrimary: resolvedAppearance === 'dark' ? '#ffffff' : '#09090b',

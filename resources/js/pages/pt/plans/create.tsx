@@ -5,26 +5,19 @@ import { ChevronLeft, Plus, Edit3 } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 import { CreateEditSchede } from '@/components/custom/createdit-schede';
 
-interface Props {
-    client: any;
-    exercises_list: any[];
-    plan?: any; // Se presente, si è in modalità Edit
-}
-
-export default function CreatePlan({ client, exercises_list, plan }: Props) {
+export default function CreatePlan({ client, exercises_list, plan }: any) {
     const isEditing = !!plan;
     const [processing, setProcessing] = useState(false);
 
-    // Mappatura dati iniziali (Create o Edit)
     const initialValues = {
         name: isEditing ? plan.name : '',
         num_weeks: isEditing ? plan.num_weeks : 1,
         exercises: isEditing && plan.exercises ? plan.exercises.map((ex: any) => ({
-            exercise_id: ex.id || ex.exercise_id,
+            exercise_id: ex.id,
             week_number: ex.pivot?.week_number || 1,
             day_of_week: ex.pivot?.day_of_week || 'Lunedì',
-            sets: ex.pivot?.sets ?? 0,
-            reps: ex.pivot?.reps ?? 0,
+            sets: ex.pivot?.sets ?? 3,
+            reps: ex.pivot?.reps ?? 10,
             weight_kg: ex.pivot?.weight_kg ?? 0,
             rest_time: ex.pivot?.rest_time ?? 60,
         })) : []
@@ -33,50 +26,41 @@ export default function CreatePlan({ client, exercises_list, plan }: Props) {
     const handleSubmit = (values: any) => {
         const payload = { 
             ...values, 
-            user_id: client.id 
+            user_id: client.id,
+            exercises: values.exercises.map((ex: any) => ({
+                ...ex,
+                exercise_id: Number(ex.exercise_id),
+                week_number: Number(ex.week_number),
+                day_of_week: String(ex.day_of_week)
+            }))
         };
 
-        const visitOptions = {
-            preserveScroll: true,
-            onStart: () => setProcessing(true),
-            onFinish: () => setProcessing(false),
-            onError: (errors: any) => console.error("Errore Validazione:", errors)
-        };
-
-        if (isEditing) {
-            router.put(`/pt/plans/${plan.id}`, payload, visitOptions);
-        } else {
-            router.post('/pt/plans/store', payload, visitOptions);
-        }
+        router[isEditing ? 'put' : 'post'](
+            isEditing ? `/pt/plans/${plan.id}` : '/pt/plans/store', 
+            payload, 
+            {
+                onStart: () => setProcessing(true),
+                onFinish: () => setProcessing(false),
+            }
+        );
     };
 
-    const breadcrumbs = [
-        { title: 'I Miei Atleti', href: '/pt/clients/manage-clients' },
-        { title: `Schede di ${client.name}`, href: `/pt/clients/${client.id}/plans` },
-        { title: isEditing ? 'Modifica Scheda' : 'Nuova Scheda', href: '#' }
-    ];
-
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isEditing ? `Modifica: ${plan.name}` : `Nuova Scheda: ${client.name}`} />
-            
-            <div className="flex h-full flex-col gap-8 p-6 md:p-10">
+        <AppLayout breadcrumbs={[{ title: 'Atleti', href: '/pt/clients/manage-clients' }, { title: 'Nuova Scheda', href: '#' }]}>
+            <Head title={isEditing ? 'Modifica Scheda' : 'Nuova Scheda'} />
+            <div className="p-6 md:p-10">
                 <HeaderNew 
-                    title={isEditing ? 'Modifica Scheda' : 'Crea Nuova Scheda'} 
-                    subtitle={isEditing 
-                        ? `Stai modificando l'allenamento per: ${client.name.toUpperCase()}` 
-                        : `Stai creando un allenamento per: ${client.name.toUpperCase()}`
-                    } 
+                    title={isEditing ? 'Modifica Scheda' : 'Nuova Scheda'} 
+                    subtitle={`${client.name.toUpperCase()}`} 
                     icon={isEditing ? Edit3 : Plus} 
-                    buttonText="Annulla" 
+                    buttonText="Indietro" 
                     buttonHref={`/pt/clients/${client.id}/plans`} 
                     buttonIcon={<ChevronLeft size={18} />} 
                 />
-                
                 <CreateEditSchede 
                     initialValues={initialValues} 
                     exercises_list={exercises_list} 
-                    submitText={isEditing ? "Aggiorna Scheda" : "Salva e Attiva Scheda"} 
+                    submitText={isEditing ? "Aggiorna" : "Salva"} 
                     loading={processing} 
                     onSubmit={handleSubmit} 
                 />

@@ -1,128 +1,78 @@
-import React, { useMemo } from 'react';
-import { Form } from 'antd'; 
-import { WeekBlock } from '@/components/custom/week-block';
-import { FormCard } from '@/components/custom/form-card';
-import { InputGroup } from '@/components/custom/input-group';
+import React, { useEffect, useMemo } from 'react';
+import { Form, Input, InputNumber, Card } from 'antd';
+import { Save } from 'lucide-react';
 import { FormButton } from '@/components/custom/form-button';
-import { Input } from 'antd';
+import { WeekBlock } from './week-block';
 
-interface Props {
-    initialValues: any;
-    exercises_list: any[];
-    onSubmit: (values: any) => void;
-    loading: boolean;
-    submitText: string;
-}
-
-export function CreateEditSchede({ initialValues, exercises_list, onSubmit, loading, submitText }: Props) {
+export function CreateEditSchede({ initialValues, exercises_list, onSubmit, loading, submitText }: any) {
     const [form] = Form.useForm();
-    
-    const numWeeks = Form.useWatch('num_weeks', form) || initialValues.num_weeks || 1;
-    const exercisesWatch = Form.useWatch('exercises', form) || [];
+    const watchedWeeks = Form.useWatch('num_weeks', form);
 
-    const weekOptions = Array.from({ length: Math.max(1, numWeeks) }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }));
-    const dayOptions = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'].map(d => ({ label: d.toUpperCase(), value: d }));
-    const exerciseOptions = exercises_list.map(ex => ({ label: ex.name.toUpperCase(), value: ex.id }));
-    const transformNumber = (v: any) => (v === '' || v === null || v === undefined) ? undefined : Number(v);
+    useEffect(() => {
+        if (initialValues) form.setFieldsValue(initialValues);
+    }, [initialValues, form]);
 
-    const activeWeeksToRender = useMemo(() => {
-        const requiredWeeks = Array.from({ length: Math.max(1, numWeeks) }, (_, i) => i + 1);
-        const usedWeeks = exercisesWatch.map((ex: any) => ex?.week_number).filter((w: any) => typeof w === 'number');
-        return Array.from(new Set([...requiredWeeks, ...usedWeeks])).sort((a, b) => a - b);
-    }, [numWeeks, exercisesWatch]);
+    const totalWeeks = useMemo(() => Number(watchedWeeks) || 1, [watchedWeeks]);
+    const weeksArray = Array.from({ length: totalWeeks }, (_, i) => i + 1);
 
     return (
-            <Form form={form} onFinish={onSubmit} layout="vertical" autoComplete="off" initialValues={initialValues}>
-                <FormCard className="mb-8">
-                    <Form.Item name="name" rules={[{ required: true, message: 'Obbligatorio' }]} className="mb-0">
-                        <InputGroup label="Nome Programma">
-                            <Input type='text'/>
-                        </InputGroup>
-                    </Form.Item>
-                    <Form.Item name="num_weeks" validateFirst rules={[{ required: true, message: 'Obbligatorio' }, { type: 'number', transform: transformNumber, min: 1, message: 'Minimo 1' }]} className="mb-0">
-                        <InputGroup label="Settimane Totali" >
-                            <Input type='number' min={1} placeholder="ES. 4"/>
-                        </InputGroup>
-                    </Form.Item>
-                </FormCard>
+        <div className="w-full max-w-5xl mx-auto">
+            <Form form={form} onFinish={onSubmit} layout="vertical" autoComplete="off">
+                {/* CONFIGURAZIONE SCHEDA */}
+                <Card className="mb-10 rounded-3xl shadow-sm border-sidebar-border bg-card/50">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                            <Form.Item 
+                                label={<span className="font-black uppercase italic text-[10px] opacity-60">Nome Scheda</span>} 
+                                name="name" 
+                                rules={[{ required: true, message: 'Inserisci un nome' }]}
+                            >
+                                <Input size="large" placeholder="ES: TOTAL BODY FORZA" className="h-12 font-bold uppercase italic" />
+                            </Form.Item>
+                        </div>
+                        <div>
+                            <Form.Item 
+                                label={<span className="font-black uppercase italic text-[10px] opacity-60">Durata (Settimane)</span>} 
+                                name="num_weeks" 
+                                rules={[{ required: true }]}
+                            >
+                                <InputNumber min={1} max={12} size="large" className="w-full h-12 font-bold" />
+                            </Form.Item>
+                        </div>
+                    </div>
+                </Card>
 
-                <div className="space-y-6">
-                    <Form.List name="exercises">
-                        {(fields, { add, remove }) => (
-                            <div className="flex flex-col gap-6">
-                                {activeWeeksToRender.map(weekNum => {
-                                    // Filtra dinamicamente i fields che appartengono a questo blocco settimana
-                                    const weekFields = fields.filter(field => {
-                                        const ex = exercisesWatch[field.name];
-                                        return (ex?.week_number || 1) === weekNum;
-                                    });
+                {/* LISTA ESERCIZI RAGGRUPPATI PER SETTIMANA */}
+                <Form.List name="exercises">
+                    {(fields, { add, remove }) => (
+                        <div className="space-y-6">
+                            {weeksArray.map((wNum) => {
+                                // Filtriamo visivamente i campi per questa settimana
+                                const weekFields = fields.filter(field => {
+                                    const val = form.getFieldValue(['exercises', field.name]);
+                                    return val?.week_number === wNum;
+                                });
 
-                                    return (
-                                        <WeekBlock 
-                                            key={weekNum}
-                                            weekNum={weekNum}
-                                            weekFields={weekFields}
-                                            add={add}
-                                            remove={remove}
-                                            weekOptions={weekOptions}
-                                            dayOptions={dayOptions}
-                                            exercisesList={exercises_list} 
-                                            transformNumber={transformNumber}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </Form.List>
-                </div>
+                                return (
+                                    <WeekBlock
+                                        key={wNum}
+                                        weekNum={wNum}
+                                        weekFields={weekFields}
+                                        remove={remove}
+                                        add={add}
+                                        exercisesList={exercises_list}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
+                </Form.List>
 
-                <div className="mt-8">
-                    <FormButton label={submitText} processing={loading} />
+                {/* BOTTONE SALVATAGGIO */}
+                <div className="mt-12 mb-20 flex justify-end">
+                    <FormButton processing={loading} label={submitText} icon={Save} />
                 </div>
             </Form>
-        
-        <Form form={form} onFinish={onSubmit} layout="vertical" autoComplete="off" initialValues={initialValues}> 
-            <FormCard className="mb-8"> 
-                <Form.Item name="name" rules={[{ required: true, message: 'Obbligatorio' }]} className="mb-0"> 
-                    <InputGroup label="Nome Programma" /> 
-                </Form.Item> 
-                <Form.Item name="num_weeks" validateFirst rules={[{ required: true, message: 'Obbligatorio' }, { type: 'number', transform: transformNumber, min: 1, message: 'Minimo 1' }]} className="mb-0"> 
-                    <InputGroup label="Settimane Totali" type="number" min={1} placeholder="ES. 4" /> 
-                </Form.Item> 
-            </FormCard> 
-            
-            <div className="space-y-6"> 
-                <Form.List name="exercises">
-                    {(fields, { add, remove }) => ( 
-                        <div className="flex flex-col gap-6"> 
-                            {activeWeeksToRender.map(weekNum => { 
-                                const weekFields = fields.filter(field => { 
-                                    const ex = exercisesWatch[field.name]; 
-                                    return (ex?.week_number || 1) === weekNum; 
-                                }); 
-                                
-                                return ( 
-                                    <WeekBlock 
-                                        key={weekNum} 
-                                        weekNum={weekNum} 
-                                        weekFields={weekFields} 
-                                        add={add} 
-                                        remove={remove} 
-                                        weekOptions={weekOptions} 
-                                        dayOptions={dayOptions} 
-                                        exercisesList={exercises_list} 
-                                        transformNumber={transformNumber} 
-                                    /> 
-                                ); 
-                            })} 
-                        </div> 
-                    )}
-                </Form.List> 
-            </div> 
-            
-            <div className="mt-8"> 
-                <FormButton label={submitText} processing={loading} /> 
-            </div> 
-        </Form> 
+        </div>
     );
 }
