@@ -11,20 +11,26 @@ class Plan extends Model
 {
     use HasFactory;
 
-    protected $appends = ['end_date']; 
+    protected $appends = ['end_date'];
+    
+    protected $fillable = [
+        'name',
+        'num_weeks',
+        'user_id',
+        'pt_id',
+        'is_active',
+        'is_paid',
+        'stripe_payment_intent',
+    ];
 
-    protected $fillable = ['name', 'num_weeks', 'user_id', 'pt_id', 'is_active'];
-
-    // Si castano i booleani per sicurezza, 
-    // così Laravel converte in automatico gli 1/0 di MySQL in veri true/false per React
     protected $casts = [
         'is_active' => 'boolean',
+        'is_paid' => 'boolean',
     ];
 
     public function getEndDateAttribute(): string
     {
         if (!$this->created_at) return 'N/A';
-        // copy() è fondamentale per non alterare la data di creazione originale
         return $this->created_at->copy()->addWeeks($this->num_weeks)->format('d/m/Y');
     }
 
@@ -46,7 +52,7 @@ class Plan extends Model
     public function exercises(): BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'plan_exercises')
-            ->withPivot(['day_of_week', 'week_number', 'sets', 'reps', 'rest_time', 'weight_kg'])
-            ->withTimestamps();
+                    ->withPivot(['day_of_week', 'week_number', 'sets', 'reps', 'rest_time', 'weight_kg'])
+                    ->withTimestamps();
     }
 }
