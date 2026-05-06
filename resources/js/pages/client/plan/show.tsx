@@ -72,7 +72,7 @@ export default function MyPlan({ plan }: Props) {
                                 
                                 <div className="w-full max-w-xs mx-auto">
                                     <Link 
-                                        href="/client/pricing"
+                                        href="/client/payment/pricing"
                                         className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-lg shadow-lg shadow-yellow-500/40 text-center transition-all hover:scale-105 active:scale-95"
                                     >
                                         Passa a PRO ora

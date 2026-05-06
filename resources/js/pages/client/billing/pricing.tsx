@@ -11,8 +11,7 @@ export default function Pricing({ auth }: any) {
 
     const handleUpgrade = (e: React.FormEvent) => {
         e.preventDefault();
-        // Puntiamo alla rotta che il tuo socio creerà nel controller
-        post('/client/checkout/subscription');
+        post('/client/billing/checkout/subscription');
     };
 
     return (
@@ -104,7 +103,7 @@ export default function Pricing({ auth }: any) {
                                                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic shadow-md py-8 text-lg transition-all hover:scale-[1.01] active:scale-95"
                                             />
                                             <p className="mt-4 text-[10px] text-center text-zinc-400 uppercase font-bold tracking-tighter">
-                                                Pagamento sicuro con Stripe
+                                                Pagamento sicuro
                                             </p>
                                         </div>
                                     </div>

@@ -25,6 +25,8 @@ use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
 use App\Http\Controllers\Client\PlanHistoryController;
 
+use App\Http\Controllers\Billing\CheckoutController;
+
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
@@ -84,15 +86,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ==========================================
     // AREA CLIENT
     // ==========================================
-    Route::prefix('client')->name('client.')->group(function () {
-        Route::get('/dashboard', ClientDashboard::class)->name('dashboard');
-        Route::get('/my-plan', [ClientPlanController::class, 'current'])->name('plan.current');
-        Route::get('/history', [ClientPlanController::class, 'history'])->name('history');
-        Route::get('/plans/{plan}', [ClientPlanController::class, 'show'])->name('plans.show');
-        
-        Route::get('/pricing', function () {
-        return Inertia::render('client/pricing');
-    })->name('subscription.index');
+    Route::prefix('client')->name('client.')->group(function () { 
+        Route::get('/dashboard', ClientDashboard::class)->name('dashboard'); 
+        Route::get('/my-plan', [ClientPlanController::class, 'current'])->name('plan.current'); 
+        Route::get('/history', [ClientPlanController::class, 'history'])->name('history'); 
+        Route::get('/plans/{plan}', [ClientPlanController::class, 'show'])->name('plans.show'); 
+
+        Route::prefix('billing')->name('billing.')->group(function () { 
+            
+            // --- Pagine Frontend (GET) ---
+            Route::get('/pricing', function () { 
+                return Inertia::render('client/billing/pricing'); 
+            })->name('pricing'); 
+            
+            Route::get('/success', function () { 
+                return Inertia::render('client/billing/success'); 
+            })->name('success'); 
+            
+            Route::get('/cancel', function () { 
+                return Inertia::render('client/billing/cancel'); 
+            })->name('cancel'); 
+
+            // --- Azioni di Pagamento (POST) ---
+            Route::post('/checkout/subscription', [CheckoutController::class, 'createSubscription'])->name('checkout.subscription');
+            Route::post('/checkout/plan', [CheckoutController::class, 'createOneOffPayment'])->name('checkout.plan');
+        }); 
     });
 });
 

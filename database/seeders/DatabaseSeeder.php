@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
         $client1 = User::firstOrCreate(
             ['email' => 'luca@tempra.com'],
             [
-                'name' => 'Cliente Luca (Basic)', 
+                'name' => 'Cliente Luca', 
                 'password' => $defaultPassword, 
                 'trainer_id' => $pt1->id,
                 'is_premium' => false 
@@ -98,7 +98,7 @@ class DatabaseSeeder extends Seeder
         $client2 = User::firstOrCreate(
             ['email' => 'sara@tempra.com'],
             [
-                'name' => 'Cliente Sara (PRO)', 
+                'name' => 'Cliente Sara', 
                 'password' => $defaultPassword, 
                 'trainer_id' => $pt2->id,
                 'is_premium' => true, 
@@ -159,7 +159,7 @@ class DatabaseSeeder extends Seeder
 
         // 2. NUOVA Scheda per Cliente 1 (Da Pagare -> Mostrerà il Paywall a Luca)
         $planLocked = Plan::firstOrCreate(
-            ['name' => 'Scheda Massa B (Nuova)', 'user_id' => $client1->id],
+            ['name' => 'Scheda Massa B', 'user_id' => $client1->id],
             ['pt_id' => $client1->trainer_id, 'num_weeks' => 4, 'is_active' => true, 'is_paid' => false]
         );
         

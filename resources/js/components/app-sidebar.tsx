@@ -94,10 +94,10 @@ const allNavItems: SidebarItem[] = [
             'plans:create'
         ],
     },
-    // --- NUOVA VOCE: ABBONAMENTO PRO ---
+    
     {
         title: 'Abbonamento PRO',
-        href: '/client/pricing',
+        href: '/client/billing/pricing',
         icon: Crown,
         permissions: ['plans:read:own'], // Visibile a chi ha permessi da cliente
         excludedPermissions: [
