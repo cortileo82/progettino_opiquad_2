@@ -73,7 +73,7 @@ class WebhookController extends Controller
         }
     }
 
-    private function handelOneOffPayment($request) {
+    private function handleOneOffPayment($request) {
         // Si recupera l'ID della scheda da comprare dai metadati che si erano "nascosti" 
         // nell'oggetto "Sessione" in CheckoutController
         $planId = $session->metadata->plan_id ?? null;
