@@ -11,11 +11,7 @@ export default function Pricing() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Il tuo Piano" />
             <div className="p-4 md:p-10 max-w-5xl mx-auto w-full space-y-12">
-                
-                {/* 
-                  HeaderNew dovrebbe già essere responsive se l'avete refattorizzato, 
-                  ma se serve, assicuratevi che i testi interni abbiano i dark:text-white 
-                */}
+             
                 <HeaderNew 
                     title="Piani di Allenamento" 
                     subtitle="Scegli il livello di supporto più adatto ai tuoi obiettivi." 
@@ -75,7 +71,7 @@ export default function Pricing() {
                         </div>
                         <div className="mt-12">
                             <div className="mb-6">
-                                <span className="text-4xl font-black italic text-white">29.90€</span>
+                                <span className="text-4xl font-black italic text-white">49.90€</span>
                                 <span className="text-zinc-500 font-bold ml-2 uppercase text-[10px] tracking-widest">/ Mese</span>
                             </div>
                             <Link href="/client/checkout/premium" className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-xl text-center transition-all shadow-lg shadow-yellow-500/30 active:scale-95">
