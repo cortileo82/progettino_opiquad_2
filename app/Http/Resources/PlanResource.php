@@ -25,11 +25,16 @@ class PlanResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            // Indica se la singola scheda è stata pagata
+            'is_paid' => (bool) $this->is_paid, 
+            // Indica se la scheda è quella attualmente in uso
+            'is_active' => (bool) $this->is_active,
             'trainer' => $trainerName,
             'created_at' => $this->created_at,
-            'start_date' => $this->created_at ? Carbon::parse($this->created_at)->format('d/m/Y') : null,
+            'start_date' => $this->created_at ? $this->created_at->format('d/m/Y') : null,
             'total_weeks' => $this->num_weeks,
             'num_weeks' => $this->num_weeks,
+            'current_week' => $this->current_week ?? 1, 
             'weeks' => $structuredWeeks,
         ];
     }
