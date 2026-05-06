@@ -11,6 +11,11 @@ export default function Pricing() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Il tuo Piano" />
             <div className="p-4 md:p-10 max-w-5xl mx-auto w-full space-y-12">
+                
+                {/* 
+                  HeaderNew dovrebbe già essere responsive se l'avete refattorizzato, 
+                  ma se serve, assicuratevi che i testi interni abbiano i dark:text-white 
+                */}
                 <HeaderNew 
                     title="Piani di Allenamento" 
                     subtitle="Scegli il livello di supporto più adatto ai tuoi obiettivi." 
