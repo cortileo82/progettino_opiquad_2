@@ -1,118 +1,133 @@
 import React from 'react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react';
+import { Check, Crown, Dumbbell, Zap } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
-import { FormCard } from '@/components/custom/form-card';
-import { FormButton } from '@/components/custom/form-button';
-import { Crown, CheckCircle2, Zap, ArrowLeft, ShieldCheck } from 'lucide-react';
 
-export default function Pricing({ auth }: any) {
-    const { post, processing } = useForm();
+interface Props {
+    activePlanName?: string;
+    singlePlanPrice?: string;
+}
 
-    const handleUpgrade = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Puntiamo alla rotta che il tuo socio creerà nel controller
-        post('/client/checkout/subscription');
-    };
+export default function Pricing({ activePlanName = "Tua Scheda Attiva", singlePlanPrice = "14.99€" }: Props) {
+    const { auth } = usePage().props as any;
+    const breadcrumbs = [{ title: 'Pricing', href: '/client/pricing' }];
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Abbonamento', href: '#' }]}>
-            <Head title="Passa a PRO" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Sblocca il tuo potenziale" />
 
-            <div className="w-full p-6 md:p-10">
+            <div className="p-4 md:p-10 max-w-5xl mx-auto w-full space-y-12">
+                
                 <HeaderNew 
-                    title="Diventa un Atleta PRO" 
-                    subtitle="Sblocca tutto il potenziale del tuo allenamento senza limiti." 
-                    icon={Crown} 
-                    buttonText="Indietro" 
-                    buttonHref="/dashboard" 
-                    buttonIcon={<ArrowLeft size={16} />} 
+                    title="Scegli come allenarti" 
+                    subtitle="Sblocca la tua scheda singola o accedi a tutti i contenuti con il piano PRO." 
+                    icon={Zap} 
                 />
 
-                <div className="mt-10 max-w-4xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 items-stretch">
-    
-                        {/* CARD PIANO BASIC */}
-                        <div className="flex">
-                            <FormCard className="bg-zinc-100/80 border-zinc-200 shadow-sm w-full flex flex-col"> 
-                                <div className="p-8 flex flex-col h-full justify-between">
-                                    <div>
-                                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 text-center">Base</h3>
-                                        <div className="mt-6 text-5xl font-black italic text-zinc-900 text-center">
-                                            €0 <span className="text-sm font-medium text-zinc-500 not-italic uppercase">/mese</span>
-                                        </div>
-                                        
-                                        <div className="h-px bg-zinc-200 my-8 w-full" />
-                                        
-                                        <ul className="space-y-6">
-                                            <li className="flex items-center gap-4 text-base font-medium text-zinc-700">
-                                                <CheckCircle2 size={20} className="text-zinc-400 shrink-0" /> 
-                                                <span>Profilo Personale</span>
-                                            </li>
-                                            <li className="flex items-center gap-4 text-base font-medium text-zinc-700">
-                                                <CheckCircle2 size={20} className="text-zinc-400 shrink-0" /> 
-                                                <span>Visualizzazione Trainer</span>
-                                            </li>
-                                            <li className="flex items-center gap-4 text-base font-medium text-zinc-400 italic line-through">
-                                                <CheckCircle2 size={20} className="opacity-20 shrink-0" /> 
-                                                <span>Accesso Sala Pesi</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    {/* Spazio vuoto o bottone disabilitato per mantenere l'altezza */}
-                                    <div className="mt-12 text-center text-zinc-400 text-xs font-bold uppercase tracking-widest">
-                                        Piano Attuale
-                                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
+                    
+                    {/* OPZIONE 1: ACQUISTO SINGOLO */}
+                    <div className="bg-white border-2 border-zinc-100 rounded-3xl p-8 flex flex-col justify-between hover:border-zinc-200 transition-all shadow-sm">
+                        <div>
+                            <div className="h-12 w-12 bg-zinc-100 rounded-2xl flex items-center justify-center mb-6">
+                                <Dumbbell className="text-zinc-600" size={24} />
+                            </div>
+                            <h3 className="text-xl font-black uppercase italic tracking-tight text-zinc-900">
+                                Singola Scheda
+                            </h3>
+                            <p className="text-zinc-500 mt-2 font-medium">
+                                Sblocca l'accesso completo a <strong>{activePlanName}</strong>.
+                            </p>
+                            
+                            <div className="mt-8 space-y-4">
+                                <div className="flex items-center gap-3 text-sm font-medium text-zinc-600">
+                                    <Check size={18} className="text-green-500" />
+                                    <span>Accesso illimitato a questa scheda</span>
                                 </div>
-                            </FormCard>
+                                <div className="flex items-center gap-3 text-sm font-medium text-zinc-600">
+                                    <Check size={18} className="text-green-500" />
+                                    <span>Carichi e note del coach</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm font-medium text-zinc-400 opacity-60">
+                                    <Check size={18} />
+                                    <span className="line-through">Accesso alle schede future</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* CARD PIANO PRO */}
-                        <div className="flex relative">
-                            <form onSubmit={handleUpgrade} className="w-full flex">
-                                <FormCard className="border-yellow-500 bg-slate-50 shadow-xl shadow-yellow-500/10 w-full flex flex-col border-2">
-                                    <div className="p-8 flex flex-col h-full justify-between">
-                                        <div>
-                                            <div className="flex justify-center items-center gap-2 mb-2">
-                                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-yellow-600 text-center">Athlete PRO</h3>
-                                                <Zap size={14} className="text-yellow-500 fill-yellow-500" />
-                                            </div>
-                                            
-                                            <div className="mt-4 text-6xl font-black italic text-zinc-900 text-center">
-                                                €49 <span className="text-sm font-medium text-yellow-600 not-italic uppercase">/mese</span>
-                                            </div>
-
-                                            <div className="h-px bg-yellow-200 my-8 w-full" />
-
-                                            <ul className="space-y-6">
-                                                <li className="flex items-center gap-4 text-base font-extrabold italic text-zinc-800">
-                                                    <ShieldCheck size={22} className="text-yellow-600 shrink-0" /> 
-                                                    <span>Accesso illimitato in Palestra</span>
-                                                </li>
-                                                <li className="flex items-center gap-4 text-base font-extrabold italic text-zinc-800">
-                                                    <ShieldCheck size={22} className="text-yellow-600 shrink-0" /> 
-                                                    <span>Tutte le Schede PT sbloccate</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="mt-12 w-full">
-                                            <FormButton 
-                                                processing={processing} 
-                                                label="Attiva Abbonamento" 
-                                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic shadow-md py-8 text-lg transition-all hover:scale-[1.01] active:scale-95"
-                                            />
-                                            <p className="mt-4 text-[10px] text-center text-zinc-400 uppercase font-bold tracking-tighter">
-                                                Pagamento sicuro con Stripe
-                                            </p>
-                                        </div>
-                                    </div>
-                                </FormCard>
-                            </form>
+                        <div className="mt-12">
+                            <div className="mb-6">
+                                <span className="text-4xl font-black italic text-zinc-900">{singlePlanPrice}</span>
+                                <span className="text-zinc-400 font-bold ml-2 uppercase text-[10px] tracking-widest">Una Tantum</span>
+                            </div>
+                            {/* Percorso statico per evitare errore route() */}
+                            <Link 
+                                href="/client/checkout/single" 
+                                className="block w-full bg-zinc-900 hover:bg-zinc-800 text-white font-black uppercase italic py-5 rounded-xl text-center transition-all active:scale-95 shadow-lg shadow-zinc-200"
+                            >
+                                Sblocca questa scheda
+                            </Link>
                         </div>
                     </div>
+
+                    {/* OPZIONE 2: ABBONAMENTO PRO (HIGHLIGHTED) */}
+                    <div className="relative bg-zinc-900 border-2 border-yellow-500 rounded-3xl p-8 flex flex-col justify-between shadow-2xl shadow-yellow-500/20 transform md:scale-105">
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-black text-[10px] font-black uppercase italic px-4 py-1 rounded-full tracking-widest whitespace-nowrap shadow-md">
+                            Consigliato dal coach
+                        </div>
+
+                        <div>
+                            <div className="h-12 w-12 bg-yellow-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-500/40">
+                                <Crown className="text-black" size={24} />
+                            </div>
+                            <h3 className="text-xl font-black uppercase italic tracking-tight text-white">
+                                Abbonamento PRO
+                            </h3>
+                            <p className="text-zinc-400 mt-2 font-medium">
+                                Accesso totale a tutte le tue schede presenti e future.
+                            </p>
+                            
+                            <div className="mt-8 space-y-4">
+                                <div className="flex items-center gap-3 text-sm font-medium text-zinc-200">
+                                    <Check size={18} className="text-yellow-500" />
+                                    <span>Tutte le schede illimitate</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm font-medium text-zinc-200">
+                                    <Check size={18} className="text-yellow-500" />
+                                    <span>Storico allenamenti e progressi</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm font-medium text-zinc-200">
+                                    <Check size={18} className="text-yellow-500" />
+                                    <span>Note e correzioni del trainer</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-12">
+                            <div className="mb-6">
+                                <span className="text-4xl font-black italic text-white">49.99€</span>
+                                <span className="text-zinc-500 font-bold ml-2 uppercase text-[10px] tracking-widest">/ Mese</span>
+                            </div>
+                            {/* Percorso statico per evitare errore route() */}
+                            <Link 
+                                href="/client/checkout/premium" 
+                                className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-xl text-center transition-all shadow-lg shadow-yellow-500/30 active:scale-95"
+                            >
+                                Diventa un Atleta PRO
+                            </Link>
+                        </div>
+                    </div>
+
                 </div>
+
+                <div className="text-center space-y-2">
+                    <p className="text-zinc-400 text-[10px] font-black uppercase italic tracking-widest">
+                        Pagamento sicuro con stripe.
+                    </p>
+                </div>
+                
+                <div className="h-10" />
             </div>
         </AppLayout>
     );

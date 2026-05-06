@@ -8,12 +8,7 @@ import { Card } from '@/components/custom/cards';
 import { PlanViewer } from '@/components/custom/plan-viewer';
 
 interface Props {
-    auth: { 
-        user: { 
-            name: string;
-            is_premium: boolean;
-        } 
-    };
+    auth: { user: { name: string; is_premium: boolean } };
     assignedTrainer: string;
     activePlan: any; 
 }
@@ -21,16 +16,13 @@ interface Props {
 export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) {
     const breadcrumbs = [{ title: 'Dashboard', href: '/client/dashboard' }];
     
-    // Verifica se l'utente è premium
-    const isPremium = auth.user.is_premium;
+    // LOGICA DI ACCESSO: Premium globale oppure Scheda singola pagata
+    const hasAccess = auth.user.is_premium || (activePlan && activePlan.is_paid);
 
     const formattedWeeks = useMemo(() => {
         if (!activePlan || !activePlan.weekly_days) return {};
         const currentWeekNumber = activePlan.current_week || 1;
-        
-        return {
-            [currentWeekNumber.toString()]: activePlan.weekly_days
-        };
+        return { [currentWeekNumber.toString()]: activePlan.weekly_days };
     }, [activePlan]);
 
     return (
@@ -38,7 +30,6 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
             <Head title="Dashboard" />
 
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-10">
-                
                 <HeaderNew 
                     title={`Bentornato, ${auth.user.name}`} 
                     subtitle="Ecco la tua scheda di allenamento per la settimana corrente." 
@@ -62,32 +53,29 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
                             </div>
 
                             <div className="relative">
-                                
-                                {!isPremium && (
-                                    /* Overlay più trasparente per far intravedere il contenuto */
-                                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[2px] px-8 py-24 text-center">
-                                        <div className="bg-white/80 p-10 rounded-3xl shadow-2xl border border-white/50 backdrop-blur-md max-w-lg">
+                                {!hasAccess && (
+                                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/10 backdrop-blur-[1px] px-8 py-24 text-center">
+                                        <div className="bg-white/90 p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/60 backdrop-blur-xl max-w-lg">
                                             <h3 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tight">
-                                                Contenuto PRO
+                                                Piano Bloccato
                                             </h3>
-                                            <p className="text-zinc-600 mt-4 mb-10 font-medium italic">
-                                                Sblocca il dettaglio degli esercizi e i carichi personalizzati dal tuo coach.
+                                            <p className="text-zinc-500 mt-4 mb-10 font-medium italic leading-relaxed">
+                                                Questa scheda non è inclusa nel tuo piano attuale. Passa a PRO o acquista la singola scheda.
                                             </p>
                                             
                                             <div className="w-full max-w-xs mx-auto">
                                                 <Link 
                                                     href="/client/pricing"
-                                                    className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-lg shadow-lg shadow-yellow-500/30 text-center transition-all hover:scale-105 active:scale-95"
+                                                    className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-lg shadow-lg shadow-yellow-500/40 text-center transition-all hover:scale-105 active:scale-95"
                                                 >
-                                                    Passa a PRO
+                                                    Sblocca Ora
                                                 </Link>
                                             </div>
                                         </div>
                                     </div>
                                 )}
 
-                                {/* La scheda sottostante: blur regolato per far "intravedere" */}
-                                <div className={`dashboard-viewer-wrapper transition-all duration-700 ${!isPremium ? 'blur-[4px] grayscale opacity-50 pointer-events-none select-none' : ''}`}>
+                                <div className={`dashboard-viewer-wrapper transition-all duration-1000 ${!hasAccess ? 'blur-[4px] opacity-60 pointer-events-none select-none' : ''}`}>
                                     <style dangerouslySetInnerHTML={{ __html: `.dashboard-viewer-wrapper .flex-wrap.gap-2.p-2 { display: none !important; }`}} />
                                     <PlanViewer weeks={formattedWeeks} totalWeeks={activePlan.current_week}  />
                                 </div>
@@ -97,8 +85,7 @@ export default function Dashboard({ auth, assignedTrainer, activePlan }: Props) 
                 ) : (
                     <EmptyState message="Nessuna scheda attiva per questo periodo." icon={Dumbbell}/>
                 )}
-                
-                <div/>
+                <div className="h-20" />
             </div>
         </AppLayout>
     );
