@@ -35,6 +35,7 @@ class CheckoutController extends Controller
                 ]
             ],
             'customer_email' => $request->user()->email,
+            'client_reference_id' => $request->user()->id,
             'success_url' => route('client.billing.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('client.billing.cancel'),
         ]);
@@ -73,6 +74,7 @@ class CheckoutController extends Controller
                 'plan_id' => $plan->id,
             ],
             'customer_email' => $request->user()->email,
+            'client_reference_id' => $request->user()->id,
             'success_url' => route('client.billing.success'),
             'cancel_url' => route('client.billing.cancel'),
         ]);

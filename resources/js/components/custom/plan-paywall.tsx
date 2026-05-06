@@ -25,20 +25,20 @@ export function PlanPaywall({ isSticky = false }: PlanPaywallProps) {
                         <div>
                             <h4 className="font-black uppercase italic text-[10px] tracking-widest text-zinc-400 mb-1">Pass Singolo</h4>
                             <p className="font-bold text-zinc-900 mb-4">Questa Scheda</p>
-                            <div className="text-2xl font-black italic text-zinc-900 mb-6">14.99€</div>
+                            <div className="text-2xl font-black italic text-zinc-900 mb-6">15.99€</div>
                         </div>
-                        <Link href="/client/checkout/single" className="block w-full bg-white border border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white font-black uppercase italic py-3 rounded-xl text-center text-xs transition-all">
+                        <Link href="/client/billing/checkout/plan" className="block w-full bg-white border border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white font-black uppercase italic py-3 rounded-xl text-center text-xs transition-all">
                             Sblocca
                         </Link>
                     </div>
 
                     <div className="bg-zinc-900 rounded-3xl p-6 border border-yellow-500 shadow-xl shadow-yellow-500/10 flex flex-col justify-between">
                         <div>
-                            <h4 className="font-black uppercase italic text-[10px] tracking-widest text-yellow-500 mb-1">Full Access</h4>
+                            <h4 className="font-black uppercase italic text-[10px] tracking-widest text-yellow-500 mb-1">Accesso Completo</h4>
                             <p className="font-bold text-white mb-4">Tutto Illimitato</p>
-                            <div className="text-2xl font-black italic text-white mb-6">49.99€</div>
+                            <div className="text-2xl font-black italic text-white mb-6">39.99€</div>
                         </div>
-                        <Link href="/client/pricing" className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-3 rounded-xl text-center text-xs transition-all">
+                        <Link href="/client/billing/pricing" className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-3 rounded-xl text-center text-xs transition-all">
                             Diventa PRO
                         </Link>
                     </div>

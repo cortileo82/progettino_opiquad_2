@@ -5,7 +5,7 @@ import { Check, Crown, User, Zap } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 
 export default function Pricing() {
-    const breadcrumbs = [{ title: 'Abbonamento', href: '/client/pricing' }];
+    const breadcrumbs = [{ title: 'Abbonamento', href: '/client/billing/pricing' }];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -71,10 +71,16 @@ export default function Pricing() {
                         </div>
                         <div className="mt-12">
                             <div className="mb-6">
-                                <span className="text-4xl font-black italic text-white">49.90€</span>
+                                <span className="text-4xl font-black italic text-white">39.99€</span>
                                 <span className="text-zinc-500 font-bold ml-2 uppercase text-[10px] tracking-widest">/ Mese</span>
                             </div>
-                            <Link href="/client/checkout/premium" className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-xl text-center transition-all shadow-lg shadow-yellow-500/30 active:scale-95">
+                            <Link 
+                                href="/client/billing/checkout/subscription" 
+                                method="post"
+                                as="button"
+                                type="button"
+                                className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-xl text-center transition-all shadow-lg shadow-yellow-500/30 active:scale-95"
+                            >
                                 Attiva Premium
                             </Link>
                         </div>
