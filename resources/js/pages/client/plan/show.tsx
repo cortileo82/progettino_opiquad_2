@@ -32,7 +32,7 @@ export default function MyPlan({ plan }: Props) {
             <Head title={`Scheda: ${plan.name}`} />
             
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
-                <HeaderNew title={plan.name} subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} icon={ClipboardList} />
+                <HeaderNew title={plan.name} subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} icon={ClipboardList} isPremium={auth.user.is_premium}/>
 
                 <div className="grid grid-cols-1">
                     {!hasAccess ? (

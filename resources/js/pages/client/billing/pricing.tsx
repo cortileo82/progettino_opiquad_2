@@ -52,7 +52,7 @@ export default function Pricing() {
                     {/* PIANO PREMIUM */}
                     <div className="relative bg-zinc-900 border-2 border-yellow-500 rounded-3xl p-8 flex flex-col justify-between shadow-2xl shadow-yellow-500/20 transform md:scale-105">
                         <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-black text-[10px] font-black uppercase italic px-4 py-1 rounded-full tracking-widest shadow-md">
-                            Top Performance
+                            Consigliato
                         </div>
                         <div>
                             <div className="h-12 w-12 bg-yellow-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-500/40">

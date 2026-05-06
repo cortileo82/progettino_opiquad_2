@@ -25,7 +25,7 @@ export function PlanPaywall({ isSticky = false }: PlanPaywallProps) {
                         <div>
                             <h4 className="font-black uppercase italic text-[10px] tracking-widest text-zinc-400 mb-1">Pass Singolo</h4>
                             <p className="font-bold text-zinc-900 mb-4">Questa Scheda</p>
-                            <div className="text-2xl font-black italic text-zinc-900 mb-6">14.90€</div>
+                            <div className="text-2xl font-black italic text-zinc-900 mb-6">14.99€</div>
                         </div>
                         <Link href="/client/checkout/single" className="block w-full bg-white border border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white font-black uppercase italic py-3 rounded-xl text-center text-xs transition-all">
                             Sblocca
@@ -36,7 +36,7 @@ export function PlanPaywall({ isSticky = false }: PlanPaywallProps) {
                         <div>
                             <h4 className="font-black uppercase italic text-[10px] tracking-widest text-yellow-500 mb-1">Full Access</h4>
                             <p className="font-bold text-white mb-4">Tutto Illimitato</p>
-                            <div className="text-2xl font-black italic text-white mb-6">29.90€</div>
+                            <div className="text-2xl font-black italic text-white mb-6">49.99€</div>
                         </div>
                         <Link href="/client/pricing" className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-3 rounded-xl text-center text-xs transition-all">
                             Diventa PRO

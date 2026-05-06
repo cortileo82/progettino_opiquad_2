@@ -112,6 +112,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/checkout/plan', [CheckoutController::class, 'createOneOffPayment'])->name('checkout.plan');
         }); 
     });
+
+    //ROTTE DA ELIMINARE, SERVONO SOLO IN FASE DI TEST.
+    Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // --- ROTTE DI TEST PER UI (Da rimuovere in produzione) ---
+    Route::prefix('test-ui')->group(function () {
+        
+        // Pagina Success: http://localhost:8000/test-ui/success
+        Route::get('/success', function () {
+            return Inertia::render('client/billing/success');
+        });
+
+        // Pagina Cancel: http://localhost:8000/test-ui/cancel
+        Route::get('/cancel', function () {
+            return Inertia::render('client/billing/cancel');
+        });
+        
+    });
+
+});
+
+
 });
 
 require __DIR__.'/settings.php';

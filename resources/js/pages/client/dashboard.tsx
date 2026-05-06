@@ -31,7 +31,7 @@ export default function Dashboard({ assignedTrainer, activePlan }: Props) {
 
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-10">
                 
-                <HeaderNew title={`Ciao, ${auth.user.name}`} subtitle="Focus settimanale e riepilogo attività." icon={LayoutDashboard} />
+                <HeaderNew title={`Ciao, ${auth.user.name}`} subtitle="Focus settimanale e riepilogo attività." icon={LayoutDashboard} isPremium={auth.user.is_premium}/>
 
                 {activePlan ? (
                     <div className="space-y-10">
