@@ -7,11 +7,13 @@ import { HeaderNew } from '@/components/custom/header-new';
 export default function Pricing() {
     const breadcrumbs = [{ title: 'Abbonamento', href: '/client/billing/pricing' }];
 
+    {/* Viene visualizzata questa pagina solo se il cliente non è ancora premium. */}
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Il tuo Piano" />
             <div className="p-4 md:p-10 max-w-5xl mx-auto w-full space-y-12">
              
+                {/* Header con componente custom */}
                 <HeaderNew 
                     title="Piani di Allenamento" 
                     subtitle="Scegli il livello di supporto più adatto ai tuoi obiettivi." 

@@ -32,12 +32,14 @@ export default function MyPlan({ plan }: Props) {
             <Head title={`Scheda: ${plan.name}`} />
             
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
+                {/* Header con componente, isPremium visualizza l'icona solo se l'utente è premium */}
                 <HeaderNew title={plan.name} subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} icon={ClipboardList} isPremium={auth.user.is_premium}/>
 
                 <div className="grid grid-cols-1">
                     {!hasAccess ? (
                         <div className="relative min-h-[600px]">
                             <div className="z-30 relative w-full flex justify-center py-10">
+                                {/* Il Paywall visualizza gli esercizi solo se l'utente è premium o ha comprato la scheda */}
                                 <PlanPaywall isSticky={true} />
                             </div>
 
