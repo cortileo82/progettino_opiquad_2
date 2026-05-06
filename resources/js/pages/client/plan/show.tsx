@@ -1,25 +1,25 @@
 import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { HeaderNew } from '@/components/custom/header-new';
 import { PlanViewer } from '@/components/custom/plan-viewer';
+import { PlanPaywall } from '@/components/custom/plan-paywall';
 import { ClipboardList, Dumbbell } from 'lucide-react';
 
 interface Props {
-    plan: any | null; // Assumiamo che plan contenga is_paid
+    plan: any | null; 
 }
 
 export default function MyPlan({ plan }: Props) {
     const { auth } = usePage().props as any;
     const breadcrumbs = [{ title: 'La Mia Scheda', href: '/client/my-plan' }];
     
-    // ACCESSO: User Premium oppure Scheda specifica Pagata
-    const hasAccess = auth.user.is_premium || (plan && plan.is_paid);
+    const hasAccess = Boolean(auth.user.is_premium) || Boolean(plan?.is_paid);
 
     if (!plan) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
-                <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center uppercase italic font-black opacity-30 tracking-tighter">
+                <div className="flex flex-col items-center justify-center py-24 opacity-30 text-center font-black uppercase italic tracking-tighter">
                     <Dumbbell size={48} className="mb-4" />
                     <p>Nessun programma attivo trovato.</p>
                 </div>
@@ -31,40 +31,30 @@ export default function MyPlan({ plan }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Scheda: ${plan.name}`} />
             
-            <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8 min-h-screen">
-                <HeaderNew 
-                    title={plan.name}
-                    subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Data Inizio: ${plan.start_date}`}
-                    icon={ClipboardList}
-                />
+            <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
+                <HeaderNew title={plan.name} subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} icon={ClipboardList} />
 
-                <div className="relative">
-                    {!hasAccess && (
-                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-start pt-32 bg-white/5 backdrop-blur-[1px] px-8 text-center">
-                            <div className="bg-white/95 p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-white/60 backdrop-blur-xl max-w-lg sticky top-40">
-                                <h3 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tight">
-                                    Analisi PRO
-                                </h3>
-                                <p className="text-zinc-500 mt-4 mb-10 font-medium italic leading-relaxed">
-                                    Acquista questa scheda singolarmente o passa al piano PRO per sbloccare tutto il catalogo.
-                                </p>
-                                <div className="w-full max-w-xs mx-auto">
-                                    <Link 
-                                        href="/client/payment/pricing"
-                                        className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-lg shadow-lg shadow-yellow-500/40 text-center transition-all hover:scale-105 active:scale-95"
-                                    >
-                                        Sblocca Accesso
-                                    </Link>
-                                </div>
+                <div className="grid grid-cols-1">
+                    {!hasAccess ? (
+                        <div className="relative min-h-[600px]">
+                            <div className="z-30 relative w-full flex justify-center py-10">
+                                <PlanPaywall isSticky={true} />
+                            </div>
+
+                            <div className="absolute inset-0 w-full h-full blur-3xl opacity-20 pointer-events-none select-none overflow-hidden rounded-[40px]">
+                                <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
                             </div>
                         </div>
+                    ) : (
+                        /* Visualizzazione standard per utenti con accesso */
+                        <div className="w-full">
+                            <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
+                        </div>
                     )}
-
-                    <div className={`transition-all duration-1000 ${!hasAccess ? 'blur-[5px] opacity-50 pointer-events-none select-none' : ''}`}>
-                        <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
-                    </div>
                 </div>
-                <div className="h-20" />
+                
+                {/* Padding finale invece di altezza fissa per pulizia layout */}
+                <div className="pb-20" />
             </div>
         </AppLayout>
     );
