@@ -8,28 +8,27 @@ import { ResourceList } from '@/components/custom/resource-list';
 import Pagination from '@/components/custom/pagination';
 
 export default function Index({ pastPlans }: any) {
-    const plansList = pastPlans.data || pastPlans;
     const { auth } = usePage().props as any;
-
+    /* pastPlans ora contiene solo schede che l'utente ha il diritto di vedere (se pagate o utente premium) */
+    const plansList = pastPlans.data || pastPlans;
     return (
         <AppLayout breadcrumbs={[{ title: 'Storico Schede', href: '/client/history' }]}>
             <Head title="Storico Schede" />
             <div className="w-full p-6 md:p-10 max-w-7xl mx-auto">
-                <HeaderNew title="Storico Schede" subtitle="Archivio delle tue schede passate." icon={Archive} isPremium={auth.user.is_premium}/>
-                
+                {/* Header con componente custom */}
+                <HeaderNew title="Storico Schede" subtitle={auth.user.is_premium 
+                        ? "Archivio completo di tutti i tuoi allenamenti." 
+                        : "Archivio delle schede sbloccate."
+                    } icon={Archive} isPremium={auth.user.is_premium} />
                 <div className="mt-6 space-y-4">
                     {plansList.length > 0 ? (
-                        /* Si delega tutto alla ResourceList in modalità sola lettura */
-                        <ResourceList 
-                            items={plansList} 
-                            type="plans" 
-                            readOnly={true} 
-                        />
+                        /* Schede visualizzate in modalità lettura con componente custom */
+                        <ResourceList items={plansList} type="plans" readOnly={true} />
                     ) : (
-                        <EmptyState message="Nessuna scheda in archivio" icon={History} />
+                        /* EmptyState con componente custom */
+                        <EmptyState message="Nessuna scheda disponibile nello storico." icon={History} />
                     )}
                 </div>
-                
                 {pastPlans.links && <Pagination meta={pastPlans} />}
             </div>
         </AppLayout>

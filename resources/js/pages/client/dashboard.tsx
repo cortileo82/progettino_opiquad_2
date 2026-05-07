@@ -8,84 +8,61 @@ import { Card } from '@/components/custom/cards';
 import { PlanViewer } from '@/components/custom/plan-viewer';
 import { PlanPaywall } from '@/components/custom/plan-paywall';
 
-interface Props {
-    assignedTrainer: string;
-    activePlan: any; 
-}
-
-export default function Dashboard({ assignedTrainer, activePlan }: Props) {
+export default function Dashboard({ assignedTrainer, activePlan }: any) {
     const { auth } = usePage().props as any;
-    const breadcrumbs = [{ title: 'Dashboard', href: '/client/dashboard' }];
-    
-    // Verifica accesso: Utente PRO oppure scheda singola già pagata
-    const hasAccess = Boolean(auth.user.is_premium) || Boolean(activePlan?.is_paid);
+    const isPremium = Boolean(auth.user?.is_premium);
+    const hasAccess = isPremium || Boolean(activePlan?.is_paid);
 
     const formattedWeeks = useMemo(() => {
-        if (!activePlan || !activePlan.weekly_days) return {};
-        const currentWeekNumber = activePlan.current_week || 1;
-        return { [currentWeekNumber.toString()]: activePlan.weekly_days };
+        if (!activePlan?.weekly_days) return {};
+        return { [activePlan.current_week.toString()]: activePlan.weekly_days };
     }, [activePlan]);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={[{ title: 'Dashboard', href: '/client/dashboard' }]}>
             <Head title="Dashboard" />
 
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-10">
-                {/* Header */}
+                
+                {/* 1. HEADER: PULITO IN CIMA */}
                 <HeaderNew 
-                    title={`Ciao, ${auth.user.name}`} 
-                    subtitle="Focus settimanale e riepilogo attività." 
+                    title={`Ciao, ${auth.user?.name}`} 
+                    subtitle={activePlan ? "Il tuo focus settimanale." : "Scegli il tuo piano di allenamento."} 
                     icon={LayoutDashboard} 
-                    isPremium={auth.user.is_premium}
+                    isPremium={isPremium}
                 />
 
-                {activePlan ? (
-                    <div className="space-y-10">
-                        {/* Statistiche Rapide */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <Card label="Programma" value={activePlan.name} icon={Activity}/>
-                            <Card label="Personal Trainer" value={assignedTrainer || 'Staff'} icon={User}/>
-                            <Card label="Progresso" value={`Settimana ${activePlan.current_week} di ${activePlan.total_weeks}`} icon={Calendar}/>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 pl-4 border-b border-zinc-100 pb-4">
-                                <div className="h-2 w-2 rounded-full bg-primary" />
-                                <h3 className="font-black uppercase italic text-sm tracking-widest text-zinc-600">
-                                    Focus: Settimana {activePlan.current_week}
-                                </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1">
-                                {!hasAccess ? (
-                                    <div className="relative min-h-[400px]">
-                                        {/* PAYWALL: Passiamo l'ID del piano attivo */}
-                                        <div className="z-30 relative w-full flex justify-center py-4">
-                                            <PlanPaywall isSticky={false} planId={activePlan.id} />
-                                        </div>
-
-                                        {/* Sfondo sfocato del programma */}
-                                        <div className="absolute top-0 left-0 w-full h-full blur-2xl opacity-20 pointer-events-none select-none overflow-hidden rounded-[32px]">
-                                            <style dangerouslySetInnerHTML={{ __html: `.dashboard-viewer-wrapper .flex-wrap.gap-2.p-2 { display: none !important; }`}} />
-                                            <div className="dashboard-viewer-wrapper">
-                                                <PlanViewer weeks={formattedWeeks} totalWeeks={activePlan.current_week} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    /* Visualizzazione Completa per utenti con accesso */
-                                    <div className="dashboard-viewer-wrapper">
-                                        <style dangerouslySetInnerHTML={{ __html: `.dashboard-viewer-wrapper .flex-wrap.gap-2.p-2 { display: none !important; }`}} />
-                                        <PlanViewer weeks={formattedWeeks} totalWeeks={activePlan.current_week} />
-                                    </div>
-                                )}
+                <div className="w-full">
+                    {activePlan ? (
+                        /* CASO A: SCHEDA PRESENTE -> SOVRAPPOSIZIONE */
+                        <div className="relative min-h-[600px]">
+                            {!hasAccess && <PlanPaywall planId={activePlan.id} />}
+                            
+                            <div className={`space-y-10 transition-all ${!hasAccess ? 'blur-3xl opacity-20 pointer-events-none' : ''}`}>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <Card label="Programma" value={activePlan.name} icon={Activity}/>
+                                    <Card label="Trainer" value={assignedTrainer || 'Staff'} icon={User}/>
+                                    <Card label="Settimana" value={activePlan.current_week} icon={Calendar}/>
+                                </div>
+                                <PlanViewer weeks={formattedWeeks} totalWeeks={activePlan.current_week} />
                             </div>
                         </div>
-                    </div>
-                ) : (
-                    <EmptyState message="Nessuna scheda attiva." icon={Dumbbell}/>
-                )}
-
+                    ) : (
+                        /* CASO B: SCHEDA MANCANTE */
+                        <div className="w-full py-10">
+                            {!hasAccess ? (
+                                /* Se non ha accesso, mostriamo SOLO il Paywall pulito */
+                                <PlanPaywall />
+                            ) : (
+                                /* Se è già premium ma non ha ancora la scheda, mostriamo l'EmptyState */
+                                <EmptyState 
+                                    message="Il tuo PT sta preparando il programma. Riceverai una notifica a breve." 
+                                    icon={Dumbbell} 
+                                />
+                            )}
+                        </div>
+                    )}
+                </div>
                 <div className="pb-20" />
             </div>
         </AppLayout>

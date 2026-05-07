@@ -1,19 +1,26 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Check, Crown, User, Zap } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 
 export default function Pricing() {
+    const [loading, setLoading] = useState(false);
     const breadcrumbs = [{ title: 'Abbonamento', href: '/client/billing/pricing' }];
 
-    {/* Viene visualizzata questa pagina solo se il cliente non è ancora premium. */}
+    const handleSubscription = () => {
+        setLoading(true);
+        // Usiamo router.post invece di Link per gestire meglio lo stato loading
+        router.post('/client/billing/checkout/subscription', {}, {
+            onFinish: () => setLoading(false),
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Il tuo Piano" />
             <div className="p-4 md:p-10 max-w-5xl mx-auto w-full space-y-12">
              
-                {/* Header con componente custom */}
                 <HeaderNew 
                     title="Piani di Allenamento" 
                     subtitle="Scegli il livello di supporto più adatto ai tuoi obiettivi." 
@@ -21,7 +28,7 @@ export default function Pricing() {
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
-                    {/* PIANO BASE (GRATIS) */}
+                    {/* PIANO BASE */}
                     <div className="bg-white border-2 border-zinc-100 rounded-3xl p-8 flex flex-col justify-between shadow-sm opacity-80">
                         <div>
                             <div className="h-12 w-12 bg-zinc-100 rounded-2xl flex items-center justify-center mb-6">
@@ -32,7 +39,7 @@ export default function Pricing() {
                             <div className="mt-8 space-y-4">
                                 <div className="flex items-center gap-3 text-sm text-zinc-600 italic font-bold">
                                     <Check size={18} className="text-green-500" />
-                                    <span>Possibilità di acquistare singole schede</span>
+                                    <span>Acquisto singole schede</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-sm text-zinc-400 font-medium">
                                     <span className="w-[18px] h-[1px] bg-zinc-300" />
@@ -76,15 +83,13 @@ export default function Pricing() {
                                 <span className="text-4xl font-black italic text-white">39.99€</span>
                                 <span className="text-zinc-500 font-bold ml-2 uppercase text-[10px] tracking-widest">/ Mese</span>
                             </div>
-                            <Link 
-                                href="/client/billing/checkout/subscription" 
-                                method="post"
-                                as="button"
-                                type="button"
-                                className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-xl text-center transition-all shadow-lg shadow-yellow-500/30 active:scale-95"
+                            <button 
+                                onClick={handleSubscription}
+                                disabled={loading}
+                                className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black uppercase italic py-5 rounded-xl text-center transition-all shadow-lg shadow-yellow-500/30 active:scale-95 disabled:opacity-50"
                             >
-                                Attiva Premium
-                            </Link>
+                                {loading ? 'Elaborazione...' : 'Attiva Premium'}
+                            </button>
                         </div>
                     </div>
                 </div>
