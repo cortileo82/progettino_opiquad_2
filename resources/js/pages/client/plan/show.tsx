@@ -54,7 +54,7 @@ export default function MyPlan({ plan }: Props) {
                 {/* 1. HEADER: Sempre visibile e mai sfocato */}
                 <HeaderNew 
                     title={plan.name} 
-                    subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} 
+                    subtitle={`Allenatore: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} 
                     icon={ClipboardList} 
                     isPremium={auth.user.is_premium} 
                 />
