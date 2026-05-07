@@ -1,87 +1,96 @@
 import React from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { HeaderNew } from '@/components/custom/header-new';
 import { PlanViewer } from '@/components/custom/plan-viewer';
 import { PlanPaywall } from '@/components/custom/plan-paywall';
 import { ClipboardList, Dumbbell } from 'lucide-react';
 
-interface Props {
-    plan: any | null;
+interface Exercise {
+    id: number;
+    name: string;
+    description: string | null;
+    pivot: {
+        sets: string;
+        reps: string;
+        rest_time: string;
+        weight_kg: string;
+    };
 }
 
-export default function MyPlan({ plan }: Props) {
-    const { auth } = usePage().props as any;
+interface Props {
+    auth: any;
+    plan: {
+        id: number;
+        is_paid: boolean;
+        name: string;
+        trainer: string;
+        start_date: string;
+        total_weeks: number;
+        weeks: Record<string, Record<string, Exercise[]>>;
+    } | null;
+}
+
+export default function MyPlan({ auth, plan }: Props) {
     const breadcrumbs = [{ title: 'La Mia Scheda', href: '/client/my-plan' }];
     
-    // Controllo accesso: Premium o singola scheda pagata
-    const hasAccess = Boolean(auth.user.is_premium) || Boolean(plan?.is_paid);
-
-    if (!plan) {
-        return (
-            <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title="Nessun Piano" />
-                <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
-                    <HeaderNew 
-                        title="Nessun Piano" 
-                        subtitle="Non ci sono programmi attivi al momento." 
-                        icon={ClipboardList} 
-                        isPremium={auth.user.is_premium} 
-                    />
-                    
-                    {/* Se non c'è il piano e l'utente non è premium, mostriamo il paywall relativo */}
-                    {!auth.user.is_premium && (
-                        <div className="py-6">
-                            <PlanPaywall isSticky={false} />
-                        </div>
-                    )}
-
-                    <div className="flex flex-col items-center justify-center py-20 opacity-30 text-center font-black uppercase italic tracking-tighter">
-                        <Dumbbell size={48} className="mb-4" />
-                        <p>In attesa del caricamento da parte del coach.</p>
-                    </div>
-                </div>
-            </AppLayout>
-        );
-    }
+    // 1. Logica di accesso identica alla Dashboard
+    const isPremium = Boolean(auth?.user?.is_premium);
+    const isPaid = Boolean(plan?.is_paid);
+    const hasAccess = isPremium || isPaid;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Scheda: ${plan.name}`} />
+            <Head title={plan ? `Scheda: ${plan.name}` : "La Mia Scheda"} />
             
-            <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
+            <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8 min-h-screen">
                 
-                {/* 1. HEADER: Sempre visibile e mai sfocato */}
+                {/* 2. HEADER: Sempre visibile e mai sfocato (Come in Dashboard) */}
                 <HeaderNew 
-                    title={plan.name} 
-                    subtitle={`Allenatore: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} 
-                    icon={ClipboardList} 
-                    isPremium={auth.user.is_premium} 
+                    title={plan ? plan.name : "La Mia Scheda"}
+                    subtitle={plan 
+                        ? `Coach: ${plan.trainer.toUpperCase()} • Data Inizio: ${plan.start_date}`
+                        : "Programma di allenamento personalizzato"
+                    }
+                    icon={ClipboardList}
+                    isPremium={isPremium}
                 />
-                
-                {/* 2. AREA CONTENUTO: Gestione Paywall o Visualizzazione */}
-                <div className="grid grid-cols-1">
-                    {!hasAccess ? (
-                        /* CASO: Scheda presente ma NON pagata */
-                        <div className="relative min-h-[600px]">
-                            
-                            {/* Il Paywall si sovrappone grazie alla classe absolute gestita internamente */}
-                            <PlanPaywall isSticky={true} planId={plan.id} />
-                            
-                            {/* Sfondo sfocato per dare profondità senza mostrare i dati */}
-                            <div className="absolute inset-0 w-full h-full blur-3xl opacity-20 pointer-events-none select-none overflow-hidden rounded-[40px]">
-                                <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
+
+                {/* 3. AREA CONTENUTO: Struttura identica alla Dashboard */}
+                <div className="relative w-full">
+                    
+                    {/* PAYWALL: Si appoggia direttamente sulla sfocatura se non c'è accesso */}
+                    {!hasAccess && <PlanPaywall planId={plan?.id} isSticky={true} />}
+
+                    {/* CONTENUTO: Sfocatura leggera (6px) per schiarire l'effetto */}
+                    <div className={`transition-all duration-700 ${
+                        !hasAccess 
+                        ? 'blur-[6px] opacity-50 pointer-events-none select-none overflow-hidden rounded-[2.5rem]' 
+                        : ''
+                    }`}>
+                        
+                        {plan ? (
+                            /* Se la scheda c'è, carichiamo il viewer */
+                            <PlanViewer 
+                                weeks={plan.weeks} 
+                                totalWeeks={plan.total_weeks} 
+                            />
+                        ) : (
+                            /* Se la scheda NON c'è nel DB, carichiamo l'Empty State */
+                            <div className="flex flex-col items-center justify-center py-32 bg-sidebar/10 rounded-[2.5rem] border border-dashed border-sidebar-border text-center">
+                                <Dumbbell size={60} className="mb-6 opacity-20" />
+                                <h3 className="text-xl font-black uppercase italic tracking-tighter opacity-40">
+                                    Nessun programma attivo trovato
+                                </h3>
+                                <p className="text-xs uppercase font-bold opacity-30 mt-2">
+                                    Riceverai una notifica quando il coach caricherà il piano
+                                </p>
                             </div>
-                        </div>
-                    ) : (
-                        /* CASO: Accesso garantito */
-                        <div className="w-full animate-in fade-in duration-700">
-                            <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-                
-                <div className="pb-20" />
+
+                <div className="h-20" />
             </div>
         </AppLayout>
     );
