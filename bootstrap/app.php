@@ -15,7 +15,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        
+        // 1. Esenzione CSRF per il Webhook di Stripe
+        // Senza questo, Stripe riceverà sempre un errore 419
+        $middleware->validateCsrfTokens(except: [
+            'api/webhooks/stripe', 
+        ]);
+
+        $middleware->encryptCookies(except: [
+            'appearance', 
+            'sidebar_state'
+        ]);
 
         $middleware->web(append: [
             HandleAppearance::class,
