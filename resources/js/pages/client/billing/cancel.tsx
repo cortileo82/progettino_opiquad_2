@@ -4,6 +4,8 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { XCircle, RefreshCcw, LifeBuoy, ArrowLeft } from 'lucide-react';
 import { HeaderNew } from '@/components/custom/header-new';
 
+// Ciao
+
 export default function Cancel() {
     const { auth } = usePage().props as any;
     const breadcrumbs = [{ title: 'Pagamento Annullato', href: '/client/billing/cancel' }];
