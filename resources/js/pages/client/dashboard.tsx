@@ -17,6 +17,7 @@ export default function Dashboard({ assignedTrainer, activePlan }: Props) {
     const { auth } = usePage().props as any;
     const breadcrumbs = [{ title: 'Dashboard', href: '/client/dashboard' }];
     
+    // Verifica accesso: Utente PRO oppure scheda singola già pagata
     const hasAccess = Boolean(auth.user.is_premium) || Boolean(activePlan?.is_paid);
 
     const formattedWeeks = useMemo(() => {
@@ -30,11 +31,17 @@ export default function Dashboard({ assignedTrainer, activePlan }: Props) {
             <Head title="Dashboard" />
 
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-10">
-                {/* Header con componente, isPremium visualizza l'icona solo se l'utente è premium */}
-                <HeaderNew title={`Ciao, ${auth.user.name}`} subtitle="Focus settimanale e riepilogo attività." icon={LayoutDashboard} isPremium={auth.user.is_premium}/>
+                {/* Header */}
+                <HeaderNew 
+                    title={`Ciao, ${auth.user.name}`} 
+                    subtitle="Focus settimanale e riepilogo attività." 
+                    icon={LayoutDashboard} 
+                    isPremium={auth.user.is_premium}
+                />
 
                 {activePlan ? (
                     <div className="space-y-10">
+                        {/* Statistiche Rapide */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <Card label="Programma" value={activePlan.name} icon={Activity}/>
                             <Card label="Personal Trainer" value={assignedTrainer || 'Staff'} icon={User}/>
@@ -48,15 +55,16 @@ export default function Dashboard({ assignedTrainer, activePlan }: Props) {
                                     Focus: Settimana {activePlan.current_week}
                                 </h3>
                             </div>
+
                             <div className="grid grid-cols-1">
                                 {!hasAccess ? (
-                                    <div className="relative">
-                                        {/* Il Paywall visualizza gli esercizi se il cliente è primium o ha comprato la scheda. */}
+                                    <div className="relative min-h-[400px]">
+                                        {/* PAYWALL: Passiamo l'ID del piano attivo */}
                                         <div className="z-30 relative w-full flex justify-center py-4">
-                                            <PlanPaywall isSticky={false} />
+                                            <PlanPaywall isSticky={false} planId={activePlan.id} />
                                         </div>
 
-                                        {/* Il contenuto dietro è posizionato in modo da non influenzare lo scroll */}
+                                        {/* Sfondo sfocato del programma */}
                                         <div className="absolute top-0 left-0 w-full h-full blur-2xl opacity-20 pointer-events-none select-none overflow-hidden rounded-[32px]">
                                             <style dangerouslySetInnerHTML={{ __html: `.dashboard-viewer-wrapper .flex-wrap.gap-2.p-2 { display: none !important; }`}} />
                                             <div className="dashboard-viewer-wrapper">
@@ -65,7 +73,7 @@ export default function Dashboard({ assignedTrainer, activePlan }: Props) {
                                         </div>
                                     </div>
                                 ) : (
-                                    /* Se ha accesso, visualizzazione normale pulita */
+                                    /* Visualizzazione Completa per utenti con accesso */
                                     <div className="dashboard-viewer-wrapper">
                                         <style dangerouslySetInnerHTML={{ __html: `.dashboard-viewer-wrapper .flex-wrap.gap-2.p-2 { display: none !important; }`}} />
                                         <PlanViewer weeks={formattedWeeks} totalWeeks={activePlan.current_week} />

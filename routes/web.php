@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 
-// Controllers...
+// Controllers
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\Admin\MuscleGroupController;
@@ -20,10 +20,9 @@ use App\Http\Controllers\PT\ExerciseCatalogController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
 use App\Http\Controllers\Billing\CheckoutController;
-use App\Http\Controllers\Billing\WebhookController; // <--- AGGIUNTO
+use App\Http\Controllers\Billing\WebhookController;
 
 // --- ROTTA WEBHOOK (PUBBLICA) ---
-// Deve stare fuori dal middleware auth
 Route::post('/api/webhooks/stripe', [WebhookController::class, 'handle']);
 
 Route::inertia('/', 'welcome', [
