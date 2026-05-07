@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 
-// Controllers...
+// Controllers
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\Admin\MuscleGroupController;
