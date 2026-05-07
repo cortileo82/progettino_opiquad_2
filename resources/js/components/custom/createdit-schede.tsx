@@ -17,13 +17,13 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
 
     return (
         <div className="w-full max-w-5xl mx-auto">
-            <Form form={form} onFinish={onSubmit} layout="vertical" autoComplete="off">
+            <Form form={form} onFinish={onSubmit} layout="vertical" autoComplete="off" requiredMark={false}>
                 {/* CONFIGURAZIONE SCHEDA */}
                 <Card className="mb-10 rounded-3xl shadow-sm border-sidebar-border bg-card/50">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="md:col-span-2">
                             <Form.Item 
-                                label={<span className="font-black uppercase italic text-[10px] opacity-60">Nome Scheda</span>} 
+                                label={<span className="font-black uppercase italic text-[10px] opacity-60 dark:text-zinc-300">Nome Scheda</span>}
                                 name="name" 
                                 rules={[{ required: true, message: 'Inserisci un nome' }]}
                             >
@@ -32,7 +32,7 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
                         </div>
                         <div>
                             <Form.Item 
-                                label={<span className="font-black uppercase italic text-[10px] opacity-60">Durata (Settimane)</span>} 
+                                label={<span className="font-black uppercase italic text-[10px] opacity-60 dark:text-zinc-300">Durata (Settimane)</span>}
                                 name="num_weeks" 
                                 rules={[{ required: true }]}
                             >
@@ -47,7 +47,7 @@ export function CreateEditSchede({ initialValues, exercises_list, onSubmit, load
                     {(fields, { add, remove }) => (
                         <div className="space-y-6">
                             {weeksArray.map((wNum) => {
-                                // Filtriamo visivamente i campi per questa settimana
+                                // Si filtrano visivamente i campi per questa settimana
                                 const weekFields = fields.filter(field => {
                                     const val = form.getFieldValue(['exercises', field.name]);
                                     return val?.week_number === wNum;

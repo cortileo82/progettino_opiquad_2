@@ -34,7 +34,7 @@ export default function MyPlan({ plan }: Props) {
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
                 <HeaderNew 
                     title={plan.name} 
-                    subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} 
+                    subtitle={`Allenatore: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} 
                     icon={ClipboardList} 
                     isPremium={auth.user.is_premium} 
                 />

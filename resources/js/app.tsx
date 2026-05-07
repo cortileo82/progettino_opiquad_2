@@ -5,26 +5,27 @@ import { initializeTheme, useAppearance } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-
-// 1. Importa il ConfigProvider di Ant Design
-import { ConfigProvider } from 'antd';
-// Opzionale: importa la lingua italiana se ti serve tradurre i componenti AntD
-
+// Si importa 'theme' da antd per usare gli algoritmi nativi
+import { ConfigProvider, theme } from 'antd'; 
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-function AntdThemeProvider({ children }: { children: React.ReactNode }) {
-    // Si legge la preferenza risolta ('dark' o 'light')
+// Wrapper:
+// Si crea un componente wrapper perché l'hook `useAppearance` può essere usato solo dentro un componente React valido.
+function RootThemeProvider({ children }: { children: React.ReactNode }) {
     const { resolvedAppearance } = useAppearance();
+    const isDark = resolvedAppearance === 'dark';
 
     return (
-        <ConfigProvider
-            theme={{
-               token: {
-                    // Si mantiene una coerenza visiva base con il design system
-                    borderRadius: 12,
+        <ConfigProvider 
+            theme={{ 
+                // Questo comando istruisce l'intera libreria Ant Design 
+                // a invertire tutti i suoi colori (sfondi, testi, bordi) nativamente.
+                algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+                token: { 
+                    borderRadius: 12, 
                     colorPrimary: resolvedAppearance === 'dark' ? '#ffffff' : '#09090b',
-                }
+                } 
             }}
         >
             {children}
@@ -49,31 +50,14 @@ createInertiaApp({
     strictMode: true,
     withApp(app) {
         return (
-            /* 2. Avvolgi tutto con il ConfigProvider */
-           <ConfigProvider
-                theme={{
-                    // Configurazione 1: Token globali
-                    token: {
-                        borderRadius: 12,
-                        colorPrimary: '#0b0a09', // Zinc 950
-                        colorBgContainer: 'transparent',
-                        colorBorder: 'rgba(0, 0, 0, 0.2)',
-                    },
-                    // Configurazione 2: Personalizzazione specifica componenti
-                    components: {
-                        Button: {
-                            colorPrimary: '#09090b',      // Zinc 950
-                            colorPrimaryHover: '#18181b', // Zinc 900
-                            colorPrimaryActive: '#27272a', // Zinc 800
-                        },
-                    },
-                }}
-            >
-                <TooltipProvider delayDuration={0}>
+            <TooltipProvider delayDuration={0}>
+                {/* Iniezione della dipendenza globale */}
+                {/* Si utilizza il nostro Wrapper che reagisce dinamicamente al tema */}
+                <RootThemeProvider>
                     {app}
                     <Toaster />
-                </TooltipProvider>
-            </ConfigProvider>
+                </RootThemeProvider>
+            </TooltipProvider>
         );
     },
     progress: {

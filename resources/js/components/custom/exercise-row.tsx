@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Select, InputNumber, Button } from 'antd';
+import { ExercisePicker } from './exercise-picker';
 import { Trash2 } from 'lucide-react';
 
 const giorniSettimana = [
@@ -14,44 +15,26 @@ const giorniSettimana = [
 
 export function ExerciseRow({ field, remove, exercisesList }: any) {
     const { name, ...restField } = field;
-
+    
     return (
         <div className="bg-sidebar/30 border border-border/50 rounded-2xl p-4 mb-2 shadow-sm">
             <div className="grid grid-cols-12 gap-4 items-end">
                 
-                {/* GIORNO DELLA SETTIMANA */}
+                {/* GIORNO */}
                 <div className="col-span-4 md:col-span-2">
-                    <Form.Item
-                        {...restField}
-                        label={<span className="text-[10px] font-black uppercase italic opacity-50">Giorno</span>}
-                        name={[name, 'day_of_week']}
-                        rules={[{ required: true, message: '!' }]}
-                        className="mb-0"
-                    >
+                    <Form.Item {...restField} label={<span className="text-[10px] font-black uppercase italic opacity-50">Giorno</span>} name={[name, 'day_of_week']} rules={[{ required: true, message: '!' }]} className="mb-0">
                         <Select options={giorniSettimana} placeholder="Giorno" className="h-10 w-full" />
                     </Form.Item>
                 </div>
-
+                
                 {/* ESERCIZIO */}
                 <div className="col-span-8 md:col-span-4">
-                    <Form.Item
-                        {...restField}
-                        label={<span className="text-[10px] font-black uppercase italic opacity-50">Esercizio</span>}
-                        name={[name, 'exercise_id']}
-                        rules={[{ required: true, message: '!' }]}
-                        className="mb-0"
-                    >
-                        <Select
-                            showSearch
-                            placeholder="Seleziona esercizio"
-                            optionFilterProp="label"
-                            className="h-10 w-full"
-                            options={exercisesList?.map((ex: any) => ({ label: ex.name.toUpperCase(), value: ex.id }))}
-                        />
+                    <Form.Item {...restField} label={<span className="text-[10px] font-black uppercase italic opacity-60 dark:text-zinc-300">Esercizio</span>} name={[name, 'exercise_id']} rules={[{ required: true, message: '!' }]} className="mb-0">
+                        <ExercisePicker exercisesList={exercisesList} />
                     </Form.Item>
                 </div>
-
-                {/* DATI TECNICI (Sets, Reps, Kg, Rest) */}
+                
+                {/* METRICHE */}
                 <div className="col-span-11 md:col-span-5 grid grid-cols-4 gap-2">
                     <div>
                         <Form.Item {...restField} name={[name, 'sets']} label={<span className="text-[10px] font-black italic opacity-50 uppercase block text-center">Sets</span>} className="mb-0">
@@ -74,19 +57,26 @@ export function ExerciseRow({ field, remove, exercisesList }: any) {
                         </Form.Item>
                     </div>
                 </div>
-
-                {/* ELIMINA */}
-                <div className="col-span-1 md:col-span-1 flex justify-end">
-                    <Button 
-                        danger 
-                        type="text" 
-                        icon={<Trash2 size={18} />} 
-                        onClick={() => remove(name)} 
-                        className="hover:bg-red-500/10 h-10 w-10 flex items-center justify-center rounded-xl"
-                    />
+                
+                {/* BOTTONE ELIMINA (ORA ALLINEATO) */}
+                <div className="col-span-1 md:col-span-1">
+                    <Form.Item 
+                        label={<span className="text-[10px] font-black uppercase italic opacity-0 block">Del</span>} 
+                        className="mb-0"
+                    >
+                        <div className="flex justify-end">
+                            <Button 
+                                danger 
+                                type="text" 
+                                icon={<Trash2 size={18} />} 
+                                onClick={() => remove(name)} 
+                                className="hover:bg-red-500/10 h-10 w-10 flex items-center justify-center rounded-xl" 
+                            />
+                        </div>
+                    </Form.Item>
                 </div>
             </div>
-            {/* Campo nascosto per mantenere il riferimento alla settimana nel payload */}
+            
             <Form.Item {...restField} name={[name, 'week_number']} noStyle>
                 <input type="hidden" />
             </Form.Item>
