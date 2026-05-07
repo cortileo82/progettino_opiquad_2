@@ -41,8 +41,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 // Estrae un array piatto con tutti i permessi dell'utente
                 'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : [],
-                 
-                'is_premium' => (bool) $request->user()->is_premium,
+                
                 // Prende il nome del primo ruolo dell'utente, utile solo per label visive
                 'role' => $request->user() ? $request->user()->roles->first()?->name : null,
             ],

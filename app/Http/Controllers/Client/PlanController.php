@@ -15,20 +15,20 @@ class PlanController extends Controller
     {
         $user = $request->user();
         
-        // 1. Costruiamo la query di base (Eager Loading dinamico)
+        // 1. Si costruisce la query di base (Eager Loading dinamico)
         $query = Plan::with(['trainer:id,name'])
             ->where('user_id', $user->id)
             ->where('is_active', true)
             ->latest();
 
-        // 2. Se l'utente è PRO, uniamo subito gli esercizi alla query (Mimiamo il codice originale)
+        // 2. Se l'utente è PRO, si uniscono subito gli esercizi alla query
         if ($user->is_premium) {
             $query->with('exercises');
         }
 
         $plan = $query->first();
 
-        // 3. Se NON è premium, ma la scheda singola è pagata, la carichiamo ora (Lazy Loading sicuro)
+        // 3. Se l'utente non è pro, ma la scheda singola è pagata, la si carica ora (Lazy Loading sicuro)
         if ($plan && !$user->is_premium && $plan->is_paid) {
             $plan->load('exercises');
         }
@@ -48,16 +48,16 @@ class PlanController extends Controller
             ->where('is_active', false)
             ->latest();
 
-        // 2. Se l'utente è PRO, carichiamo TUTTO subito (Eager Loading ottimizzato)
-        // In questo modo riceverà la proprietà "weeks" e il frontend gli permetterà l'espansione
+        // 2. Se l'utente è PRO, si carcia tutto subito (Eager Loading ottimizzato)
+        //    In tale modo riceverà la proprietà "weeks" e il frontend gli permetterà l'espansione
         if ($user->is_premium) {
             $query->with('exercises');
         }
 
         $pastPlans = $query->paginate(10);
 
-        // 3. Se l'utente NON è PRO, dobbiamo controllare scheda per scheda.
-        // Lazy-loading condizionale: carichiamo gli esercizi SOLO per le vecchie schede che aveva pagato.
+        // 3. Se l'utente non è pro, si controlla scheda per scheda.
+        //    Lazy-loading condizionale: carichiamo gli esercizi solo per le vecchie schede che aveva pagato.
         if (!$user->is_premium) {
             $pastPlans->getCollection()->transform(function ($plan) {
                 if ($plan->is_paid) {
@@ -78,10 +78,10 @@ class PlanController extends Controller
         Gate::authorize('view', $plan);
         $user = auth()->user();
 
-        // ARCHITETTURA: Definiamo un array di relazioni dinamico per fare un singolo "load"
+        // Si definisce un array di relazioni dinamico per fare un singolo "load"
         $relations = ['trainer:id,name'];
 
-        // Se l'utente ha diritto, accodiamo gli esercizi all'array
+        // Se l'utente ha diritto, si accodano gli esercizi all'array
         if ($user->is_premium || $plan->is_paid) {
             $relations[] = 'exercises';
         }
