@@ -31,11 +31,11 @@ export default function Success() {
                     </div>
 
                     <h2 className="text-4xl font-black italic uppercase text-zinc-900 mb-4 tracking-tighter text-center">
-                        Accesso Pro Sbloccato
+                        Funzionalità Sbloccata
                     </h2>
                     
                     <p className="text-zinc-500 mb-12 text-center max-w-md font-medium italic px-6 leading-relaxed">
-                        Transazione completata con successo. Tutte le funzionalità premium e i tuoi piani di allenamento personalizzati sono ora disponibili nella tua area riservata.
+                        Transazione completata con successo.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full px-6 justify-center">

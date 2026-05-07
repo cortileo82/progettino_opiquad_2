@@ -7,7 +7,7 @@ import { PlanPaywall } from '@/components/custom/plan-paywall';
 import { ClipboardList, Dumbbell } from 'lucide-react';
 
 interface Props {
-    plan: any | null; 
+    plan: any | null;
 }
 
 export default function MyPlan({ plan }: Props) {
@@ -32,30 +32,32 @@ export default function MyPlan({ plan }: Props) {
             <Head title={`Scheda: ${plan.name}`} />
             
             <div className="p-4 md:p-10 max-w-7xl mx-auto w-full space-y-8">
-                {/* Header con componente, isPremium visualizza l'icona solo se l'utente è premium */}
-                <HeaderNew title={plan.name} subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} icon={ClipboardList} isPremium={auth.user.is_premium}/>
-
+                <HeaderNew 
+                    title={plan.name} 
+                    subtitle={`Coach: ${plan.trainer?.toUpperCase()} • Iniziata: ${plan.start_date}`} 
+                    icon={ClipboardList} 
+                    isPremium={auth.user.is_premium} 
+                />
+                
                 <div className="grid grid-cols-1">
                     {!hasAccess ? (
                         <div className="relative min-h-[600px]">
+                            {/* REFACTORING: Iniettato planId nel Paywall */}
                             <div className="z-30 relative w-full flex justify-center py-10">
-                                {/* Il Paywall visualizza gli esercizi solo se l'utente è premium o ha comprato la scheda */}
-                                <PlanPaywall isSticky={true} />
+                                <PlanPaywall isSticky={true} planId={plan.id} />
                             </div>
-
+                            
                             <div className="absolute inset-0 w-full h-full blur-3xl opacity-20 pointer-events-none select-none overflow-hidden rounded-[40px]">
                                 <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
                             </div>
                         </div>
                     ) : (
-                        /* Visualizzazione standard per utenti con accesso */
                         <div className="w-full">
                             <PlanViewer weeks={plan.weeks} totalWeeks={plan.total_weeks} />
                         </div>
                     )}
                 </div>
                 
-                {/* Padding finale invece di altezza fissa per pulizia layout */}
                 <div className="pb-20" />
             </div>
         </AppLayout>

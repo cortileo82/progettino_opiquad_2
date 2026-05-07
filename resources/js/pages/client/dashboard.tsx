@@ -53,7 +53,7 @@ export default function Dashboard({ assignedTrainer, activePlan }: Props) {
                                     <div className="relative">
                                         {/* Il Paywall visualizza gli esercizi se il cliente è primium o ha comprato la scheda. */}
                                         <div className="z-30 relative w-full flex justify-center py-4">
-                                            <PlanPaywall isSticky={false} />
+                                            <PlanPaywall isSticky={false} planId={activePlan.id} />
                                         </div>
 
                                         {/* Il contenuto dietro è posizionato in modo da non influenzare lo scroll */}

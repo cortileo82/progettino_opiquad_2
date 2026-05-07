@@ -11,58 +11,60 @@ use App\Enums\Billing\StripeMode;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
 use Illuminate\Support\Facades\Log;
+use Stripe\Checkout\Session as StripeSession;
 
 class WebhookController extends Controller
 {
     /**
-     * Metodo che riceve la chiamata da Stripe
+     * Metodo principale che riceve la chiamata da Stripe
      */
-    public function handle(Request $request) {
-
-        // --- Sicurezza ----
-
-        // Non si utilizza $request->all() perché serve il formato grezzo della stringa JSON per la crittografia.
+    public function handle(Request $request) 
+    {
+        // --- 1. Sicurezza e Validazione Firma ----
         $payload = $request->getContent(); 
         $sigHeader = $request->header('Stripe-Signature');
         $endpointSecret = config('services.stripe.webhook_secret');
 
         try {
-            // L'SDK di Stripe ricalcola l'hash.
-            // Se la firma non combacia, allora si lancia un'eccezione e si passa al blocco "catch"
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
         } catch(\UnexpectedValueException | SignatureVerificationException $e) {
-            // Potrebbe essere che qualcuno abbia mandato un JSON finto
-            // Lo si blocca e si restituisce errore 404
-            Log::warning('Webhook Stripe try failed: signature not valid.');
-            return response()->json(['error' => 'Signature not valid'], 400);
+            Log::error('Stripe Webhook Error: Signature non valida o payload corrotto.', [
+                'message' => $e->getMessage()
+            ]);
+            return response()->json(['error' => 'Invalid signature'], 400);
         }
 
-        // ---- Routing ----
-
-        // Poiché Stripe invia diversi tipi di eventi (rimborsi, dispute, ...), allora si filtrano solo i pagamenti completati.
-        if($event->type === StripeEvent::CheckoutCompleted->value) {
-            // Si recupera l'oggetto "Sessione" creato in CheckoutController
+        // ---- 2. Routing degli Eventi ----
+        // Gestiamo il completamento della sessione di checkout
+        if ($event->type === StripeEvent::CheckoutCompleted->value) {
+            
             $session = $event->data->object;
+            
+            Log::info("Stripe Webhook ricevuto: {$event->type}", ['session_id' => $session->id]);
 
-            // A seconda della proprietà "mode" si smista il lavoro a metodi privati
-            if($session->mode === StripeMode::Subscription->value) {
+            // Smistamento in base alla modalità (Abbonamento o Pagamento Singolo)
+            if ($session->mode === StripeMode::Subscription->value) {
                 $this->handleSubscription($session);
-            } elseif($session->mode === StripeMode::Payment->value) {
+            } elseif ($session->mode === StripeMode::Payment->value) {
                 $this->handleOneOffPayment($session);
             }
         }
 
-        // ---- Acknowledgment ----
-
+        // ---- 3. Risposta a Stripe ----
+        // Restituiamo sempre 200 per confermare la ricezione, altrimenti Stripe continuerà a riprovare
         return response()->json(['status' => 'success']);
-
     }
 
-    private function handleSubscription($session) {
-        // Stripe resituisce l'ID dell'utente che ha pagato (ID del DB di Tempra passato da CheckoutController)
-        $user = User::find($session->client_reference_id);
+    /**
+     * Gestisce lo sblocco dell'abbonamento Premium
+     */
+    private function handleSubscription(StripeSession $session) 
+    {
+        // client_reference_id deve essere passato durante la creazione della sessione nel CheckoutController
+        $userId = $session->client_reference_id;
+        $user = User::find($userId);
 
-        if($user) {
+        if ($user) {
             $user->update([
                 'is_premium' => true,
                 // Si salva l'ID del cliente usato da Stripe per future reference (Es.: per annullare l'abbonamento) (Foreign Key Virtuale)
@@ -73,23 +75,26 @@ class WebhookController extends Controller
         }
     }
 
-    private function handleOneOffPayment($request) {
+    private function handleOneOffPayment(StripeSession $session) {
         // Si recupera l'ID della scheda da comprare dai metadati che si erano "nascosti" 
         // nell'oggetto "Sessione" in CheckoutController
         $planId = $session->metadata->plan_id ?? null;
 
-        if($planId) {
+        if ($planId) {
             $plan = Plan::find($planId);
 
-            if($plan) {
+            if ($plan) {
                 $plan->update([
                     'is_paid' => true,
-                    // Si salva l'ID della transazione Stripe per eventuali rimborsi
                     'stripe_payment_intent' => $session->payment_intent,
                 ]);
 
-                Log::info("Webhook: la scheda con ID {$plan->id} è stata sbloccata.");
+                Log::info("Webhook: Piano ID {$plan->id} sbloccato correttamente.");
+            } else {
+                Log::warning("Webhook Warning: Pagamento ricevuto per Piano ID {$planId} ma il piano non esiste nel DB.");
             }
+        } else {
+            Log::warning("Webhook Warning: Pagamento One-off ricevuto senza plan_id nei metadata.");
         }
     }
 }
