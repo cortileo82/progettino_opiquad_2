@@ -20,6 +20,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             
             'auth' => [
+                // Prova
                 // Lazy Evaluation (fn() =>)
                 // Il server calcola questi dati solo un millisecondo prima di inviare il JSON.
                 'user' => fn () => $request->user() ? [
