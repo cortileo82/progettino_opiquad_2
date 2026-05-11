@@ -7,47 +7,39 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
         return [
             ...parent::share($request),
+            
             'auth' => [
-                'user' => $request->user(),
-                // Estrae un array piatto con tutti i permessi dell'utente
-                'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : [],
-                
-                // Prende il nome del primo ruolo dell'utente, utile solo per label visive
-                'role' => $request->user() ? $request->user()->roles->first()?->name : null,
+                // Lazy Evaluation (fn() =>)
+                // Il server calcola questi dati solo un millisecondo prima di inviare il JSON.
+                'user' => fn () => $request->user() ? [
+                    // DTO (Data Transfer Object)
+                    // Si seleziona chirurgicamente solo i dati sicuri.
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'is_premium' => $request->user()->is_premium,
+                    
+                    // Incapsulamento
+                    // Ruoli e permessi vivono DENTRO l'oggetto user.
+                    'role' => $request->user()->roles->first()?->name,
+                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                ] : null,
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-
-            // Messaggi specifici, di successo e di errore passati al frontend.
+            
+            // Lazy Evaluation anche per la lettura dei cookie
+            'sidebarOpen' => fn () => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
