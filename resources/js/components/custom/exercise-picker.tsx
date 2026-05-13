@@ -37,7 +37,6 @@ export function ExercisePicker({ value, onChange, exercisesList }: ExercisePicke
     return (
         <>
             <Select
-                // Usiamo "value" per far capire ad Ant Design che siamo controllati
                 value={value}
                 placeholder="Seleziona..."
                 className="w-full"
@@ -46,10 +45,9 @@ export function ExercisePicker({ value, onChange, exercisesList }: ExercisePicke
                     e.preventDefault();
                     setIsOpen(true);
                 }}
-                // Importante: Ant Design Select ha bisogno dell'opzione nell'array per visualizzarla
+                // Ant Design Select ha bisogno dell'opzione nell'array per visualizzarla
                 options={selectedExercise ? [{ label: selectedExercise.name, value: selectedExercise.id }] : []}
                 suffixIcon={<ChevronRight size={14} className="text-muted-foreground/40" />}
-                // Forza la visualizzazione anche se la lista opzioni è quasi vuota
                 optionLabelProp="label"
             />
 
@@ -63,7 +61,7 @@ export function ExercisePicker({ value, onChange, exercisesList }: ExercisePicke
                 placement="right" 
                 onClose={() => setIsOpen(false)} 
                 open={isOpen} 
-                width={400} // Sostituisci con size="large" se vuoi togliere il warning
+                width={400} // Altirmento si può utilizzare size="large"
                 styles={{ body: { padding: 0 } }}
             >
                 <div className="p-4 border-b border-sidebar-border sticky top-0 bg-background/95 backdrop-blur-sm z-10">

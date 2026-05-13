@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Exercise;
 use App\Models\Plan;
@@ -53,15 +54,19 @@ class DatabaseSeeder extends Seeder
 
         $ptRole = Role::firstOrCreate(['name' => User::ROLE_PT ?? 'pt']);
         $ptRole->syncPermissions([
-            'exercises:read', 'muscle-groups:read',
-            'users:read:own', 'users:update:own', 'users:take-free-client',
-            'plans:create', 'plans:read:own', 'plans:update:own', 'plans:delete:own',
+            'exercises:read',
+            'muscle-groups:read',
+            'users:read:own',
+            'users:update:own',
+            'users:take-free-client',
+            'plans:create',
+            'plans:read:own',
+            'plans:update:own',
+            'plans:delete:own',
         ]);
 
         $clientRole = Role::firstOrCreate(['name' => User::ROLE_CLIENT ?? 'client']);
-        $clientRole->syncPermissions([
-            'users:read:own', 'plans:read:own',
-        ]);
+        $clientRole->syncPermissions(['users:read:own', 'plans:read:own']);
     }
 
     private function seedUsers(): void
@@ -88,13 +93,24 @@ class DatabaseSeeder extends Seeder
 
         $client1 = User::firstOrCreate(
             ['email' => 'luca@tempra.com'],
-            ['name' => 'Cliente Luca', 'password' => $defaultPassword, 'trainer_id' => $pt1->id]
+            [
+                'name' => 'Cliente Luca',
+                'password' => $defaultPassword,
+                'trainer_id' => $pt1->id,
+                'is_premium' => false
+            ]
         );
         $client1->assignRole(User::ROLE_CLIENT ?? 'client');
 
         $client2 = User::firstOrCreate(
             ['email' => 'sara@tempra.com'],
-            ['name' => 'Cliente Sara', 'password' => $defaultPassword, 'trainer_id' => $pt2->id]
+            [
+                'name' => 'Cliente Sara',
+                'password' => $defaultPassword,
+                'trainer_id' => $pt2->id,
+                'is_premium' => true,
+                'stripe_id' => 'cus_test_seeder_123'
+            ]
         );
         $client2->assignRole(User::ROLE_CLIENT ?? 'client');
     }
@@ -102,8 +118,8 @@ class DatabaseSeeder extends Seeder
     private function seedCatalog(): void
     {
         $muscleGroupsList = [
-            'Alti Pettorali', 'Pettorali', 'Schiena Alta', 'Laterali', 'Schiena Bassa', 
-            'Quadricipiti', 'Bicipiti Femorali', 'Deltoidi Anteriori', 'Deltoidi Laterali', 
+            'Alti Pettorali', 'Pettorali', 'Schiena Alta', 'Laterali', 'Schiena Bassa',
+            'Quadricipiti', 'Bicipiti Femorali', 'Deltoidi Anteriori', 'Deltoidi Laterali',
             'Deltoidi Posteriori', 'Bicipiti', 'Tricipiti', 'Addome', 'Cardio', 'Collo'
         ];
 
@@ -132,79 +148,119 @@ class DatabaseSeeder extends Seeder
 
     private function seedPlans(): void
     {
-        $client1 = User::where('email', 'luca@tempra.com')->first();
-        $client2 = User::where('email', 'sara@tempra.com')->first();
+        $luca = User::where('email', 'luca@tempra.com')->first();
+        $sara = User::where('email', 'sara@tempra.com')->first();
+        $allExercises = Exercise::all();
+
+        // 1. LA SCHEDA ENORME DI LUCA (Programma Titan: 12 settimane, 6 giorni a settimana)
+        $this->createTitanPlan($luca, $allExercises);
+
+        // 2. UNA SCHEDA VECCHIA DA SBLOCCARE PER LUCA (Storico Paywall Testing)
+        $this->createLockedHistoryPlan($luca, $allExercises);
+
+        // 3. UNA SCHEDA STANDARD PER SARA (Premium User)
+        $this->createStandardPlan($sara, $allExercises);
+    }
+
+    /**
+     * ARCHITETTURA: Metodo dedicato alla generazione intensiva.
+     * Genera una scheda di 12 settimane, 6 giorni su 7, con 6 esercizi al giorno (432 record pivot in totale).
+     * Utilizza DB::transaction per garantire l'atomicità ed evitare colli di bottiglia nelle query.
+     */
+    private function createTitanPlan(User $client, $allExercises): void
+    {
+        $plan = Plan::firstOrCreate(
+            ['name' => 'Programma Titan (Volume Estremo)', 'user_id' => $client->id],
+            ['pt_id' => $client->trainer_id, 'num_weeks' => 12, 'is_active' => true, 'is_paid' => true]
+        );
         
-        // Estraiamo dal database una selezione di esercizi per creare le routine
-        $panca    = Exercise::where('name', 'Panca Piana')->first();
-        $french   = Exercise::where('name', 'French Press')->first();
-        $squat    = Exercise::where('name', 'Squat')->first();
-        $legCurl  = Exercise::where('name', 'Leg Curl')->first();
-        $trazioni = Exercise::where('name', 'Trazioni')->first();
-        $curl     = Exercise::where('name', 'Curl Bicipiti')->first();
+        $plan->exercises()->detach();
+        $days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
 
-        // Entrambe le schede ora sono di 4 settimane
-        $plan1 = Plan::firstOrCreate(
-            ['name' => 'Scheda Massa A', 'user_id' => $client1->id],
-            ['pt_id' => $client1->trainer_id, 'num_weeks' => 4, 'is_active' => true]
+        DB::transaction(function () use ($plan, $days, $allExercises) {
+            for ($week = 1; $week <= 12; $week++) {
+                // Aumento progressivo dei carichi ogni 4 settimane per simulare un mesociclo reale
+                $intensityMultiplier = 1 + (floor($week / 4) * 0.1); 
+
+                foreach ($days as $day) {
+                    // Selezioniamo 6 esercizi casuali dal catalogo per ogni giorno
+                    $dailyRoutine = $allExercises->random(6);
+
+                    foreach ($dailyRoutine as $ex) {
+                        $baseWeight = rand(10, 60);
+                        
+                        $plan->exercises()->attach($ex->id, [
+                            'week_number' => $week,
+                            'day_of_week' => $day,
+                            'sets'        => rand(3, 5),
+                            'reps'        => rand(6, 15),
+                            'rest_time'   => rand(45, 120),
+                            'weight_kg'   => round($baseWeight * $intensityMultiplier, 1)
+                        ]);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Genera una vecchia scheda non pagata per testare il Paywall nello storico.
+     */
+    private function createLockedHistoryPlan(User $client, $allExercises): void
+    {
+        $plan = Plan::firstOrCreate(
+            ['name' => 'Forza Pura (Archiviata)', 'user_id' => $client->id],
+            ['pt_id' => $client->trainer_id, 'num_weeks' => 4, 'is_active' => false, 'is_paid' => false]
         );
+        
+        $plan->exercises()->detach();
 
-        $plan2 = Plan::firstOrCreate(
-            ['name' => 'Definizione Invernale', 'user_id' => $client2->id],
-            ['pt_id' => $client2->trainer_id, 'num_weeks' => 4, 'is_active' => true]
-        );
-
-        // ARCHITETTURA: Puliamo la pivot prima di inserire. 
-        // Questo rende il seeder "Idempotente" aggirando il limite del sync() con ID duplicati.
-        $plan1->exercises()->detach();
-        $plan2->exercises()->detach();
-
-        $days = ['Lunedì', 'Mercoledì', 'Venerdì'];
-
-        // Strutturiamo la routine (2 esercizi al giorno)
-        $routine = [
-            'Lunedì' => [
-                ['ex' => $panca, 'sets' => 4, 'reps' => 8, 'rest' => 90, 'weight' => 60.5],
-                ['ex' => $french, 'sets' => 3, 'reps' => 10, 'rest' => 60, 'weight' => 22.5],
-            ],
-            'Mercoledì' => [
-                ['ex' => $squat, 'sets' => 5, 'reps' => 5, 'rest' => 120, 'weight' => 80],
-                ['ex' => $legCurl, 'sets' => 3, 'reps' => 12, 'rest' => 60, 'weight' => 35],
-            ],
-            'Venerdì' => [
-                ['ex' => $trazioni, 'sets' => 4, 'reps' => 8, 'rest' => 90, 'weight' => 0], // A corpo libero
-                ['ex' => $curl, 'sets' => 3, 'reps' => 12, 'rest' => 60, 'weight' => 14],
-            ]
-        ];
-
-        // Popolamento massivo: 4 settimane x 3 giorni x 2 esercizi = 24 righe per scheda
-        for ($week = 1; $week <= 4; $week++) {
-            foreach ($days as $day) {
-                foreach ($routine[$day] as $workout) {
-                    
-                    // Inserimento Scheda 1 (Massa)
-                    $plan1->exercises()->attach($workout['ex']->id, [
-                        'week_number' => $week,
+        DB::transaction(function () use ($plan, $allExercises) {
+            // Solo due giorni per questa scheda bloccata (Full Body)
+            foreach (['Lunedì', 'Giovedì'] as $day) {
+                $exercises = $allExercises->random(4);
+                foreach ($exercises as $ex) {
+                    $plan->exercises()->attach($ex->id, [
+                        'week_number' => 1,
                         'day_of_week' => $day,
-                        'sets'        => $workout['sets'],
-                        'reps'        => $workout['reps'],
-                        'rest_time'   => $workout['rest'],
-                        'weight_kg'   => $workout['weight']
-                    ]);
-
-                    // Inserimento Scheda 2 (Definizione)
-                    // Variamo dinamicamente i dati per non avere schede identiche:
-                    // Abbassiamo i recuperi, togliamo 10kg e aumentiamo le reps
-                    $plan2->exercises()->attach($workout['ex']->id, [
-                        'week_number' => $week,
-                        'day_of_week' => $day,
-                        'sets'        => $workout['sets'],
-                        'reps'        => $workout['reps'] + 4,
-                        'rest_time'   => 45,
-                        'weight_kg'   => max(0, $workout['weight'] - 10) 
+                        'sets'        => 5,
+                        'reps'        => 5,
+                        'rest_time'   => 120,
+                        'weight_kg'   => 80
                     ]);
                 }
             }
-        }
+        });
+    }
+
+    /**
+     * Genera la routine standard per Sara (Utente PRO)
+     */
+    private function createStandardPlan(User $client, $allExercises): void
+    {
+        $plan = Plan::firstOrCreate(
+            ['name' => 'Definizione Invernale PRO', 'user_id' => $client->id],
+            ['pt_id' => $client->trainer_id, 'num_weeks' => 4, 'is_active' => true, 'is_paid' => true]
+        );
+        
+        $plan->exercises()->detach();
+
+        DB::transaction(function () use ($plan, $allExercises) {
+            foreach (['Lunedì', 'Mercoledì', 'Venerdì'] as $day) {
+                $exercises = $allExercises->random(4);
+                for ($week = 1; $week <= 4; $week++) {
+                    foreach ($exercises as $ex) {
+                        $plan->exercises()->attach($ex->id, [
+                            'week_number' => $week,
+                            'day_of_week' => $day,
+                            'sets'        => 3,
+                            'reps'        => 12,
+                            'rest_time'   => 60,
+                            'weight_kg'   => rand(10, 30)
+                        ]);
+                    }
+                }
+            }
+        });
     }
 }

@@ -60,7 +60,7 @@ class MuscleGroupController extends Controller
     {
         Gate::authorize('delete', $muscleGroup);
 
-        // PROTEZIONE INTEGRITÀ REFERENZIALE
+        // Protezione integrità referenziale
         if ($muscleGroup->exercises()->exists()) {
             return redirect('/admin/muscle-groups')->with('error', 'Non è possibile eliminare il gruppo muscolare perchè sono asscoiati esercizi.');
         }
