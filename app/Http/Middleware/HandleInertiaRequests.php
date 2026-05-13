@@ -38,7 +38,6 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                // Prova
                 'user' => $request->user(),
                 // Estrae un array piatto con tutti i permessi dell'utente
                 'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : [],
