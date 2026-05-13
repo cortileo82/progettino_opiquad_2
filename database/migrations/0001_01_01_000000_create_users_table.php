@@ -18,6 +18,11 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
+            // google_id deve essere unico, ma nullable (chi usa email/pwd non lo avrà)
+            $table->string('google_id')->nullable()->unique()->after('email');
+            // Opzionale: per salvare la foto profilo di Google
+            // $table->string('avatar')->nullable()->after('password');
+
             $table->string('stripe_id')->nullable()->unique()->after('id');     // nullable() perché quando un utente si registra non ha ancora pagato nulla
             $table->boolean('is_premium')->default(false)->after('stripe_id');  // unique() perché due utenti non possono avere lo stesso account Stripe
 
