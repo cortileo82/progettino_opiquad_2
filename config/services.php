@@ -35,18 +35,16 @@ return [
         ],
     ],
 
-    //Stripe per il pagamento dell'account Pro e acquiasto schede
-    'stripe' => [
-        'secret' => env('STRIPE_SECRET'),
-        'price_id_pro' => env('STRIPE_PRICE_ID_PRO'),
-        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
-    ],
-
-    //Google per il Single sign-on (accesso all'app con l'account Google)
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'price_id_pro' => env('STRIPE_PRICE_ID_PRO'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
 ];

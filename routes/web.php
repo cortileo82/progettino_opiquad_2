@@ -5,26 +5,40 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 
-// Controllers
+// Controller Generici
+use App\Http\Controllers\Billing\CheckoutController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+
+// Controller Admin
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\ExerciseController;
 use App\Http\Controllers\Admin\MuscleGroupController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
+
+// Controller PT
 use App\Http\Controllers\PT\DashboardController as PTDashboard;
 use App\Http\Controllers\PT\ManageClientsController;
 use App\Http\Controllers\PT\ClientAssignmentController;
 use App\Http\Controllers\PT\PlanController as PTPlanController;
 use App\Http\Controllers\PT\ShowClientPlansController;
 use App\Http\Controllers\PT\ExerciseCatalogController;
+
+// Controller Client
 use App\Http\Controllers\Client\DashboardController as ClientDashboard;
 use App\Http\Controllers\Client\PlanController as ClientPlanController;
-use App\Http\Controllers\Billing\CheckoutController;
 
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
+// Gruppo Guest per chi non è loggato
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
+});
+
+// Gruppo Auth per chi è loggato
 Route::middleware(['auth', 'verified'])->group(function () {
     
     // 1. MOTORE DI SMISTAMENTO
